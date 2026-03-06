@@ -1,149 +1,154 @@
 <svelte:head>
-	<title>AppTemplate — Google login & Stripe payments, ready to go</title>
+	<title>Flip — The puzzle game that flips everything</title>
 </svelte:head>
 
-<!-- Nav -->
-<header class="sticky top-0 z-10 border-b border-gray-100 bg-white/80 backdrop-blur">
+<header class="fixed top-0 inset-x-0 z-10 border-b border-gray-100 bg-white">
 	<div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
-		<a href="/" class="text-lg font-bold tracking-tight text-gray-900">AppTemplate</a>
+		<Logo href="/" />
 		<nav class="flex items-center gap-4">
-			<a href="/pricing" class="text-sm text-gray-500 hover:text-gray-900 transition-colors">
-				Pricing
-			</a>
-			<a
-				href="/auth/login"
-				class="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-700"
-			>
-				Get started
-			</a>
+			{#if !data.user}
+				<Button href="/auth/login" variant="primary">Sign in</Button>
+			{/if}
 		</nav>
 	</div>
 </header>
 
-<!-- Hero -->
-<main>
-	<section class="mx-auto max-w-5xl px-4 pb-24 pt-20 text-center">
-		<span
-			class="inline-flex items-center rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700"
-		>
-			Proof of concept · Google Auth + Stripe
-		</span>
-
-		<h1 class="mt-6 text-5xl font-extrabold tracking-tight text-gray-900 sm:text-6xl">
-			Ship with auth and<br />payments already done
-		</h1>
-		<p class="mx-auto mt-6 max-w-xl text-lg text-gray-500">
-			A SvelteKit starter wired up with Google sign-in via Better Auth and subscription billing via
-			Stripe — so you can focus on your actual product.
-		</p>
-
-		<div class="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-			<a
-				href="/auth/login"
-				class="rounded-lg bg-gray-900 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-gray-700"
-			>
-				Get started free
-			</a>
-			<a
-				href="/pricing"
-				class="rounded-lg border border-gray-300 px-6 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50"
-			>
-				View pricing
-			</a>
-		</div>
-	</section>
-
-	<!-- Features -->
-	<section class="border-t border-gray-100 bg-gray-50 py-20">
-		<div class="mx-auto max-w-5xl px-4">
-			<h2 class="text-center text-2xl font-bold tracking-tight text-gray-900">
-				Everything you need to get started
-			</h2>
-			<p class="mt-3 text-center text-gray-500">
-				The boring infrastructure is already built — jump straight to your idea.
+<!-- Hero / dashboard cards -->
+<main class="pt-16">
+	<section class="mx-auto max-w-3xl px-4 pb-16 pt-14 space-y-6 sm:pt-20">
+		<!-- Today's puzzle card -->
+		<Card class="text-center">
+			<h1 class="text-lg font-semibold tracking-tight text-gray-900 sm:text-xl">
+				Today's puzzle
+			</h1>
+			<p class="mt-1 text-sm text-gray-500">
+				One new puzzle every day. Free, no account needed.
 			</p>
 
-			<div class="mt-12 grid gap-6 sm:grid-cols-3">
-				<div class="rounded-2xl bg-white p-6 shadow-sm">
-					<div
-						class="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-100"
-					>
-						<svg class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M15 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-						</svg>
-					</div>
-					<h3 class="font-semibold text-gray-900">Google sign-in</h3>
-					<p class="mt-2 text-sm text-gray-500">
-						One-click OAuth via Better Auth. Sessions are stored in your Postgres DB with Drizzle ORM — no magic, full control.
-					</p>
-				</div>
-
-				<div class="rounded-2xl bg-white p-6 shadow-sm">
-					<div
-						class="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-green-100"
-					>
-						<svg class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-						</svg>
-					</div>
-					<h3 class="font-semibold text-gray-900">Stripe subscriptions</h3>
-					<p class="mt-2 text-sm text-gray-500">
-						Hosted Stripe Checkout handles PCI compliance. Webhooks update your DB automatically when payments succeed or fail.
-					</p>
-				</div>
-
-				<div class="rounded-2xl bg-white p-6 shadow-sm">
-					<div
-						class="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-purple-100"
-					>
-						<svg class="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-						</svg>
-					</div>
-					<h3 class="font-semibold text-gray-900">Protected routes</h3>
-					<p class="mt-2 text-sm text-gray-500">
-						A server hook guards every private page. Unauthenticated requests are redirected to login — no extra wiring required.
-					</p>
+			<div class="mt-4 mx-auto w-fit rounded-xl bg-gray-100 p-3">
+				<div
+					class="grid gap-0.5"
+					style={`grid-template-columns: repeat(${
+					  (data.daily ? data.daily.config.startState : defaultPreview)[0].length
+					}, minmax(0, 1fr));`}
+				>
+					{#each (data.daily ? data.daily.config.startState : defaultPreview) as row}
+						{#each row as cell}
+							<div
+								class="h-4 w-4 rounded-[4px] sm:h-5 sm:w-5"
+								class:bg-white={cell === 1}
+								class:bg-gray-900={cell === 0}
+							></div>
+						{/each}
+					{/each}
 				</div>
 			</div>
-		</div>
+
+			<Button href="/daily" variant="primary" class="mt-4 rounded-full px-6">
+				Play daily puzzle
+			</Button>
+		</Card>
+
+		<!-- How it works card -->
+		<Card class="text-center">
+			<h2 class="text-lg font-semibold tracking-tight text-gray-900 sm:text-xl">How it works</h2>
+			<p class="mt-1 text-sm text-gray-500">
+				Learn the basics in a short interactive tutorial, then come back here to play.
+			</p>
+			<Button href="/tutorial" variant="primary" class="mt-4 rounded-full px-6">
+				Open tutorial
+			</Button>
+		</Card>
 	</section>
 
-	<!-- Pricing teaser -->
-	<section class="py-20">
-		<div class="mx-auto max-w-sm px-4 text-center">
-			<h2 class="text-2xl font-bold tracking-tight text-gray-900">One simple plan</h2>
-			<p class="mt-3 text-gray-500">Everything included, no surprises.</p>
-
-			<div class="mt-8 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-				<p class="text-4xl font-extrabold text-gray-900">
-					$10
-					<span class="text-lg font-medium text-gray-400">/ mo</span>
-				</p>
-				<ul class="mt-6 space-y-2 text-sm text-gray-600 text-left">
-					{#each ['Full access to all features', 'Priority support', 'Cancel anytime'] as feature}
-						<li class="flex items-center gap-2">
-							<svg class="h-4 w-4 shrink-0 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-							</svg>
-							{feature}
-						</li>
-					{/each}
-				</ul>
+	<!-- Packs teaser -->
+	<section class="mx-auto max-w-3xl px-4 pb-16 space-y-6">
+		<Card class="text-center">
+			<h2 class="text-lg font-semibold tracking-tight text-gray-900 sm:text-xl">Puzzle packs</h2>
+			<p class="mt-1 text-sm text-gray-500">Start free, unlock more when you're ready. Click a pack to see its puzzles.</p>
+			<div class="mt-6 grid gap-4 sm:grid-cols-2 text-left">
 				<a
-					href="/auth/login"
-					class="mt-8 block w-full rounded-lg bg-gray-900 px-4 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-gray-700"
+					href="/play/puzzles?pack=intro-pack"
+					class="block rounded-2xl border border-gray-200 bg-white p-6 shadow-sm text-left transition-shadow hover:shadow-md hover:border-gray-300"
 				>
-					Get started
+					<span class="inline-block rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 mb-3">Free</span>
+					<h3 class="font-semibold text-gray-900">Intro Pack</h3>
+					<p class="mt-1 text-sm text-gray-500">10 puzzles · Perfect for getting started</p>
+					<p class="mt-3 text-xs font-medium text-indigo-600">View puzzles →</p>
+				</a>
+				<a
+					href="/play"
+					class="block rounded-2xl border border-gray-200 bg-white p-6 shadow-sm text-left transition-shadow hover:shadow-md hover:border-gray-300"
+				>
+					<span class="inline-block rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700 mb-3">Paid</span>
+					<h3 class="font-semibold text-gray-900">Hard in 3</h3>
+					<p class="mt-1 text-sm text-gray-500">Challenging puzzles · Only solvable in exactly 3 moves</p>
+					<p class="mt-3 text-xs font-medium text-indigo-600">Browse all packs →</p>
 				</a>
 			</div>
-		</div>
+			<a href="/play" class="mt-6 inline-block text-sm text-indigo-600 hover:text-indigo-800 font-medium">
+				Browse all packs →
+			</a>
+		</Card>
+
+		{#if !data.user}
+				<Card dashed class="mt-10 text-center">
+					<p class="text-sm font-semibold text-gray-900">Sign in to track your progress</p>
+					<p class="mt-1 text-sm text-gray-500">
+						We’ll remember which puzzles and packs you’ve completed, and keep your streaks in sync across devices.
+					</p>
+					<Button href="/auth/login" variant="primary" class="mt-4">
+						Sign in to save progress
+					</Button>
+				</Card>
+			{:else}
+				<Card dashed class="mt-10 text-center">
+					<p class="text-sm font-semibold text-gray-900">Progress is being tracked</p>
+					<p class="mt-1 text-sm text-gray-500">
+						You're signed in as <span class="font-medium text-gray-900">{data.user.email}</span>. Your completed puzzles and packs are saved.
+					</p>
+					<div class="mt-4 flex items-center justify-center gap-3">
+						<Button href="/settings" variant="secondary">
+							Account &amp; settings
+						</Button>
+						<Button variant="primary" disabled={isSigningOut} onclick={signOut}>
+							{isSigningOut ? 'Signing out…' : 'Sign out'}
+						</Button>
+					</div>
+				</Card>
+			{/if}
 	</section>
 </main>
 
-<!-- Footer -->
 <footer class="border-t border-gray-100 py-8">
 	<div class="mx-auto max-w-5xl px-4 text-center text-sm text-gray-400">
-		&copy; {new Date().getFullYear()} AppTemplate. Built with SvelteKit, Better Auth &amp; Stripe.
+		&copy; {new Date().getFullYear()} Flip. A puzzle game.
 	</div>
 </footer>
+
+<script lang="ts">
+	import { authClient } from '$lib/auth-client';
+	import { goto } from '$app/navigation';
+	import Logo from '$lib/components/Logo.svelte';
+	import Card from '$lib/components/Card.svelte';
+	import Button from '$lib/components/Button.svelte';
+	import type { PageData } from './$types';
+
+	let { data }: { data: PageData } = $props();
+
+	let isSigningOut = $state(false);
+
+	async function signOut() {
+	  isSigningOut = true;
+	  await authClient.signOut();
+	  goto('/');
+	}
+
+	const defaultPreview: number[][] = [
+	  [1, 1, 1, 1, 1],
+	  [1, 0, 0, 0, 1],
+	  [1, 0, 1, 0, 1],
+	  [1, 0, 0, 0, 1],
+	  [1, 1, 1, 1, 1]
+	];
+</script>

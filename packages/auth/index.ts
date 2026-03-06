@@ -1,7 +1,7 @@
 import { betterAuth } from 'better-auth';
 import { organization } from 'better-auth/plugins';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { db } from '@boilerplate/db';
+import { db } from '@flip/db';
 
 export const auth = betterAuth({
 	baseURL: process.env.BETTER_AUTH_URL,

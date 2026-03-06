@@ -1,13 +1,16 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { csrf } from 'hono/csrf';
 import { logger } from 'hono/logger';
-import { db } from '@boilerplate/db';
+import { db } from '@flip/db';
 import { sql } from 'drizzle-orm';
 import { prettyJSON } from 'hono/pretty-json';
 import { requestId } from 'hono/request-id';
 import { handleZodError, handleError } from '@lib/errors';
 import { Scalar } from '@scalar/hono-api-reference';
 import { stripeRoutes } from './stripe/stripe.routes';
+import { progressRoutes } from './progress/progress.routes';
+import { dailyRoutes } from './daily/daily.routes';
+import { packsRoutes } from './packs/packs.routes';
 
 export const app = new OpenAPIHono({
 	defaultHook: handleZodError
@@ -40,12 +43,12 @@ app.doc('/openapi.json', (c) => ({
 	openapi: '3.0.0',
 	info: {
 		version: '1.0.0',
-		title: 'Boilerplate API'
+		title: 'Flip API'
 	},
 	servers: [
 		{
 			url: new URL(c.req.url).origin,
-			description: 'Boilerplate API server'
+			description: 'Flip API server'
 		}
 	]
 }));
@@ -53,3 +56,6 @@ app.doc('/openapi.json', (c) => ({
 app.get('/reference', Scalar({ url: '/openapi.json', showDeveloperTools: 'never' }));
 
 app.route('/webhooks', stripeRoutes);
+app.route('/progress', progressRoutes);
+app.route('/daily', dailyRoutes);
+app.route('/packs', packsRoutes);

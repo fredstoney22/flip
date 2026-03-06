@@ -1,23 +1,13 @@
 <script lang="ts">
-	import { authClient } from '$lib/auth-client';
-	import { goto } from '$app/navigation';
 	import { enhance } from '$app/forms';
-	import AppNav from '$lib/components/AppNav.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 
-	let isSigningOut = $state(false);
 	let isConfirmingCancel = $state(false);
 	let isCanceling = $state(false);
 	let isConfirmingDelete = $state(false);
 	let isDeleting = $state(false);
-
-	async function signOut() {
-		isSigningOut = true;
-		await authClient.signOut();
-		goto('/auth/login');
-	}
 </script>
 
 <svelte:head>
@@ -25,25 +15,6 @@
 </svelte:head>
 
 <div class="min-h-screen bg-gray-50">
-	<AppNav email={data.user.email}>
-		{#if data.user.image}
-			<img
-				src={data.user.image}
-				alt={data.user.name}
-				referrerpolicy="no-referrer"
-				class="h-8 w-8 rounded-full object-cover"
-			/>
-		{/if}
-		<span class="text-sm text-gray-600">{data.user.name}</span>
-		<button
-			onclick={signOut}
-			disabled={isSigningOut}
-			class="rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
-		>
-			{isSigningOut ? 'Signing out…' : 'Sign out'}
-		</button>
-	</AppNav>
-
 	<main class="mx-auto max-w-5xl px-4 py-10">
 		<div class="rounded-2xl bg-white p-8 shadow-sm">
 			<h2 class="text-2xl font-bold text-gray-900">
@@ -62,139 +33,125 @@
 				</div>
 			</dl>
 
-			<!-- Subscription section -->
-			<div class="mt-6 border-t border-gray-100 pt-6">
-				<div class="flex items-center justify-between">
-					<div>
-						<p class="text-xs font-medium uppercase tracking-wide text-gray-400">Subscription</p>
+			<!-- Card grid: subscription + danger zone, mobile-friendly like Minute Cryptic tiles -->
+			<div class="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
+				<!-- Subscription card -->
+				<section class="flex flex-col justify-between rounded-2xl bg-gray-50 p-5 shadow-sm">
+					<div class="space-y-2 text-left">
+						<p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Subscription</p>
 						{#if data.subscription}
 							{#if data.subscription.cancelAtPeriodEnd}
-								<div class="mt-1 flex items-center gap-2">
-									<span class="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">
-										Canceling
-									</span>
-									<span class="text-sm text-gray-500">
-										Access until {new Date(data.subscription.currentPeriodEnd).toLocaleDateString()}
-									</span>
-								</div>
+								<p class="text-sm font-medium text-gray-900">Canceling at period end</p>
+								<p class="text-xs text-gray-500">
+									Access until {new Date(data.subscription.currentPeriodEnd).toLocaleDateString()}
+								</p>
 							{:else}
-								<div class="mt-1 flex items-center gap-2">
-									<span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-										Active
-									</span>
-									<span class="text-sm text-gray-500">
-										Renews {new Date(data.subscription.currentPeriodEnd).toLocaleDateString()}
-									</span>
-								</div>
+								<p class="text-sm font-medium text-gray-900">Pro active</p>
+								<p class="text-xs text-gray-500">
+									Renews {new Date(data.subscription.currentPeriodEnd).toLocaleDateString()}
+								</p>
 							{/if}
 						{:else}
-							<div class="mt-1 flex items-center gap-2">
-								<span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">
-									Free
-								</span>
-							</div>
+							<p class="text-sm font-medium text-gray-900">Free plan</p>
+							<p class="text-xs text-gray-500">Play the daily puzzle and intro pack.</p>
 						{/if}
 					</div>
 
-					<div class="flex items-center gap-3">
+					<div class="mt-4 flex flex-wrap items-center gap-3">
 						{#if !data.subscription}
 							<a
 								href="/pricing"
-								class="rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-gray-700"
+								class="inline-flex flex-1 items-center justify-center rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-gray-800 sm:flex-none"
 							>
-								Upgrade to Pro
+								View packs & pricing
 							</a>
 						{:else if !data.subscription.cancelAtPeriodEnd}
 							{#if isConfirmingCancel}
-								<p class="text-sm text-gray-600">Cancel at end of billing period?</p>
 								<form
 									method="POST"
 									action="?/cancelSubscription"
 									use:enhance={() => {
-										isCanceling = true;
-										return async ({ update }) => {
-											await update();
-											isCanceling = false;
-											isConfirmingCancel = false;
-										};
+									  isCanceling = true;
+									  return async ({ update }) => {
+									    await update();
+									    isCanceling = false;
+									    isConfirmingCancel = false;
+									  };
 									}}
 								>
 									<button
 										type="submit"
 										disabled={isCanceling}
-										class="rounded-lg bg-amber-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-amber-700 disabled:opacity-50"
+										class="inline-flex items-center justify-center rounded-xl bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-amber-700 disabled:opacity-50"
 									>
 										{isCanceling ? 'Canceling…' : 'Confirm cancel'}
 									</button>
 								</form>
 								<button
 									onclick={() => (isConfirmingCancel = false)}
-									class="text-sm text-gray-500 hover:text-gray-700"
+									class="text-xs text-gray-500 hover:text-gray-700"
 								>
 									Never mind
 								</button>
 							{:else}
 								<button
 									onclick={() => (isConfirmingCancel = true)}
-									class="rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-50"
+									class="inline-flex items-center justify-center rounded-xl border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
 								>
 									Cancel subscription
 								</button>
 							{/if}
 						{/if}
 					</div>
-				</div>
-			</div>
+				</section>
 
-			<!-- Danger zone -->
-			<div class="mt-6 rounded-xl border border-red-200 p-6">
-				<h3 class="text-sm font-semibold text-red-700">Danger zone</h3>
-				<p class="mt-1 text-sm text-gray-500">
-					Permanently delete your account and all associated data. Any active subscription will be
-					cancelled immediately with no refund.
-				</p>
-
-				{#if isConfirmingDelete}
-					<div class="mt-4 rounded-lg bg-red-50 p-4">
-						<p class="text-sm font-medium text-red-800">
-							Are you sure? This cannot be undone.
+				<!-- Danger zone card -->
+				<section class="flex flex-col justify-between rounded-2xl bg-red-50 p-5 shadow-sm">
+					<div class="space-y-2 text-left">
+						<h3 class="text-xs font-semibold uppercase tracking-wide text-red-700">Danger zone</h3>
+						<p class="text-sm font-medium text-red-900">Delete your account</p>
+						<p class="text-xs text-red-700">
+							This removes your data and cancels any active subscription immediately.
 						</p>
-						<div class="mt-3 flex items-center gap-3">
+					</div>
+
+					{#if isConfirmingDelete}
+						<div class="mt-4 flex flex-wrap items-center gap-3">
 							<form
 								method="POST"
 								action="?/deleteAccount"
 								use:enhance={() => {
-									isDeleting = true;
-									return async ({ update }) => {
-										await update();
-										isDeleting = false;
-									};
+								  isDeleting = true;
+								  return async ({ update }) => {
+								    await update();
+								    isDeleting = false;
+								  };
 								}}
 							>
 								<button
 									type="submit"
 									disabled={isDeleting}
-									class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-50"
+									class="inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-red-700 disabled:opacity-50"
 								>
 									{isDeleting ? 'Deleting…' : 'Yes, delete my account'}
 								</button>
 							</form>
 							<button
 								onclick={() => (isConfirmingDelete = false)}
-								class="text-sm text-gray-500 hover:text-gray-700"
+								class="text-xs text-red-700 hover:text-red-900"
 							>
 								Never mind
 							</button>
 						</div>
-					</div>
-				{:else}
-					<button
-						onclick={() => (isConfirmingDelete = true)}
-						class="mt-4 rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 transition-colors hover:bg-red-50"
-					>
-						Delete account
-					</button>
-				{/if}
+					{:else}
+						<button
+							onclick={() => (isConfirmingDelete = true)}
+							class="mt-4 inline-flex items-center justify-center rounded-xl border border-red-300 px-4 py-2 text-xs font-semibold text-red-700 transition-colors hover:bg-red-100"
+						>
+							Delete account
+						</button>
+					{/if}
+				</section>
 			</div>
 		</div>
 	</main>

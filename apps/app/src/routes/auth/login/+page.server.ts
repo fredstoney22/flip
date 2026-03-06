@@ -2,11 +2,11 @@ import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
-	if (locals.user) {
-		redirect(302, '/dashboard');
-	}
+  if (locals.user) {
+    redirect(302, '/');
+  }
 
-	const returnTo = url.searchParams.get('returnTo') ?? '/dashboard';
+  const returnTo = url.searchParams.get('returnTo') ?? '/';
 
-	return { returnTo };
+  return { returnTo };
 };

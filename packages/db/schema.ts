@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, index, uniqueIndex } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, boolean, integer, index, uniqueIndex } from 'drizzle-orm/pg-core';
 
 export type SubscriptionStatus =
 	| 'active'
@@ -161,3 +161,107 @@ export const subscription = pgTable(
 		index('subscription_stripeCustomerId_idx').on(table.stripeCustomerId)
 	]
 );
+
+/**
+ * A puzzle pack. Metadata lives here; puzzle data lives in the `puzzle` table.
+ * Multiple pack rows can share the same stripeProductId — that models a bundle.
+ */
+export const pack = pgTable(
+	'pack',
+	{
+		id: text('id').primaryKey(),
+		name: text('name').notNull(),
+		slug: text('slug').notNull(),
+		access: text('access').notNull().default('free'), // 'free' | 'paid'
+		stripeProductId: text('stripe_product_id'),
+		active: boolean('active').notNull().default(true),
+		sortOrder: integer('sort_order').notNull().default(0),
+		createdAt: timestamp('created_at').notNull()
+	},
+	(t) => [uniqueIndex('pack_slug_uidx').on(t.slug)]
+);
+
+/** An individual puzzle belonging to a pack. Grid data stored as JSON strings. */
+export const puzzle = pgTable(
+	'puzzle',
+	{
+		id: text('id').primaryKey(),
+		packId: text('pack_id')
+			.notNull()
+			.references(() => pack.id, { onDelete: 'cascade' }),
+		puzzleNumber: integer('puzzle_number').notNull(),
+		startState: text('start_state').notNull(),
+		templates: text('templates').notNull(),
+		sortOrder: integer('sort_order').notNull().default(0),
+		createdAt: timestamp('created_at').notNull()
+	},
+	(t) => [
+		uniqueIndex('puzzle_pack_number_uidx').on(t.packId, t.puzzleNumber),
+		index('puzzle_packId_idx').on(t.packId)
+	]
+);
+
+/**
+ * Tracks which packs a user has unlocked via Stripe.
+ * One row per unlocked pack per user — a bundle purchase inserts multiple rows.
+ */
+export const packAccess = pgTable(
+	'pack_access',
+	{
+		id: text('id').primaryKey(),
+		userId: text('user_id')
+			.notNull()
+			.references(() => user.id, { onDelete: 'cascade' }),
+		packSlug: text('pack_slug').notNull(),
+		stripeProductId: text('stripe_product_id'),
+		stripeSessionId: text('stripe_session_id'),
+		purchasedAt: timestamp('purchased_at').notNull()
+	},
+	(table) => [
+		uniqueIndex('pack_access_user_pack_uidx').on(table.userId, table.packSlug),
+		index('pack_access_userId_idx').on(table.userId)
+	]
+);
+
+/** Stores the best move count for each puzzle a user has completed. */
+export const puzzleProgress = pgTable(
+	'puzzle_progress',
+	{
+		id: text('id').primaryKey(),
+		userId: text('user_id')
+			.notNull()
+			.references(() => user.id, { onDelete: 'cascade' }),
+		packSlug: text('pack_slug').notNull(),
+		puzzleId: integer('puzzle_id').notNull(),
+		bestMoveCount: integer('best_move_count').notNull(),
+		completedAt: timestamp('completed_at').notNull()
+	},
+	(table) => [
+		uniqueIndex('progress_user_pack_puzzle_uidx').on(table.userId, table.packSlug, table.puzzleId),
+		index('progress_userId_idx').on(table.userId)
+	]
+);
+
+/** Persists one in-progress game state per user so they can resume later. */
+export const savedGameState = pgTable('saved_game_state', {
+	userId: text('user_id')
+		.primaryKey()
+		.references(() => user.id, { onDelete: 'cascade' }),
+	packSlug: text('pack_slug').notNull(),
+	puzzleId: integer('puzzle_id'),
+	puzzleState: text('puzzle_state').notNull(),
+	moveCount: integer('move_count').notNull(),
+	updatedAt: timestamp('updated_at').notNull()
+});
+
+/**
+ * Curated daily puzzles — one row per calendar date (YYYY-MM-DD).
+ * Public; no auth required to read today's entry.
+ */
+export const dailyPuzzle = pgTable('daily_puzzle', {
+	id: text('id').primaryKey(),
+	date: text('date').notNull().unique(),
+	packSlug: text('pack_slug').notNull(),
+	puzzleId: integer('puzzle_id').notNull(),
+	createdAt: timestamp('created_at').notNull()
+});

@@ -1,9 +1,9 @@
 {
-	"name": "@boilerplate/auth",
+	"name": "@flip/auth",
 	"private": true,
 	"type": "module",
 	"dependencies": {
-		"@boilerplate/db": "*",
+		"@flip/db": "*",
 		"better-auth": "^1.4.0",
 		"zod": "^4.3.6"
 	}

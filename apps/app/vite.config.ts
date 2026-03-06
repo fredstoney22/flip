@@ -6,14 +6,14 @@ import { resolve } from 'path';
 const monorepoRoot = resolve(__dirname, '../../');
 
 export default defineConfig(({ mode }) => {
-	const env = loadEnv(mode, monorepoRoot, '');
-	Object.assign(process.env, env);
+  const env = loadEnv(mode, monorepoRoot, '');
+  Object.assign(process.env, env);
 
-	return {
-		plugins: [tailwindcss(), sveltekit()],
-		envDir: monorepoRoot,
-		ssr: {
-			noExternal: ['svelte-sonner']
-		}
-	};
+  return {
+    plugins: [tailwindcss(), sveltekit()],
+    envDir: monorepoRoot,
+    ssr: {
+      noExternal: ['svelte-sonner']
+    }
+  };
 });

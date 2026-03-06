@@ -1,5 +1,5 @@
 {
-	"name": "@boilerplate/api",
+	"name": "@flip/api",
 	"private": true,
 	"type": "module",
 	"main": "src/index.ts",
@@ -19,10 +19,12 @@
 		"tsx": "^4.19.0"
 	},
 	"dependencies": {
-		"@boilerplate/auth": "*",
-		"@boilerplate/db": "*",
+		"@flip/auth": "*",
+		"@flip/db": "*",
+		"@flip/game": "*",
 		"@hono/node-server": "^1.19.9",
 		"@hono/zod-openapi": "^1.2.0",
+		"@hono/zod-validator": "^0.7.6",
 		"@scalar/hono-api-reference": "^0.9.37",
 		"better-auth": "^1.4.0",
 		"hono": "^4.12.2",

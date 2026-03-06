@@ -21,3 +21,6 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Deprecated code (kept locally for reference, not committed)
+src/deprecated-files/

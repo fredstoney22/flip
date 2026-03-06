@@ -8,18 +8,18 @@
 	let error = $state('');
 
 	async function signInWithGoogle() {
-		isLoading = true;
-		error = '';
+	  isLoading = true;
+	  error = '';
 
-		const { error: signInError } = await authClient.signIn.social({
-			provider: 'google',
-			callbackURL: data.returnTo
-		});
+	  const { error: signInError } = await authClient.signIn.social({
+	    provider: 'google',
+	    callbackURL: data.returnTo
+	  });
 
-		if (signInError) {
-			error = signInError.message ?? 'Failed to sign in with Google. Please try again.';
-			isLoading = false;
-		}
+	  if (signInError) {
+	    error = signInError.message ?? 'Failed to sign in with Google. Please try again.';
+	    isLoading = false;
+	  }
 	}
 </script>
 

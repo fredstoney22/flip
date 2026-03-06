@@ -3,13 +3,13 @@
 export default $config({
 	app(input) {
 		return {
-			name: 'app-template',
+			name: 'flip',
 			// Retain resources on removal in production to avoid accidental data loss
 			removal: input?.stage === 'production' ? 'retain' : 'remove',
 			protect: ['production'].includes(input?.stage),
 			home: 'aws',
 			providers: {
-				aws: { profile: 'app-template' }
+				aws: { profile: 'flip' }
 			}
 		};
 	},

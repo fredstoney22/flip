@@ -1,4 +1,4 @@
-import { auth } from '@boilerplate/auth';
+import { auth } from '@flip/auth';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = ({ request }) => auth.handler(request);
