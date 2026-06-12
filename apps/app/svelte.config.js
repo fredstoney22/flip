@@ -1,4 +1,4 @@
-import adapter from 'svelte-kit-sst';
+import adapter from '@sveltejs/adapter-vercel';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {

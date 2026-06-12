@@ -2,7 +2,7 @@ import { error, redirect } from '@sveltejs/kit';
 import { getUserProgress } from '$lib/progress.server';
 import type { PageServerLoad } from './$types';
 
-const API_URL = process.env.PUBLIC_API_URL ?? 'http://localhost:3001';
+import { apiUrl } from '$lib/api-url.server';
 
 type BinaryConfig = { startState: number[][]; templates: number[][][] };
 
@@ -19,8 +19,8 @@ export const load: PageServerLoad = async ({ url, fetch, request }) => {
 
   // Fetch puzzle config and puzzle list (for next-puzzle navigation) in parallel
   const [puzzleRes, listRes, progress] = await Promise.all([
-    fetch(`${API_URL}/packs/${slug}/puzzles/${puzzleNumber}`, { headers: { cookie } }),
-    fetch(`${API_URL}/packs/${slug}/puzzles`, { headers: { cookie } }),
+    fetch(apiUrl(`/api/packs/${slug}/puzzles/${puzzleNumber}`), { headers: { cookie } }),
+    fetch(apiUrl(`/api/packs/${slug}/puzzles`), { headers: { cookie } }),
     getUserProgress(fetch, request.headers)
   ]);
 

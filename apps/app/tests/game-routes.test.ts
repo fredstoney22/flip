@@ -16,7 +16,7 @@
  *  (B) API-dependent — require `CI_E2E=true` and a real (or mock) Hono API.
  *      They demonstrate the correct `page.route()` patterns for client-side
  *      navigation flows (where the browser runs the load after SSR hydration)
- *      and for SvelteKit API-proxy routes (/api/progress, /api/pack-checkout).
+ *      and for Hono API routes (/api/progress, /api/webhooks/pack-checkout).
  *
  *  (C) Full-stack — require `CI_E2E=true` AND a seeded test session (auth
  *      token set via `page.context().addCookies()`). See the note below for

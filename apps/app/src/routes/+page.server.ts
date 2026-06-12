@@ -1,7 +1,7 @@
 import type { PageServerLoad } from './$types';
 import type { PuzzleConfig } from '@flip/game';
 
-const API_URL = process.env.PUBLIC_API_URL ?? 'http://localhost:3001';
+import { apiUrl } from '$lib/api-url.server';
 
 interface DailyResponse {
 	date: string;
@@ -11,7 +11,7 @@ interface DailyResponse {
 }
 
 export const load: PageServerLoad = async ({ fetch, locals }) => {
-  const res = await fetch(`${API_URL}/daily`);
+  const res = await fetch(apiUrl('/api/daily'));
   const daily = !res.ok
     ? null
     : ((await res.json()) as DailyResponse);

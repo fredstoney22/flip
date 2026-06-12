@@ -11,7 +11,7 @@
 	  errorMessage = '';
 
 	  try {
-	    const res = await fetch('/api/pack-checkout', {
+	    const res = await fetch('/api/webhooks/pack-checkout', {
 	      method: 'POST',
 	      headers: { 'content-type': 'application/json' },
 	      body: JSON.stringify({ packSlug })

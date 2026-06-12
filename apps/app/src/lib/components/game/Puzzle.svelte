@@ -15,9 +15,13 @@
 		onNextPuzzle?: () => void;
 		/** Called when user selects a template (for tutorial walkthrough). */
 		onTemplateSelect?: (index: number) => void;
+		/** Called after each move is applied (for tutorial: advance when first move is done). */
+		onMove?: (moveCount: number) => void;
+		/** Called when user rotates a template (for tutorial: advance to "apply second move" step). */
+		onTemplateRotate?: (index: number) => void;
 	}
 
-	let { puzzleConfig, packSlug, packName, puzzleId, onSolve, onNextPuzzle, onTemplateSelect }: Props = $props();
+	let { puzzleConfig, packSlug, packName, puzzleId, onSolve, onNextPuzzle, onTemplateSelect, onMove, onTemplateRotate }: Props = $props();
 
 	const MAX_HISTORY = 20;
 
@@ -170,6 +174,7 @@
 	  hoverPosition = null;
 	  hintRegion = null;
 	  moveCount += 1;
+	  onMove?.(moveCount);
 	}
 
 	function handleUndo() {
@@ -219,6 +224,7 @@
 	  templateRotations = next;
 	  animatingTemplateIndex = null;
 	  animatingDeg = 0;
+	  onTemplateRotate?.(index);
 	}
 
 	function handleRotateTransitionEnd(index: number, e: TransitionEvent) {
@@ -349,7 +355,7 @@
 	</svelte:fragment>
 
 	<svelte:fragment slot="templates">
-		<p class="templates-label">Templates — tap to rotate, then tap the grid</p>
+		<div class="templates-divider" aria-hidden="true"></div>
 		<div class="templates-grid">
 			{#each puzzleConfig.templates as _, index}
 				{@const rotated = getRotatedTemplate(index)}
@@ -380,11 +386,11 @@
 </PuzzleShell>
 
 <style>
-	.templates-label {
-		margin: 0;
-		font-size: 0.8rem;
-		color: #9ca3af;
-		text-align: center;
+	.templates-divider {
+		height: 1px;
+		background: #000;
+		margin: 0.5rem 0;
+		border: none;
 	}
 
 	.templates-grid {

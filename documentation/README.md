@@ -13,7 +13,9 @@ This folder holds all project documentation and Cursor context.
 | [testing.md](./testing.md) | Playwright e2e and Vitest unit test setup, scripts, and how to add tests |
 | [stripe-cli.md](./stripe-cli.md) | Stripe CLI install, login, and webhook forwarding for local dev |
 | [stripe.md](./stripe.md) | Stripe subscription integration: architecture, env vars, dev flow, gotchas |
+| [vercel-deployment.md](./vercel-deployment.md) | **Deploy to Vercel** — env vars, Stripe webhooks, custom domain |
 | [cloudflare.md](./cloudflare.md) | Cloudflare setup: bot protection, DNS proxying, rate limiting rules |
+| [sst-deployment.md](./sst-deployment.md) | Deprecated AWS/SST notes (historical) |
 | (here) | General project docs; add architecture, contributing, API, etc. as needed |
 
 ## Adding docs

@@ -5,6 +5,9 @@
 	"main": "src/index.ts",
 	"types": "src/index.ts",
 	"exports": {
+		"./app": {
+			"import": "./src/app.ts"
+		},
 		"./hc": {
 			"import": {
 				"types": "./dist/hc.d.ts",

@@ -33,11 +33,16 @@ npm run api:dev
 | `npm run db:generate` | Generate Drizzle DB migrations |
 | `npm run db:studio` | Open Drizzle Studio to inspect the database |
 
+## Deploy
+
+Deploy to [Vercel](https://vercel.com) — see [`documentation/vercel-deployment.md`](./documentation/vercel-deployment.md).
+
 ## Documentation
 
 See [`documentation/`](./documentation/) for detailed guides:
 
 - [`new-app-checklist.md`](./documentation/new-app-checklist.md) — **start here** when reusing this template for a new project
+- [`vercel-deployment.md`](./documentation/vercel-deployment.md) — production deployment
 - [`setup.md`](./documentation/setup.md) — full setup notes and changes from the original boilerplate
 - [`stripe-cli.md`](./documentation/stripe-cli.md) — Stripe CLI for local webhook testing
 - [`gemeni-sveltekit.md`](./documentation/gemeni-sveltekit.md) — SvelteKit notes

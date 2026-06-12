@@ -1,3 +1,9 @@
+# SST v3 Deployment (AWS) — deprecated
+
+> **This project now deploys to Vercel.** See [`vercel-deployment.md`](./vercel-deployment.md).
+>
+> The notes below are kept for reference if you need to tear down an old SST stack.
+
 # SST v3 Deployment (AWS)
 
 This project deploys to AWS using [SST v3](https://sst.dev). The SvelteKit frontend and Hono API each run as separate Lambda functions behind CloudFront.

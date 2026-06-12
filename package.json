@@ -33,13 +33,13 @@
 		"test:ui": "npm run test:ui -w @flip/app",
 		"test:unit": "vitest run",
 		"test:unit:watch": "vitest",
-		"stripe:listen": "stripe listen --forward-to localhost:3001/webhooks/stripe"
+		"stripe:listen": "stripe listen --forward-to localhost:5173/api/webhooks/stripe",
+		"stripe:create-pack-product": "npx tsx apps/api/scripts/create-pack-stripe-product.ts"
 	},
 	"devDependencies": {
 		"@types/node": "^25.3.0",
 		"oxfmt": "^0.27.0",
 		"oxlint": "^1.42.0",
-		"sst": "^4.0.6",
 		"typescript": "^5",
 		"vitest": "^3.2.4"
 	}

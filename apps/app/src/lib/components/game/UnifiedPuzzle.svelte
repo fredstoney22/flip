@@ -622,7 +622,7 @@
 	</svelte:fragment>
 
 	<svelte:fragment slot="templates">
-		<p class="templates-label">Templates — tap to rotate, then tap the grid</p>
+		<div class="templates-divider" aria-hidden="true"></div>
 		<div class="templates-grid">
 		{#if isColorMode && colorConfig}
 				{#each colorConfig.templates as template, index}
@@ -703,11 +703,11 @@
 </PuzzleShell>
 
 <style>
-	.templates-label {
-		margin: 0;
-		font-size: 0.8rem;
-		color: #9ca3af;
-		text-align: center;
+	.templates-divider {
+		height: 1px;
+		background: #000;
+		margin: 0.5rem 0;
+		border: none;
 	}
 
 	.templates-grid {

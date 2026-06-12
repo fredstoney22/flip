@@ -72,20 +72,31 @@ test.describe('Puzzle interactions — tutorial 3x3 board', () => {
     ]);
   });
 
-  test('click applies the template at the snapped center and solves the tutorial puzzle', async ({
+  test('two-part tutorial: first move then spin and second move solves the puzzle', async ({
     page
   }) => {
     await page.goto('/tutorial');
 
+    // Select template and apply first move at top-left
     await page.getByTestId('template-0').click();
-
     const { x, y } = await getCellCenter(page, 0, 0);
     await page.mouse.click(x, y);
 
-    const after = await getGridState(page, 3);
+    // After first move, grid is not yet solved
+    const afterFirst = await getGridState(page, 3);
+    expect(afterFirst).not.toEqual([
+      [0, 0, 0],
+      [0, 0, 0],
+      [0, 0, 0]
+    ]);
 
-    // Tutorial puzzle is designed so a single application solves it: all zeros (cleared)
-    expect(after).toEqual([
+    // Spin the template (tap template again to rotate 90°)
+    await page.getByTestId('template-0').click();
+    // Apply second move at top-left to solve
+    await page.mouse.click(x, y);
+
+    const afterSecond = await getGridState(page, 3);
+    expect(afterSecond).toEqual([
       [0, 0, 0],
       [0, 0, 0],
       [0, 0, 0]

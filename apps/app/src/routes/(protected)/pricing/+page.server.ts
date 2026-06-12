@@ -1,11 +1,11 @@
 import type { PageServerLoad } from './$types';
 
-const API_URL = process.env.PUBLIC_API_URL ?? 'http://localhost:3001';
+import { apiUrl } from '$lib/api-url.server';
 
 export const load: PageServerLoad = async ({ fetch, request }) => {
   const cookie = request.headers.get('cookie') ?? '';
 
-  const packsRes = await fetch(`${API_URL}/packs`, { headers: { cookie } });
+  const packsRes = await fetch(apiUrl('/api/packs'), { headers: { cookie } });
   const allPacks: Array<{
 		id: string;
 		name: string;

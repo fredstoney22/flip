@@ -12,19 +12,16 @@ import { progressRoutes } from './progress/progress.routes';
 import { dailyRoutes } from './daily/daily.routes';
 import { packsRoutes } from './packs/packs.routes';
 
-export const app = new OpenAPIHono({
+/** Hono routes mounted under `/api` (same origin as SvelteKit on Vercel). */
+const api = new OpenAPIHono({
 	defaultHook: handleZodError
 });
 
-app.use(requestId());
-app.use(logger());
-app.use(prettyJSON());
+api.route('/webhooks', stripeRoutes);
 
-app.use(csrf());
+api.use(csrf());
 
-app.onError(handleError);
-
-app.get('/healthcheck', async (c) => {
+api.get('/healthcheck', async (c) => {
 	try {
 		await db.execute(sql`SELECT 1`);
 		return c.json({ status: 'ok' });
@@ -34,12 +31,12 @@ app.get('/healthcheck', async (c) => {
 	}
 });
 
-app.openAPIRegistry.registerComponent('securitySchemes', 'Bearer', {
+api.openAPIRegistry.registerComponent('securitySchemes', 'Bearer', {
 	type: 'http',
 	scheme: 'bearer'
 });
 
-app.doc('/openapi.json', (c) => ({
+api.doc('/openapi.json', (c) => ({
 	openapi: '3.0.0',
 	info: {
 		version: '1.0.0',
@@ -53,9 +50,18 @@ app.doc('/openapi.json', (c) => ({
 	]
 }));
 
-app.get('/reference', Scalar({ url: '/openapi.json', showDeveloperTools: 'never' }));
+api.get('/reference', Scalar({ url: '/api/openapi.json', showDeveloperTools: 'never' }));
 
-app.route('/webhooks', stripeRoutes);
-app.route('/progress', progressRoutes);
-app.route('/daily', dailyRoutes);
-app.route('/packs', packsRoutes);
+api.route('/progress', progressRoutes);
+api.route('/daily', dailyRoutes);
+api.route('/packs', packsRoutes);
+
+export const app = new OpenAPIHono({
+	defaultHook: handleZodError
+});
+
+app.use(requestId());
+app.use(logger());
+app.use(prettyJSON());
+app.onError(handleError);
+app.route('/api', api);

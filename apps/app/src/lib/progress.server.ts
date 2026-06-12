@@ -3,7 +3,7 @@
  * Used in SvelteKit +page.server.ts load functions.
  */
 
-const API_URL = process.env.PUBLIC_API_URL ?? 'http://localhost:3001';
+import { apiUrl } from '$lib/api-url.server';
 
 export interface ProgressData {
 	packAccess: string[];
@@ -23,7 +23,7 @@ export async function getUserProgress(
   fetch: typeof globalThis.fetch,
   headers: Headers
 ): Promise<ProgressData> {
-  const res = await fetch(`${API_URL}/progress`, {
+  const res = await fetch(apiUrl('/api/progress'), {
     headers: { cookie: headers.get('cookie') ?? '' }
   });
   if (!res.ok) return { packAccess: [], progress: [] };
@@ -38,7 +38,7 @@ export async function saveCompletion(
   headers: Headers,
   data: { packSlug: string; puzzleId: number; moveCount: number }
 ): Promise<void> {
-  await fetch(`${API_URL}/progress`, {
+  await fetch(apiUrl('/api/progress'), {
     method: 'POST',
     headers: {
       'content-type': 'application/json',

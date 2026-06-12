@@ -2,7 +2,7 @@ import { error, redirect } from '@sveltejs/kit';
 import { getUserProgress } from '$lib/progress.server';
 import type { PageServerLoad } from './$types';
 
-const API_URL = process.env.PUBLIC_API_URL ?? 'http://localhost:3001';
+import { apiUrl } from '$lib/api-url.server';
 
 export const load: PageServerLoad = async ({ url, fetch, request }) => {
   const slug = url.searchParams.get('pack');
@@ -11,7 +11,7 @@ export const load: PageServerLoad = async ({ url, fetch, request }) => {
   const cookie = request.headers.get('cookie') ?? '';
 
   const [packRes, progress] = await Promise.all([
-    fetch(`${API_URL}/packs/${slug}/puzzles`, { headers: { cookie } }),
+    fetch(apiUrl(`/api/packs/${slug}/puzzles`), { headers: { cookie } }),
     getUserProgress(fetch, request.headers)
   ]);
 

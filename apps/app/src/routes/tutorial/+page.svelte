@@ -1,12 +1,11 @@
 <script lang="ts">
-	import { getPuzzleById } from '@flip/game';
 	import Puzzle from '$lib/components/game/Puzzle.svelte';
 	import TutorialWalkthrough from '$lib/components/game/TutorialWalkthrough.svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import { TUTORIAL_STEPS } from '$lib/constants/tutorialSteps';
+	import { TUTORIAL_PUZZLE_CONFIG } from '$lib/constants/tutorialPuzzle';
 
-	const tutorialConfig = getPuzzleById('intro-pack', 1);
-	const puzzleConfig = $derived(tutorialConfig ?? { startState: [[]], templates: [] });
+	const puzzleConfig = TUTORIAL_PUZZLE_CONFIG;
 
 	let currentStep = $state(0);
 	let skipped = $state(false);
@@ -19,8 +18,17 @@
 	  if (currentStep === 1) currentStep = 2;
 	}
 
+	function handleMove(moveCount: number) {
+	  // After first move, advance to "spin the template" step
+	  if (currentStep === 2 && moveCount === 1) currentStep = 3;
+	}
+
+	function handleTemplateRotate() {
+	  if (currentStep === 3) currentStep = 4;
+	}
+
 	function handleSolve() {
-	  if (currentStep === 2) currentStep = 3;
+	  if (currentStep === 4) currentStep = 5;
 	}
 
 	function handleSkip() {
@@ -51,17 +59,15 @@
 			</p>
 		{/if}
 
-		{#if tutorialConfig}
-			<div class="tutorial-puzzle-wrap">
-				<Puzzle
-					puzzleConfig={puzzleConfig}
-					onTemplateSelect={handleTemplateSelect}
-					onSolve={handleSolve}
-				/>
-			</div>
-		{:else}
-			<p class="text-gray-500">Tutorial puzzle could not be loaded.</p>
-		{/if}
+		<div class="tutorial-puzzle-wrap">
+			<Puzzle
+				{puzzleConfig}
+				onTemplateSelect={handleTemplateSelect}
+				onMove={handleMove}
+				onTemplateRotate={handleTemplateRotate}
+				onSolve={handleSolve}
+			/>
+		</div>
 
 		<div class="mt-8 flex justify-center gap-3">
 			<a

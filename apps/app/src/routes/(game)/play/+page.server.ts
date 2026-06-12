@@ -1,12 +1,12 @@
 import { getUserProgress } from '$lib/progress.server';
 import type { PageServerLoad } from './$types';
 
-const API_URL = process.env.PUBLIC_API_URL ?? 'http://localhost:3001';
+import { apiUrl } from '$lib/api-url.server';
 
 export const load: PageServerLoad = async ({ fetch, request }) => {
   const [progress, packsRes] = await Promise.all([
     getUserProgress(fetch, request.headers),
-    fetch(`${API_URL}/packs`, {
+    fetch(apiUrl('/api/packs'), {
       headers: { cookie: request.headers.get('cookie') ?? '' }
     })
   ]);
