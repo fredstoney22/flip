@@ -53,8 +53,26 @@ Add these in Vercel → Project → Settings → Environment Variables (Producti
 | `STRIPE_SECRET_KEY` | Stripe secret key (`sk_live_...` or `sk_test_...`) |
 | `STRIPE_WEBHOOK_SECRET` | From Stripe Dashboard → Webhooks → signing secret |
 | `STRIPE_PRO_PRICE_ID` | Subscription price ID for `/billing` |
+| `CRON_SECRET` | `openssl rand -hex 32` — secures `/api/cron/daily-puzzles` (Vercel Cron) |
 
 `PUBLIC_API_URL` is **not needed** on Vercel — the API is same-origin under `/api`.
+
+---
+
+## Daily puzzle cron
+
+`vercel.json` schedules `/api/cron/daily-puzzles` daily at 05:00 UTC to pre-schedule the next 14 days of daily puzzles.
+
+1. Set `CRON_SECRET` in Vercel (Production). Vercel sends `Authorization: Bearer <CRON_SECRET>` automatically.
+2. Redeploy so the cron job is registered.
+
+If cron is missed, the first visitor to `/daily` still creates today's row on demand via `GET /api/daily`.
+
+Manual backfill (local or CI):
+
+```bash
+curl -H "Authorization: Bearer $CRON_SECRET" https://your-domain/api/cron/daily-puzzles
+```
 
 ---
 
@@ -92,6 +110,8 @@ In Google Cloud Console → Credentials → your OAuth client:
 - **Authorised redirect URIs:** `https://your-domain.vercel.app/api/auth/callback/google`
 
 Set `BETTER_AUTH_URL` to the same origin.
+
+See [`production-auth.md`](./production-auth.md) for a full verification checklist and `npm run verify:auth`.
 
 ---
 

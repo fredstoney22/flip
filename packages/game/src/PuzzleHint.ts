@@ -1,72 +1,68 @@
 /**
- * Runtime hint solver for Flip puzzles.
- *
- * Given a current grid state and the puzzle's templates, finds a short sequence
- * of moves that leads to the solved (all-1s) state and returns the FIRST move
- * in that sequence as a hint.
- *
- * This uses a breadth-first search similar to `solveMinMoves`, but tracks
- * which initial move led to each state so we can return a concrete
- * (templateIndex, rotation, row, col) move for the current orientation.
+ * Runtime hint solver — returns the first move of a shortest path to solved.
  */
 
-import { applyTemplate, rotateRight, areAllElementsOne } from './PuzzleFunctions.js';
-import { canonicalizeGrid, gridToKey } from './PuzzleGenerator.js';
-import type { PuzzleGrid } from './types.js';
+import {
+	allTemplatesUsed,
+	applyTemplate,
+	isSolved,
+	orientTemplate
+} from './PuzzleFunctions.js';
+import { canonicalizeGrid, gridToKey } from './puzzleGrid.js';
+import type { PuzzleConfig, PuzzleGrid, PuzzleTemplate } from './types.js';
+import { MONO_FLIP_SOLVED_VALUE } from './types.js';
 
-/**
- * A concrete move in the current puzzle: apply a specific template (with a
- * given 0–3 rotation count) at (row, col), where (row, col) is the top-left
- * corner of the rotated template.
- */
 export interface HintMove {
 	templateIndex: number;
-	rotation: number; // 0, 1, 2, 3 → 0°, 90°, 180°, 270°
+	rotation: number;
 	row: number;
 	col: number;
 }
 
 interface InternalMove extends HintMove {
-	template: PuzzleGrid; // rotated template grid actually applied
+	template: PuzzleTemplate;
 }
 
-/**
- * Enumerate all valid moves for the given templates on a square grid.
- * For each original template we consider its up-to-4 distinct rotations;
- * rotationally symmetric templates will yield fewer.
- */
-function enumerateAllHintMoves(puzzleSize: number, templates: PuzzleGrid[]): InternalMove[] {
+function enumerateHintMoves(
+	puzzleSize: number,
+	templates: PuzzleTemplate[],
+	allowTemplateRotation: boolean
+): InternalMove[] {
 	const moves: InternalMove[] = [];
 
 	for (let tIdx = 0; tIdx < templates.length; tIdx++) {
 		const base = templates[tIdx];
-		const seen = new Set<string>();
-		let current = base;
+		const orientations: { template: PuzzleTemplate; rotation: number }[] = [];
 
-		for (let rotation = 0; rotation < 4; rotation++) {
-			const key = gridToKey(current);
-			if (!seen.has(key)) {
-				seen.add(key);
-
-				const tRows = current.length;
-				const tCols = current[0]?.length ?? 0;
-				for (let row = 0; row <= puzzleSize - tRows; row++) {
-					for (let col = 0; col <= puzzleSize - tCols; col++) {
-						// Store a cloned template to avoid accidental mutation later
-						const cloned = current.map((r) => [...r]);
-						moves.push({
-							templateIndex: tIdx,
-							rotation,
-							template: cloned,
-							row,
-							col
-						});
-					}
+		if (allowTemplateRotation) {
+			const seen = new Set<string>();
+			for (let rotation = 0; rotation < 4; rotation++) {
+				const oriented = orientTemplate(base, rotation);
+				const key = oriented.shape.map((r) => r.join('')).join('|');
+				if (!seen.has(key)) {
+					seen.add(key);
+					orientations.push({ template: oriented, rotation });
 				}
 			}
+		} else {
+			orientations.push({ template: base, rotation: 0 });
+		}
 
-			// Rotate 90° clockwise for the next iteration
-			current = rotateRight(current);
+		for (const { template: oriented, rotation } of orientations) {
+			const shape = oriented.shape;
+			const tRows = shape.length;
+			const tCols = shape[0]?.length ?? 0;
+			for (let row = 0; row <= puzzleSize - tRows; row++) {
+				for (let col = 0; col <= puzzleSize - tCols; col++) {
+					moves.push({
+						templateIndex: tIdx,
+						rotation,
+						template: oriented,
+						row,
+						col
+					});
+				}
+			}
 		}
 	}
 
@@ -75,38 +71,39 @@ function enumerateAllHintMoves(puzzleSize: number, templates: PuzzleGrid[]): Int
 
 interface QueueNode {
 	grid: PuzzleGrid;
+	usedMask: number;
 	firstMoveIndex: number | null;
 	depth: number;
 }
 
 const DEFAULT_MAX_HINT_DEPTH = 10;
 
-/**
- * Finds a single hint move from the given `startState`, if one exists within
- * the given search depth.
- *
- * The hint is the FIRST move in a shortest path (in number of moves) from the
- * current state to the solved state. Returns `null` if no such move is found
- * within `maxDepth`.
- */
 export function findHintMove(
-	startState: PuzzleGrid,
-	templates: PuzzleGrid[],
-	maxDepth: number = DEFAULT_MAX_HINT_DEPTH
+	config: PuzzleConfig,
+	maxDepth: number = DEFAULT_MAX_HINT_DEPTH,
+	currentGrid?: PuzzleGrid,
+	usedTemplateMask: number = 0
 ): HintMove | null {
-	if (areAllElementsOne(startState)) return null;
+	const { templates, solvedValue, allowTemplateRotation = true } = config;
+	const startState = currentGrid ?? config.startState;
+	if (isSolved(startState, solvedValue) && allTemplatesUsed(templates.length, usedTemplateMask)) {
+		return null;
+	}
 	if (!startState.length || !startState[0]?.length) return null;
 
 	const size = startState.length;
-	const moves = enumerateAllHintMoves(size, templates);
+	const moves = enumerateHintMoves(size, templates, allowTemplateRotation);
 	if (moves.length === 0) return null;
 
-	const startKey = canonicalizeGrid(startState);
-	const visited = new Set<string>([startKey]);
+	const useCanonical = allowTemplateRotation && solvedValue === MONO_FLIP_SOLVED_VALUE;
+	const stateKey = (grid: PuzzleGrid, usedMask: number) =>
+		`${useCanonical ? canonicalizeGrid(grid) : gridToKey(grid)}:${usedMask}`;
 
+	const visited = new Set<string>([stateKey(startState, usedTemplateMask)]);
 	let queue: QueueNode[] = [
 		{
 			grid: startState.map((r) => [...r]),
+			usedMask: usedTemplateMask,
 			firstMoveIndex: null,
 			depth: 0
 		}
@@ -119,12 +116,13 @@ export function findHintMove(
 		for (let i = 0; i < moves.length; i++) {
 			const move = moves[i];
 			const nextGrid = applyTemplate(node.grid, move.template, move.row, move.col);
-			const key = canonicalizeGrid(nextGrid);
+			const nextUsedMask = node.usedMask | (1 << move.templateIndex);
+			const key = stateKey(nextGrid, nextUsedMask);
 			if (visited.has(key)) continue;
 
 			const nextFirst = node.firstMoveIndex === null ? i : node.firstMoveIndex;
 
-			if (areAllElementsOne(nextGrid)) {
+			if (isSolved(nextGrid, solvedValue) && allTemplatesUsed(templates.length, nextUsedMask)) {
 				const chosen = moves[nextFirst];
 				return {
 					templateIndex: chosen.templateIndex,
@@ -137,6 +135,7 @@ export function findHintMove(
 			visited.add(key);
 			queue.push({
 				grid: nextGrid,
+				usedMask: nextUsedMask,
 				firstMoveIndex: nextFirst,
 				depth: node.depth + 1
 			});
@@ -145,4 +144,3 @@ export function findHintMove(
 
 	return null;
 }
-

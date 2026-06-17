@@ -14,17 +14,17 @@
 	<title>Daily Puzzle — Flip</title>
 </svelte:head>
 
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+<div class="flex h-dvh flex-col overflow-hidden bg-gray-50 dark:bg-gray-900">
 	<NoScroll />
 
-	<main class="mx-auto max-w-5xl px-4 py-8 flex justify-center">
-		<div class="w-full max-w-3xl">
-			<div class="mb-4 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+	<main class="mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col px-4 py-3">
+		<div class="flex min-h-0 w-full max-w-3xl flex-1 flex-col self-center">
+			<div class="mb-2 flex shrink-0 items-center justify-between text-xs text-gray-500 dark:text-gray-400">
 				<BackLink href="/" />
 				<span>{dateLabel}</span>
 			</div>
 
-			<div class="flex justify-center">
+			<div class="flex min-h-0 flex-1 justify-center">
 				<Puzzle
 					puzzleConfig={data.daily.config}
 					packSlug={data.daily.packSlug}

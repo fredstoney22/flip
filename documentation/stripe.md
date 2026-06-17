@@ -1,23 +1,26 @@
 # Stripe Integration
 
-This project implements a Stripe subscription POC: a hosted Checkout flow, webhook handling, and subscription status surfaced in the dashboard.
+Flip uses Stripe for **one-time puzzle pack purchases**. A legacy subscription POC (`/billing`, `STRIPE_PRO_PRICE_ID`) still exists but the primary flow is pack checkout on `/pricing`.
+
+**Going live?** See [`stripe-live-setup.md`](./stripe-live-setup.md).
 
 ---
 
 ## Architecture
 
 ```
-SvelteKit app (port 5174)
-  └─ POST /billing         → creates Stripe Checkout Session (server-side, has user from locals)
-  └─ GET  /pricing         → shows plan card; Subscribe button calls /billing
-  └─ GET  /billing/success → confirmation page after payment
-  └─ GET  /dashboard       → shows Active / Free badge from DB
+SvelteKit + Hono API (same origin on Vercel, /api/*)
+  └─ GET  /pricing                    → lists paid packs; Buy calls pack-checkout
+  └─ POST /api/webhooks/pack-checkout → creates one-time Checkout Session (auth required)
+  └─ POST /api/webhooks/stripe        → Stripe webhook; unlocks packs on checkout.session.completed
 
-Hono API (port 3001)
-  └─ POST /webhooks/stripe → verifies Stripe signature, handles events, writes to DB
+Legacy subscription POC (optional):
+  └─ POST /billing         → subscription Checkout Session
+  └─ GET  /billing/success → post-subscription confirmation
+  └─ GET  /dashboard       → Active / Free badge from subscription table
 ```
 
-The checkout session is created in SvelteKit (not the Hono API) because `locals.user` is already populated by better-auth there, avoiding any cross-service auth complexity.
+Pack checkout runs in the Hono API because it already has auth + DB access and mounts at `/api/webhooks/pack-checkout` on Vercel.
 
 ---
 
@@ -181,9 +184,21 @@ stripeSubscription.items.data[0].current_period_end
 
 ---
 
+## Pack product setup (CLI)
+
+```bash
+npm run stripe:status              # readiness check
+npm run stripe:setup-paid-packs    # all packs in pack-pricing.ts
+npm run stripe:setup-webhook       # production webhook + signing secret
+```
+
+Configure prices in `apps/api/scripts/lib/pack-pricing.ts`.
+
 ## Production checklist
 
-- [ ] Use `STRIPE_SECRET_KEY=sk_live_...` (live key, not test)
-- [ ] Create a webhook endpoint in Stripe Dashboard pointing to your deployed API URL (`/webhooks/stripe`)
-- [ ] Use the **Dashboard** signing secret (not the `stripe listen` one) as `STRIPE_WEBHOOK_SECRET`
-- [ ] Ensure the Hono API is deployed and reachable at the URL you register in Stripe
+See [`stripe-live-setup.md`](./stripe-live-setup.md). Summary:
+
+- [ ] `npm run stripe:setup-paid-packs` with `sk_live_…` and production `DATABASE_URL`
+- [ ] `npm run stripe:setup-webhook` → set `STRIPE_WEBHOOK_SECRET` in Vercel
+- [ ] `STRIPE_SECRET_KEY=sk_live_…` in Vercel Production
+- [ ] Test purchase on `https://flip.frederickstoney.com/pricing`

@@ -2,17 +2,17 @@
 	let isOpen = $state(false);
 
 	function close() {
-		isOpen = false;
+	  isOpen = false;
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
-		if (e.key === 'Escape') close();
+	  if (e.key === 'Escape') close();
 	}
 
 	$effect(() => {
-		if (!isOpen) return;
-		window.addEventListener('keydown', handleKeydown);
-		return () => window.removeEventListener('keydown', handleKeydown);
+	  if (!isOpen) return;
+	  window.addEventListener('keydown', handleKeydown);
+	  return () => window.removeEventListener('keydown', handleKeydown);
 	});
 </script>
 
@@ -29,13 +29,11 @@
 </div>
 
 {#if isOpen}
-	<!-- svelte-ignore a11y_click_events_have_key_events - backdrop click is supplementary to Escape -->
 	<div
 		class="help-backdrop"
 		role="presentation"
 		onclick={close}
 	>
-		<!-- svelte-ignore a11y_click_events_have_key_events - dialog has close button with keyboard support -->
 		<div
 			class="help-modal"
 			role="dialog"
@@ -43,6 +41,7 @@
 			aria-label="How to play"
 			tabindex="-1"
 			onclick={(e) => e.stopPropagation()}
+			onkeydown={(e) => e.stopPropagation()}
 		>
 			<button
 				class="close-btn"
@@ -65,7 +64,7 @@
 					a square to apply at that position.
 				</li>
 				<li>
-					<strong>Goal</strong> — make every square white (value 0) to solve the puzzle.
+					<strong>Goal</strong> — clear the grid to the target color and use every template at least once.
 				</li>
 				<li>
 					<strong>Undo</strong> — click Undo or press Ctrl+Z (⌘Z on Mac).

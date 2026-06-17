@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { load } from './+page.server';
+import { load } from '../../../(game)/play/game/+page.server';
 
 // ---------------------------------------------------------------------------
 // Types mirroring what the Hono API returns
@@ -7,7 +7,12 @@ import { load } from './+page.server';
 interface ApiPuzzleResponse {
 	packSlug: string;
 	puzzleNumber: number;
-	config: { startState: number[][]; templates: number[][][] };
+	config: {
+		startState: number[][];
+		templates: Array<{ shape: number[][]; pigment: number }>;
+		solvedValue: number;
+		allowTemplateRotation?: boolean;
+	};
 }
 
 interface ApiPuzzleListResponse {
@@ -39,7 +44,9 @@ const INTRO_PUZZLE: ApiPuzzleResponse = {
       [1, 0, 1],
       [1, 1, 1]
     ],
-    templates: [[[0, 0, 0], [0, 1, 0], [0, 0, 0]]]
+    templates: [{ shape: [[0, 0, 0], [0, 1, 0], [0, 0, 0]], pigment: 1 }],
+    solvedValue: 1,
+    allowTemplateRotation: true
   }
 };
 

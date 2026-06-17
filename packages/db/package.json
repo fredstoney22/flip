@@ -5,6 +5,10 @@
 	"type": "module",
 	"main": "index.ts",
 	"types": "index.ts",
+	"exports": {
+		".": "./index.ts",
+		"./dailyPuzzleSchedule": "./dailyPuzzleSchedule.ts"
+	},
 	"scripts": {
 		"generate": "drizzle-kit generate",
 		"migrate": "drizzle-kit migrate",

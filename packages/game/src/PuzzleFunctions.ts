@@ -1,37 +1,120 @@
 /**
- * Puzzle-specific utility functions for applying templates and checking puzzle state.
+ * Puzzle apply/solve helpers — masked XOR on pigment grids.
  */
 
-import {
-	overwriteWithSubmatrix,
-	rotateRight,
-	areAllElementsOne,
-	elementWiseOperation,
-	getSubmatrix,
-	getMatrixDimensions
-} from './MatrixFunctions.js';
-
-type Matrix = number[][];
-
-const xor = (a: number, b: number): number => a ^ b;
+import { rotateRight as rotateShapeRight } from './MatrixFunctions.js';
+import { getTemplateCellPigment, orientTemplate } from './templatePigment.js';
+import type { Pigment, PuzzleConfig, PuzzleGrid, PuzzleTemplate } from './types.js';
 
 /**
- * Applies a template to a puzzle grid at the given position using XOR flipping.
- * Cells where the template is 1 (dark) are flipped; template 0 (light) means no change.
- * Returns a new puzzle state without mutating the original.
+ * Applies a template to the puzzle grid at the given top-left position.
+ * XORs the template pigment into every cell covered by the shape mask.
  */
 export function applyTemplate(
-	puzzleState: Matrix,
-	template: Matrix,
+	state: PuzzleGrid,
+	template: PuzzleTemplate,
 	startRow: number,
 	startCol: number
-): Matrix {
-	const stateCopy = puzzleState.map((row) => [...row]);
-	const templateDims = getMatrixDimensions(template);
-	const submatrix = getSubmatrix(stateCopy, startRow, startCol, templateDims.rows, templateDims.cols);
-	// Flip where the template has 1s; 0 leaves the cell unchanged
-	const resultSubmatrix = elementWiseOperation(submatrix, template, xor);
-	return overwriteWithSubmatrix(stateCopy, resultSubmatrix, startRow, startCol);
+): PuzzleGrid {
+	return state.map((row, r) =>
+		row.map((cell, c) => {
+			const tr = r - startRow;
+			const tc = c - startCol;
+			if (
+				tr >= 0 &&
+				tr < template.shape.length &&
+				tc >= 0 &&
+				tc < template.shape[0].length &&
+				template.shape[tr][tc] === 1
+			) {
+				const cellPigment = getTemplateCellPigment(template, tr, tc);
+				return ((cell ^ cellPigment) & 0b111) as Pigment;
+			}
+			return cell;
+		})
+	);
 }
 
-export { rotateRight, areAllElementsOne };
+/** Returns true when every cell equals the puzzle's solved value. */
+export function isSolved(state: PuzzleGrid, solvedValue: Pigment): boolean {
+	return state.every((row) => row.every((cell) => cell === solvedValue));
+}
+
+export function isPuzzleSolved(config: PuzzleConfig, state: PuzzleGrid): boolean {
+	return isSolved(state, config.solvedValue);
+}
+
+/** Bitmask with all template indices marked used (for `templateCount` templates). */
+export function fullTemplateUsedMask(templateCount: number): number {
+	return templateCount <= 0 ? 0 : (1 << templateCount) - 1;
+}
+
+/** Returns true when every template index has been applied at least once. */
+export function allTemplatesUsed(templateCount: number, usedTemplateMask: number): boolean {
+	return usedTemplateMask === fullTemplateUsedMask(templateCount);
+}
+
+/** Grid is solved and every template has been used at least once. */
+export function isPuzzleComplete(
+	config: PuzzleConfig,
+	state: PuzzleGrid,
+	usedTemplateMask: number
+): boolean {
+	return (
+		isPuzzleSolved(config, state) &&
+		allTemplatesUsed(config.templates.length, usedTemplateMask)
+	);
+}
+
+export function rotateRight(shape: number[][]): number[][] {
+	return rotateShapeRight(shape);
+}
+
+export { orientTemplate };
+
+/** @deprecated Use isSolved(state, 1) */
+export function areAllElementsOne(state: PuzzleGrid): boolean {
+	return isSolved(state, 1);
+}
+
+/**
+ * Returns valid top-left positions where a template can be placed
+ * without overflowing the grid bounds.
+ */
+export function getValidPositions(
+	state: PuzzleGrid,
+	template: PuzzleTemplate
+): [number, number][] {
+	const positions: [number, number][] = [];
+	const maxRow = state.length - template.shape.length;
+	const maxCol = state[0].length - template.shape[0].length;
+	for (let r = 0; r <= maxRow; r++) {
+		for (let c = 0; c <= maxCol; c++) {
+			positions.push([r, c]);
+		}
+	}
+	return positions;
+}
+
+/**
+ * Returns the centered top-left start position for placing a template
+ * over the clicked cell. Returns null if the template would overflow.
+ */
+export function getCenteredPosition(
+	state: PuzzleGrid,
+	template: PuzzleTemplate,
+	centerRow: number,
+	centerCol: number
+): [number, number] | null {
+	const startRow = centerRow - Math.floor(template.shape.length / 2);
+	const startCol = centerCol - Math.floor(template.shape[0].length / 2);
+	if (
+		startRow >= 0 &&
+		startCol >= 0 &&
+		startRow + template.shape.length <= state.length &&
+		startCol + template.shape[0].length <= state[0].length
+	) {
+		return [startRow, startCol];
+	}
+	return null;
+}

@@ -1,28 +1,16 @@
 import { Hono } from 'hono';
-import { db, dailyPuzzle, puzzle, pack, eq, and } from '@flip/db';
+import { db, puzzle, pack, eq, and } from '@flip/db';
+import {
+	ensureDailyPuzzleForDate,
+	formatDateUtc,
+	type DailyPuzzleRow
+} from '@flip/db/dailyPuzzleSchedule';
+import { parseStoredPuzzle } from '@flip/game';
 
 const app = new Hono();
 
-/**
- * GET /daily
- * Returns today's curated puzzle config. No auth required.
- * Looks up today's date (YYYY-MM-DD) in the daily_puzzle table,
- * then resolves the full puzzle config from the DB.
- */
-app.get('/', async (c) => {
-	const today = new Date().toISOString().slice(0, 10);
-
-	const rows = await db
-		.select()
-		.from(dailyPuzzle)
-		.where(eq(dailyPuzzle.date, today))
-		.limit(1);
-
-	if (!rows.length) {
-		return c.json({ error: 'No daily puzzle scheduled for today' }, 404);
-	}
-
-	const { packSlug, puzzleId, date } = rows[0];
+async function resolveDailyPuzzleResponse(row: DailyPuzzleRow) {
+	const { packSlug, puzzleId, date } = row;
 
 	const packRows = await db
 		.select({ id: pack.id })
@@ -31,7 +19,7 @@ app.get('/', async (c) => {
 		.limit(1);
 
 	if (!packRows.length) {
-		return c.json({ error: 'Daily puzzle references an unknown pack' }, 500);
+		return { error: 'Daily puzzle references an unknown pack', status: 500 as const };
 	}
 
 	const puzzleRows = await db
@@ -41,19 +29,45 @@ app.get('/', async (c) => {
 		.limit(1);
 
 	if (!puzzleRows.length) {
-		return c.json({ error: 'Daily puzzle references an unknown puzzle' }, 500);
+		return { error: 'Daily puzzle references an unknown puzzle', status: 500 as const };
 	}
 
 	const p = puzzleRows[0];
-	return c.json({
-		date,
-		packSlug,
-		puzzleId,
-		config: {
-			startState: JSON.parse(p.startState) as number[][],
-			templates: JSON.parse(p.templates) as number[][][]
-		}
-	});
+	const config = parseStoredPuzzle(p.startState, p.templates);
+
+	return {
+		body: {
+			date,
+			packSlug,
+			puzzleId,
+			config
+		},
+		status: 200 as const
+	};
+}
+
+/**
+ * GET /daily
+ * Returns today's curated puzzle config. No auth required.
+ * Creates today's schedule row on demand if missing (cron pre-schedules ahead as well).
+ */
+app.get('/', async (c) => {
+	const today = formatDateUtc(new Date());
+
+	let row: DailyPuzzleRow;
+	try {
+		row = await ensureDailyPuzzleForDate(today);
+	} catch (error) {
+		console.error('Failed to ensure daily puzzle:', error);
+		return c.json({ error: 'No daily puzzle scheduled for today' }, 404);
+	}
+
+	const result = await resolveDailyPuzzleResponse(row);
+	if ('error' in result) {
+		return c.json({ error: result.error }, result.status);
+	}
+
+	return c.json(result.body);
 });
 
 export { app as dailyRoutes };

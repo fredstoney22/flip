@@ -1,9 +1,6 @@
 <script lang="ts">
 	import type { TutorialStep } from '$lib/constants/tutorialSteps';
 
-	export type { TutorialStep } from '$lib/constants/tutorialSteps';
-	export type { StepAction } from '$lib/constants/tutorialSteps';
-
 	interface Props {
 		steps: TutorialStep[];
 		currentStep: number;

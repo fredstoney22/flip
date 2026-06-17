@@ -27,6 +27,8 @@
 		"api:dev": "npm run dev -w @flip/api",
 		"app:dev": "npm run dev -w @flip/app",
 		"game:validate": "npx tsx packages/game/scripts/validate-packs.ts",
+		"game:generate-color-spectrum": "npx tsx packages/game/scripts/generate-color-spectrum-pack.ts",
+		"game:generate-chromatic-ascent": "npx tsx packages/game/scripts/generate-chromatic-ascent-pack.ts",
 		"lint": "npm run lint -w @flip/app",
 		"lint:fix": "npm run lint:fix -w @flip/app",
 		"test": "npm run test -w @flip/app",
@@ -34,7 +36,13 @@
 		"test:unit": "vitest run",
 		"test:unit:watch": "vitest",
 		"stripe:listen": "stripe listen --forward-to localhost:5173/api/webhooks/stripe",
-		"stripe:create-pack-product": "npx tsx apps/api/scripts/create-pack-stripe-product.ts"
+		"stripe:create-pack-product": "npx tsx apps/api/scripts/create-pack-stripe-product.ts",
+		"stripe:setup-paid-packs": "npx tsx apps/api/scripts/setup-paid-pack-products.ts",
+		"stripe:setup-webhook": "npx tsx apps/api/scripts/setup-stripe-webhook.ts",
+		"stripe:status": "npx tsx apps/api/scripts/stripe-status.ts",
+		"stripe:replay-purchases": "npx tsx apps/api/scripts/replay-pack-purchases.ts",
+		"stripe:go-live": "npx tsx apps/api/scripts/go-live-stripe.ts",
+		"verify:auth": "npx tsx scripts/verify-production-auth.ts"
 	},
 	"devDependencies": {
 		"@types/node": "^25.3.0",

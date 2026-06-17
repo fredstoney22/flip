@@ -1,10 +1,8 @@
 import { error, redirect } from '@sveltejs/kit';
 import { getUserProgress } from '$lib/progress.server';
 import type { PageServerLoad } from './$types';
-
+import type { PuzzleConfig } from '@flip/game';
 import { apiUrl } from '$lib/api-url.server';
-
-type BinaryConfig = { startState: number[][]; templates: number[][][] };
 
 export const load: PageServerLoad = async ({ url, fetch, request }) => {
   const slug = url.searchParams.get('pack');
@@ -17,7 +15,6 @@ export const load: PageServerLoad = async ({ url, fetch, request }) => {
 
   if (isNaN(puzzleNumber)) redirect(302, `/play/puzzles?pack=${slug}`);
 
-  // Fetch puzzle config and puzzle list (for next-puzzle navigation) in parallel
   const [puzzleRes, listRes, progress] = await Promise.all([
     fetch(apiUrl(`/api/packs/${slug}/puzzles/${puzzleNumber}`), { headers: { cookie } }),
     fetch(apiUrl(`/api/packs/${slug}/puzzles`), { headers: { cookie } }),
@@ -31,12 +28,9 @@ export const load: PageServerLoad = async ({ url, fetch, request }) => {
   const puzzleData: {
 		packSlug: string;
 		puzzleNumber: number;
-		mode?: 'binary' | 'color';
-		// For binary puzzles this matches BinaryConfig; for colour puzzles it's ColorPuzzleConfig.
-		config: unknown;
+		config: PuzzleConfig;
 	} = await puzzleRes.json();
 
-  // Derive next puzzle number and pack name from the list response
   let nextPuzzleId: number | null = null;
   let packName = slug;
   if (listRes.ok) {
@@ -54,13 +48,10 @@ export const load: PageServerLoad = async ({ url, fetch, request }) => {
 		progress.progress.find((p) => p.packSlug === slug && p.puzzleId === puzzleNumber)
 		  ?.bestMoveCount ?? null;
 
-  const mode = puzzleData.mode ?? 'binary';
-
   return {
     pack: { name: packName, slug },
     puzzleId: puzzleNumber,
-    config: puzzleData.config as BinaryConfig | unknown,
-    mode,
+    config: puzzleData.config,
     bestMoveCount,
     nextPuzzleId
   };

@@ -120,12 +120,6 @@
 	</section>
 </main>
 
-<footer class="border-t border-gray-100 py-8">
-	<div class="mx-auto max-w-5xl px-4 text-center text-sm text-gray-400">
-		&copy; {new Date().getFullYear()} Flip. A puzzle game.
-	</div>
-</footer>
-
 <script lang="ts">
 	import { authClient } from '$lib/auth-client';
 	import { goto } from '$app/navigation';

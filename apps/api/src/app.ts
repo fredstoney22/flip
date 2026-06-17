@@ -11,6 +11,7 @@ import { stripeRoutes } from './stripe/stripe.routes';
 import { progressRoutes } from './progress/progress.routes';
 import { dailyRoutes } from './daily/daily.routes';
 import { packsRoutes } from './packs/packs.routes';
+import { cronRoutes } from './cron/cron.routes';
 
 /** Hono routes mounted under `/api` (same origin as SvelteKit on Vercel). */
 const api = new OpenAPIHono({
@@ -18,6 +19,7 @@ const api = new OpenAPIHono({
 });
 
 api.route('/webhooks', stripeRoutes);
+api.route('/cron', cronRoutes);
 
 api.use(csrf());
 

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { load } from './+page.server';
+import { load } from '../../../(game)/play/puzzles/+page.server';
 
 // ---------------------------------------------------------------------------
 // Types mirroring what the Hono API returns

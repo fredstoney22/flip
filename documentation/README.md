@@ -11,9 +11,12 @@ This folder holds all project documentation and Cursor context.
 | [setup.md](./setup.md) | Full setup notes and all changes from the original boilerplate |
 | [database.md](./database.md) | Database provider, schema, migration commands, and first-time setup |
 | [testing.md](./testing.md) | Playwright e2e and Vitest unit test setup, scripts, and how to add tests |
+| [monitoring.md](./monitoring.md) | CI pipeline, uptime checks, Sentry error monitoring, legal/SEO routes |
 | [stripe-cli.md](./stripe-cli.md) | Stripe CLI install, login, and webhook forwarding for local dev |
-| [stripe.md](./stripe.md) | Stripe subscription integration: architecture, env vars, dev flow, gotchas |
+| [stripe.md](./stripe.md) | Stripe pack purchases + legacy subscription POC |
+| [stripe-live-setup.md](./stripe-live-setup.md) | **Go live** — pack products, webhooks, Vercel env vars |
 | [vercel-deployment.md](./vercel-deployment.md) | **Deploy to Vercel** — env vars, Stripe webhooks, custom domain |
+| [production-auth.md](./production-auth.md) | Production Google OAuth verification — env vars, Google Console, automated checks |
 | [cloudflare.md](./cloudflare.md) | Cloudflare setup: bot protection, DNS proxying, rate limiting rules |
 | [sst-deployment.md](./sst-deployment.md) | Deprecated AWS/SST notes (historical) |
 | (here) | General project docs; add architecture, contributing, API, etc. as needed |

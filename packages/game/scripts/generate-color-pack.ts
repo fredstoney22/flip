@@ -1,6 +1,9 @@
-import { generateVerifiedColorPuzzle } from '../src/ColorPuzzleGenerator.js';
-import type { ColorGeneratorConfig, GeneratedColorPuzzleConfig } from '../src/ColorPuzzleGenerator.js';
-import type { ColorPuzzleConfig, Pigment } from '../src/colorTypes.js';
+import {
+	generateVerifiedPuzzle,
+	pigmentGeneratorConfig
+} from '../src/PuzzleGenerator.js';
+import type { GeneratedPuzzleConfig, GeneratorConfig } from '../src/PuzzleGenerator.js';
+import type { PuzzleConfig } from '../src/types.js';
 
 type DifficultySpec = {
 	name: string;
@@ -8,32 +11,28 @@ type DifficultySpec = {
 };
 
 const DIFFICULTIES: DifficultySpec[] = [
-	{ name: 'Warmup', targetMinMoves: 2 },
+	{ name: 'Warmup', targetMinMoves: 3 },
 	{ name: 'Mixer', targetMinMoves: 3 },
 	{ name: 'Tertiary Twist', targetMinMoves: 3 },
 	{ name: 'Deep Shade', targetMinMoves: 4 },
 	{ name: 'Chromatic Knot', targetMinMoves: 4 }
 ];
 
-const BASE_CONFIG: Omit<ColorGeneratorConfig, 'targetMinMoves'> = {
-	puzzleSize: 3,
-	templateCount: 3,
-	allowedPigments: [1, 2, 4] as Pigment[], // Red, Yellow, Blue
-	maxAttempts: 800,
-	minShapeSize: 2,
-	maxShapeSize: 3
-};
+const BASE_CONFIG: Omit<GeneratorConfig, 'targetMinMoves'> = (() => {
+	const { targetMinMoves: _ignored, ...rest } = pigmentGeneratorConfig({ targetMinMoves: 2 });
+	return rest;
+})();
 
-function stripGenerated(cfg: GeneratedColorPuzzleConfig): ColorPuzzleConfig {
-	const { startState, templates } = cfg;
-	return { startState, templates };
+function stripGenerated(cfg: GeneratedPuzzleConfig): PuzzleConfig {
+	const { startState, templates, solvedValue, allowTemplateRotation, minMovesToSolve } = cfg;
+	return { startState, templates, solvedValue, allowTemplateRotation, minMovesToSolve };
 }
 
 function main() {
-	const configs: { title: string; description: string; config: ColorPuzzleConfig }[] = [];
+	const configs: { title: string; description: string; config: PuzzleConfig }[] = [];
 
 	for (const spec of DIFFICULTIES) {
-		const generated = generateVerifiedColorPuzzle({
+		const generated = generateVerifiedPuzzle({
 			...BASE_CONFIG,
 			targetMinMoves: spec.targetMinMoves
 		});
@@ -46,19 +45,18 @@ function main() {
 		});
 	}
 
-	const header = `// ---- BEGIN AUTO-GENERATED COLOR PACK ----
+	const header = `// ---- BEGIN AUTO-GENERATED COLOR LAB PUZZLES ----
 // Generated via: npx tsx packages/game/scripts/generate-color-pack.ts
-// Paste this constant into ColorFunctions.ts (or a dedicated color pack module).
+// Merge into color-lab pack in packs.ts
 `;
 
 	const body =
-		'export const GENERATED_COLOR_PACK: { title: string; description: string; config: ColorPuzzleConfig }[] = ' +
+		'export const GENERATED_COLOR_LAB_PUZZLES: { title: string; description: string; config: PuzzleConfig }[] = ' +
 		JSON.stringify(configs, null, 2) +
 		';\n' +
-		'// ---- END AUTO-GENERATED COLOR PACK ----';
+		'// ---- END AUTO-GENERATED COLOR LAB PUZZLES ----';
 
 	process.stdout.write(header + body + '\n');
 }
 
 main();
-

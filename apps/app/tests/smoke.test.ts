@@ -28,4 +28,26 @@ test.describe('Smoke tests', () => {
       expect(res.status(), `Link ${href} returned ${res.status()}`).toBeLessThan(400);
     }
   });
+
+  test('privacy page loads', async ({ page }) => {
+    const response = await page.goto('/privacy');
+    expect(response?.status()).toBe(200);
+    await expect(page.getByRole('heading', { level: 1, name: /privacy policy/i })).toBeVisible();
+  });
+
+  test('terms page loads', async ({ page }) => {
+    const response = await page.goto('/terms');
+    expect(response?.status()).toBe(200);
+    await expect(page.getByRole('heading', { level: 1, name: /terms of service/i })).toBeVisible();
+  });
+
+  test('robots.txt and sitemap.xml are reachable', async ({ page }) => {
+    const robots = await page.request.get('/robots.txt');
+    expect(robots.status()).toBe(200);
+    expect(await robots.text()).toContain('Sitemap:');
+
+    const sitemap = await page.request.get('/sitemap.xml');
+    expect(sitemap.status()).toBe(200);
+    expect(await sitemap.text()).toContain('<urlset');
+  });
 });

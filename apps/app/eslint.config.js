@@ -5,7 +5,7 @@ import tseslint from 'typescript-eslint';
 import globals from 'globals';
 
 export default [
-  { ignores: ['.svelte-kit/**', 'build/**', 'node_modules/**', 'static/**'] },
+  { ignores: ['.svelte-kit/**', '.vercel/**', 'build/**', 'node_modules/**', 'static/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   ...svelte.configs['flat/recommended'],

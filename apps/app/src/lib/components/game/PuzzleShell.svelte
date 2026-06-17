@@ -159,23 +159,23 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 1.5rem;
+		justify-content: flex-start;
+		gap: 0.5rem;
 		width: 100%;
-	}
-
-	@media (min-width: 768px) {
-		.puzzle-shell {
-			flex-direction: row;
-			align-items: flex-start;
-			justify-content: center;
-		}
+		height: 100%;
+		min-height: 0;
+		overflow: hidden;
 	}
 
 	.puzzle-grid-section {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 0.75rem;
+		gap: 0.5rem;
+		flex-shrink: 0;
+		min-height: 0;
+		position: relative;
+		z-index: 1;
 	}
 
 	.puzzle-header {
@@ -278,7 +278,13 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 0.75rem;
+		gap: 0.5rem;
+		flex: 1 1 auto;
+		flex-shrink: 0;
+		min-height: 0;
+		max-width: 100%;
+		width: 100%;
+		overflow: hidden;
 	}
 
 	.templates-actions {

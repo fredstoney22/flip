@@ -106,19 +106,22 @@ async function stubHonoProgress(
 // ---------------------------------------------------------------------------
 
 test.describe('Unauthenticated access — redirects', () => {
-  test('GET /play redirects unauthenticated users to /auth/login', async ({ page }) => {
-    await page.goto('/play');
-    await expect(page).toHaveURL(/\/auth\/login/);
+  test('GET /play is accessible without authentication', async ({ page }) => {
+    const response = await page.goto('/play');
+    expect(response?.status()).toBeLessThan(500);
+    await expect(page).toHaveURL(/\/play/);
   });
 
-  test('GET /play/puzzles redirects unauthenticated users to /auth/login', async ({ page }) => {
-    await page.goto('/play/puzzles?pack=intro-pack');
-    await expect(page).toHaveURL(/\/auth\/login/);
+  test('GET /play/puzzles is accessible without authentication', async ({ page }) => {
+    const response = await page.goto('/play/puzzles?pack=intro-pack');
+    expect(response?.status()).toBeLessThan(500);
+    await expect(page).toHaveURL(/\/play\/puzzles/);
   });
 
-  test('GET /play/game redirects unauthenticated users to /auth/login', async ({ page }) => {
-    await page.goto('/play/game?pack=intro-pack&id=1');
-    await expect(page).toHaveURL(/\/auth\/login/);
+  test('GET /play/game is accessible without authentication', async ({ page }) => {
+    const response = await page.goto('/play/game?pack=intro-pack&id=1');
+    expect(response?.status()).toBeLessThan(500);
+    await expect(page).toHaveURL(/\/play\/game/);
   });
 
   test('GET /pricing redirects unauthenticated users to /auth/login', async ({ page }) => {
@@ -132,8 +135,7 @@ test.describe('Unauthenticated access — redirects', () => {
   });
 
   test('/auth/login?returnTo is preserved through the redirect', async ({ page }) => {
-    await page.goto('/play/puzzles?pack=intro-pack');
-    // The login URL should contain returnTo with the original path
+    await page.goto('/pricing');
     await expect(page).toHaveURL(/returnTo=/);
   });
 });
@@ -160,11 +162,10 @@ test.describe('Public pages — no auth required', () => {
     await expect(page.locator('h1')).toBeVisible();
   });
 
-  test('home page links to /daily and /pricing', async ({ page }) => {
+  test('home page links to /daily and /play', async ({ page }) => {
     await page.goto('/');
-    // Use .first() — the page has multiple /daily links (nav bar + hero CTA)
     await expect(page.locator('a[href="/daily"]').first()).toBeVisible();
-    await expect(page.locator('a[href="/pricing"]').first()).toBeVisible();
+    await expect(page.locator('a[href="/play"]').first()).toBeVisible();
   });
 
   /**

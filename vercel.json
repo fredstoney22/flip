@@ -2,5 +2,11 @@
 	"$schema": "https://openapi.vercel.sh/vercel.json",
 	"buildCommand": "npm run build -w @flip/app && mkdir -p .vercel && cp -r apps/app/.vercel/output .vercel/output",
 	"devCommand": "npm run dev -w @flip/app",
-	"installCommand": "npm install"
+	"installCommand": "npm install",
+	"crons": [
+		{
+			"path": "/api/cron/daily-puzzles",
+			"schedule": "0 5 * * *"
+		}
+	]
 }
