@@ -43,15 +43,6 @@ function selectLens(body: string, templateIndex?: number): TutorialStep {
   };
 }
 
-function rotateLens(body: string): TutorialStep {
-  return {
-    title: 'Rotate the lens',
-    body,
-    action: 'wait',
-    advanceOn: 'templateRotate'
-  };
-}
-
 function placeLens(body: string, moveCount: number): TutorialStep {
   return {
     title: 'Place the lens',
