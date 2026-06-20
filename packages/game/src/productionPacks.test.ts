@@ -10,9 +10,10 @@ describe('productionPacks', () => {
 		}
 	});
 
-	it('includes first-steps as the production pack', () => {
-		expect(PRODUCTION_PACK_SLUGS).toEqual(['first-steps']);
+	it('includes production allowlisted packs', () => {
+		expect(PRODUCTION_PACK_SLUGS).toEqual(['first-steps', 'chromatic-ascent']);
 		expect(isProductionPack('first-steps')).toBe(true);
+		expect(isProductionPack('chromatic-ascent')).toBe(true);
 		expect(isProductionPack('intro-pack')).toBe(false);
 	});
 
