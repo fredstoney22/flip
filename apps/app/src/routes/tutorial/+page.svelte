@@ -1,95 +1,101 @@
 <script lang="ts">
 	import Puzzle from '$lib/components/game/Puzzle.svelte';
+	import PuzzlePlayLayout from '$lib/components/game/PuzzlePlayLayout.svelte';
 	import TutorialWalkthrough from '$lib/components/game/TutorialWalkthrough.svelte';
-	import PageHeader from '$lib/components/PageHeader.svelte';
-	import { TUTORIAL_STEPS } from '$lib/constants/tutorialSteps';
-	import { TUTORIAL_PUZZLE_CONFIG } from '$lib/constants/tutorialPuzzle';
+	import { createTutorialProgressCallbacks } from '$lib/utils/tutorialProgress';
+	import type { PageData } from './$types';
 
-	const puzzleConfig = TUTORIAL_PUZZLE_CONFIG;
+	let { data }: { data: PageData } = $props();
 
 	let currentStep = $state(0);
 	let skipped = $state(false);
 
-	function handleNext() {
-	  if (currentStep < TUTORIAL_STEPS.length - 1) currentStep += 1;
-	}
+	const tutorialCallbacks = createTutorialProgressCallbacks({
+	  getSteps: () => data.tutorial.steps,
+	  getCurrentStep: () => currentStep,
+	  setCurrentStep: (step) => {
+	    currentStep = step;
+	  },
+	  setSkipped: (value) => {
+	    skipped = value;
+	  }
+	});
 
-	function handleTemplateSelect() {
-	  if (currentStep === 1) currentStep = 2;
-	}
+	const pageTitle = $derived(
+	  data.pack ? `Tutorial · ${data.pack.name}` : 'Tutorial'
+	);
 
-	function handleMove(moveCount: number) {
-	  // After first move, advance to "spin the template" step
-	  if (currentStep === 2 && moveCount === 1) currentStep = 3;
-	}
+	const backHref = $derived(
+	  data.pack ? `/play/puzzles?pack=${data.pack.slug}` : '/'
+	);
 
-	function handleTemplateRotate() {
-	  if (currentStep === 3) currentStep = 4;
-	}
-
-	function handleSolve() {
-	  if (currentStep === 4) currentStep = 5;
-	}
-
-	function handleSkip() {
-	  skipped = true;
-	}
+	const backLabel = $derived(data.pack ? `← ${data.pack.name}` : '← Back');
 </script>
 
 <svelte:head>
-	<title>Tutorial — Flip</title>
+	<title>{pageTitle} — Flip</title>
 </svelte:head>
 
-<div class="min-h-screen bg-gray-50">
-	<PageHeader backHref="/" backLabel="← Back" title="Tutorial" />
-
-	<main class="mx-auto max-w-3xl px-4 py-8 flex flex-col items-center">
+<PuzzlePlayLayout {backHref} {backLabel} title="Tutorial">
+	{#snippet sidePanel()}
 		{#if !skipped}
 			<TutorialWalkthrough
-				steps={TUTORIAL_STEPS}
+				steps={data.tutorial.steps}
 				{currentStep}
-				onNext={handleNext}
+				onNext={tutorialCallbacks.onNext}
 				onComplete={() => {}}
-				onSkip={handleSkip}
+				onSkip={tutorialCallbacks.onSkip}
 			/>
 		{:else}
-			<p class="text-sm text-gray-500 mb-4">
-				<button type="button" class="text-indigo-600 underline hover:no-underline" onclick={() => (skipped = false)}>Show tutorial again</button>
-				· <a href="/daily" class="text-indigo-600 underline">Daily puzzle</a>
+			<p class="tutorial-skipped-banner">
+				<button type="button" class="tutorial-skipped-link" onclick={() => (skipped = false)}>
+					Show again
+				</button>
+				{#if data.tutorial.skippedLinks?.length}
+					{#each data.tutorial.skippedLinks as link}
+						<span aria-hidden="true"> · </span>
+						<a href={link.href} class="tutorial-skipped-link">{link.label}</a>
+					{/each}
+				{/if}
 			</p>
 		{/if}
+	{/snippet}
 
-		<div class="tutorial-puzzle-wrap">
-			<Puzzle
-				{puzzleConfig}
-				onTemplateSelect={handleTemplateSelect}
-				onMove={handleMove}
-				onTemplateRotate={handleTemplateRotate}
-				onSolve={handleSolve}
-			/>
-		</div>
-
-		<div class="mt-8 flex justify-center gap-3">
-			<a
-				href="/daily"
-				class="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors"
-			>
-				Try today's puzzle
-			</a>
-			<a
-				href="/auth/login"
-				class="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
-			>
-				Create account
-			</a>
-		</div>
-	</main>
-</div>
+	<Puzzle
+		puzzleConfig={data.config}
+		packSlug={data.pack?.slug}
+		packName={data.pack?.name}
+		puzzleId={data.puzzleId}
+		onTemplateSelect={tutorialCallbacks.onTemplateSelect}
+		onMove={tutorialCallbacks.onMove}
+		onTemplateRotate={tutorialCallbacks.onTemplateRotate}
+		onSolve={tutorialCallbacks.onSolve}
+	/>
+</PuzzlePlayLayout>
 
 <style>
-	.tutorial-puzzle-wrap {
-		width: 100%;
-		display: flex;
-		justify-content: center;
+	.tutorial-skipped-banner {
+		margin: 0;
+		padding: 0.625rem 0.75rem;
+		font-size: 0.75rem;
+		color: #6b7280;
+		background: white;
+		border: 1px solid #e5e7eb;
+		border-radius: 10px;
+		line-height: 1.4;
+	}
+
+	.tutorial-skipped-link {
+		color: #4f46e5;
+		text-decoration: underline;
+		background: none;
+		border: none;
+		padding: 0;
+		font: inherit;
+		cursor: pointer;
+	}
+
+	.tutorial-skipped-link:hover {
+		text-decoration: none;
 	}
 </style>

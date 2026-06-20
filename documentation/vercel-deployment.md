@@ -82,7 +82,10 @@ Push the schema to your production database before the first deploy (or after sc
 
 ```bash
 DATABASE_URL="postgresql://..." npm run db:push
+DATABASE_URL="postgresql://..." npm run db:seed:production
 ```
+
+Use `db:seed:production` (not plain `db:seed`) on production so only packs in `packages/game/src/productionPacks.ts` are active. Local dev and CI use `npm run db:seed`, which activates every pack for vetting.
 
 ---
 

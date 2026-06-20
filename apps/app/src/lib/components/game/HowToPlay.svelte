@@ -64,7 +64,7 @@
 					a square to apply at that position.
 				</li>
 				<li>
-					<strong>Goal</strong> — clear the grid to the target color and use every template at least once.
+					<strong>Goal</strong> — clear the grid to the target color.
 				</li>
 				<li>
 					<strong>Undo</strong> — click Undo or press Ctrl+Z (⌘Z on Mac).

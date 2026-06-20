@@ -1,20 +1,19 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import PuzzleShell from './PuzzleShell.svelte';
-	import PuzzleDevMetadata from './PuzzleDevMetadata.svelte';
 	import ColorSquare from './ColorSquare.svelte';
 	import { settings } from '$lib/stores/settings';
 	import {
 	  applyTemplate,
 	  findHintMove,
 	  isMonochromeFlipPuzzle,
-	  isPuzzleComplete,
+	  isPuzzleSolved,
 	  PIGMENT_HEX,
 	  orientTemplate,
 	  getTemplateCellPigment
 	} from '@flip/game';
 	import type { Pigment, PuzzleConfig, PuzzleGrid, PuzzleTemplate } from '@flip/game';
-	import { computePuzzleLayout } from '$lib/utils/puzzleLayout';
+	import { computePuzzleLayout, getTemplateIndexRowGroups } from '$lib/utils/puzzleLayout';
 
 	interface Props {
 		puzzleConfig: PuzzleConfig;
@@ -75,6 +74,12 @@
 	let cellSize = $state(50);
 	let templateSquareSize = $state(30);
 	let templateAreaHeight = $state(120);
+	let layoutTemplateIndexRowGroups = $state<number[][]>([]);
+	const templateIndexRowGroups = $derived(
+	  layoutTemplateIndexRowGroups.length > 0
+	    ? layoutTemplateIndexRowGroups
+	    : getTemplateIndexRowGroups(puzzleConfig.templates.length, 1)
+	);
 	let layoutRoot: HTMLDivElement | null = $state(null);
 	let resizeFrame: number | null = null;
 	let lastLayoutKey = '';
@@ -82,7 +87,7 @@
 	const templateScale = $derived(templateSquareSize / TEMPLATE_RENDER_CELL);
 
 	const monochromeFlip = $derived(isMonochromeFlipPuzzle(puzzleConfig));
-	const allowRotation = true;
+	const allowRotation = $derived(puzzleConfig.allowTemplateRotation ?? true);
 	const showHints = true;
 
 	const tileMode = $derived($settings.tileAppearanceMode);
@@ -95,11 +100,12 @@
 	  return { h: (pigment & 1) !== 0, v: (pigment & 2) !== 0, d: (pigment & 4) !== 0 };
 	}
 
-	$effect(() => {
+	$effect.pre(() => {
 	  void puzzleConfig;
 	  lastLayoutKey = '';
 	  puzzleState = puzzleConfig.startState.map((r) => [...r]);
 	  templateRotations = new Array(puzzleConfig.templates.length).fill(0);
+	  layoutTemplateIndexRowGroups = [];
 	  animatingTemplateIndex = null;
 	  animatingDeg = 0;
 	  animatingDurationMs = ROTATE_DURATION_MS;
@@ -119,7 +125,11 @@
 	});
 
 	$effect(() => {
-	  if (!isSolved && isPuzzleComplete(puzzleConfig, puzzleState, usedTemplateMask)) {
+	  if (
+	    !isSolved &&
+	    puzzleState.length > 0 &&
+	    isPuzzleSolved(puzzleConfig, puzzleState)
+	  ) {
 	    isSolved = true;
 	    onSolve?.({ packSlug: packSlug ?? '', puzzleId: puzzleId ?? 0, moveCount });
 	  }
@@ -128,9 +138,9 @@
 	function measureAvailableSpace(): { width: number; height: number; isMobile: boolean } {
 	  const isMobile = window.innerWidth <= 768;
 	  const root = layoutRoot;
-	  const width = root?.clientWidth ?? window.innerWidth - (isMobile ? 32 : 64);
 
 	  if (!root) {
+	    const width = window.innerWidth - (isMobile ? 32 : 64);
 	    return {
 	      width,
 	      height: window.innerHeight - (isMobile ? 160 : 200),
@@ -138,10 +148,22 @@
 	    };
 	  }
 
-	  const top = root.getBoundingClientRect().top;
+	  const rect = root.getBoundingClientRect();
+	  const width = Math.max(1, rect.width || root.clientWidth);
+	  const parent = root.parentElement;
+	  const parentHeight = parent?.clientHeight ?? 0;
+
+	  if (parentHeight > 0) {
+	    return {
+	      width,
+	      height: Math.max(200, parentHeight),
+	      isMobile
+	    };
+	  }
+
 	  return {
 	    width,
-	    height: Math.max(200, window.innerHeight - top - 8),
+	    height: Math.max(200, window.innerHeight - rect.top - 8),
 	    isMobile
 	  };
 	}
@@ -167,13 +189,14 @@
 	    isMobile
 	  });
 
-	  const nextKey = `${layout.cellSize},${layout.templateSquareSize},${layout.templateAreaHeight}`;
+	  const nextKey = `${layout.cellSize},${layout.templateSquareSize},${layout.templateAreaHeight},${layout.templateRowCount}`;
 	  if (nextKey === lastLayoutKey) return;
 	  lastLayoutKey = nextKey;
 
 	  cellSize = layout.cellSize;
 	  templateSquareSize = layout.templateSquareSize;
 	  templateAreaHeight = layout.templateAreaHeight;
+	  layoutTemplateIndexRowGroups = layout.templateIndexRowGroups;
 	}
 
 	function scheduleUpdateSizes() {
@@ -203,6 +226,19 @@
 	  };
 	});
 
+	$effect(() => {
+	  const root = layoutRoot;
+	  if (!root || typeof ResizeObserver === 'undefined') return;
+
+	  const observer = new ResizeObserver(() => scheduleUpdateSizes());
+	  observer.observe(root);
+	  const parent = root.parentElement;
+	  if (parent) observer.observe(parent);
+	  scheduleUpdateSizes();
+
+	  return () => observer.disconnect();
+	});
+
 	function handleKeyDown(e: KeyboardEvent) {
 	  if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
 	    e.preventDefault();
@@ -213,6 +249,18 @@
 	function getOrientedTemplate(index: number): PuzzleTemplate {
 	  const base = puzzleConfig.templates[index];
 	  return orientTemplate(base, templateRotations[index] ?? 0);
+	}
+
+	/** Rotation used for hover preview — steps at 90° boundaries while a template animates. */
+	function getPreviewRotation(index: number): number {
+	  const committed = templateRotations[index] ?? 0;
+	  if (animatingTemplateIndex !== index) return committed;
+	  return (committed + Math.floor(animatingDeg / 90)) % 4;
+	}
+
+	function getOrientedTemplateForPreview(index: number): PuzzleTemplate {
+	  const base = puzzleConfig.templates[index];
+	  return orientTemplate(base, getPreviewRotation(index));
 	}
 
 	function getSnapToCenterPosition(
@@ -423,7 +471,7 @@
 	  selectedTemplateIndex === null || !hoverPosition
 	    ? puzzleState
 	    : (() => {
-	      const oriented = getOrientedTemplate(selectedTemplateIndex);
+	      const oriented = getOrientedTemplateForPreview(selectedTemplateIndex);
 	      return applyTemplate(
 	        puzzleState,
 	        oriented,
@@ -436,7 +484,7 @@
 	const hoverHighlight = $derived(
 	  (() => {
 	    if (selectedTemplateIndex === null || !hoverPosition) return undefined;
-	    const t = getOrientedTemplate(selectedTemplateIndex);
+	    const t = getOrientedTemplateForPreview(selectedTemplateIndex);
 	    return {
 	      start: [hoverPosition[1], hoverPosition[0]] as [number, number],
 	      dim: [t.shape[0]?.length ?? 0, t.shape.length] as [number, number]
@@ -455,6 +503,7 @@
 </script>
 
 <div class="puzzle-layout-root" bind:this={layoutRoot}>
+{#key `${packSlug ?? ''}:${puzzleId ?? ''}`}
 <PuzzleShell
 	moveCount={moveCount}
 	isSolved={isSolved}
@@ -467,6 +516,7 @@
 	{packSlug}
 	{packName}
 	{puzzleId}
+	showColorGuide={!monochromeFlip}
 	enableShareAndRating={true}
 >
 	<svelte:fragment slot="grid">
@@ -474,6 +524,7 @@
 			grid={renderState}
 			{cellSize}
 			monochromeFlip={monochromeFlip}
+			winCollapse={isSolved}
 			highlightStart={hoverHighlight?.start}
 			highlightDim={hoverHighlight?.dim}
 			hintHighlightStart={hintHighlight?.start}
@@ -487,95 +538,92 @@
 	<svelte:fragment slot="templates">
 		<div class="templates-divider" aria-hidden="true"></div>
 		<div
-			class="templates-grid"
-			style:height="{templateAreaHeight}px"
+			class="templates-area"
+			style:min-height="{templateAreaHeight}px"
 		>
-			{#each puzzleConfig.templates as template, index}
-				{@const isSelected = selectedTemplateIndex === index}
-				{@const isAnimating = animatingTemplateIndex === index}
-				{@const orientedTemplate = getOrientedTemplate(index)}
-				{@const orientedShape = orientedTemplate.shape}
-				{@const boundDim = getTemplateBoundDim(template.shape)}
-				{@const baseBound = getTemplateBoundSize(boundDim, TEMPLATE_RENDER_CELL)}
-				{@const displayBound = baseBound * templateScale}
-				<div
-					class="template-item"
-					class:selected={isSelected}
-					role="button"
-					tabindex="0"
-					aria-label="Template {index + 1}{isSelected ? ' (selected)' : ''}"
-					data-testid="template-{index}"
-					onclick={() => handleTemplateTap(index)}
-					onkeydown={(e) => e.key === 'Enter' && handleTemplateTap(index)}
-				>
-					<div
-						class="template-scale-slot"
-						style:width="{displayBound}px"
-						style:height="{displayBound}px"
-					>
+			{#each templateIndexRowGroups as rowIndices}
+				<div class="templates-row">
+					{#each rowIndices as index}
+						{@const template = puzzleConfig.templates[index]}
+						{@const isSelected = selectedTemplateIndex === index}
+						{@const isAnimating = animatingTemplateIndex === index}
+						{@const committedRotateDeg = (templateRotations[index] ?? 0) * 90}
+						{@const totalRotateDeg = committedRotateDeg + (isAnimating ? animatingDeg : 0)}
+						{@const boundDim = getTemplateBoundDim(template.shape)}
+						{@const baseBound = getTemplateBoundSize(boundDim, TEMPLATE_RENDER_CELL)}
+						{@const displayBound = baseBound * templateScale}
 						<div
-							class="template-rotate-wrapper"
-							class:animating={isAnimating && allowRotation}
-							style:width="{baseBound}px"
-							style:height="{baseBound}px"
-							style:--rotate-duration="{animatingDurationMs}ms"
-							style:transform={allowRotation && isAnimating
-							  ? `rotate(${animatingDeg}deg) scale(${templateScale})`
-							  : `scale(${templateScale})`}
-							style:transform-origin="center center"
-							ontransitionend={(e) => handleRotateTransitionEnd(index, e)}
+							class="template-item"
+							class:selected={isSelected}
+							role="button"
+							tabindex="0"
+							aria-label="Template {index + 1}{isSelected ? ' (selected)' : ''}"
+							data-testid="template-{index}"
+							onclick={() => handleTemplateTap(index)}
+							onkeydown={(e) => e.key === 'Enter' && handleTemplateTap(index)}
 						>
-							<div class="template-item-shape">
-								{#each orientedShape as shapeRow, rowIdx}
-									<div class="template-item-shape-row">
-										{#each shapeRow as cell, colIdx}
-											{@const filled = cell === 1}
-											{@const cellPigment = getTemplateCellPigment(orientedTemplate, rowIdx, colIdx)}
-											{@const cellHex = PIGMENT_HEX[cellPigment]}
-											{@const lines = filled ? lineFlags(cellPigment) : { h: false, v: false, d: false }}
-											<div
-												class="template-item-shape-cell"
-												class:filled
-												class:with-lines={showLines && filled && (lines.h || lines.v || lines.d)}
-												style:width="{TEMPLATE_RENDER_CELL}px"
-												style:height="{TEMPLATE_RENDER_CELL}px"
-												style:background={filled
-												  ? monochromeFlip
-												    ? '#1f2937'
-												    : showColor
-												      ? cellHex
-												      : '#e5e7eb'
-												  : '#f9fafb'}
-											>
-												{#if showLines && filled && (lines.h || lines.v || lines.d)}
-													<span class="template-cell-lines" aria-hidden="true">
-														{#if lines.h}<span class="template-line template-line-h"></span>{/if}
-														{#if lines.v}<span class="template-line template-line-v"></span>{/if}
-														{#if lines.d}<span class="template-line template-line-d"></span>{/if}
-													</span>
-												{/if}
+							<div
+								class="template-scale-slot"
+								style:width="{displayBound}px"
+								style:height="{displayBound}px"
+							>
+								<div
+									class="template-rotate-wrapper"
+									class:animating={isAnimating && allowRotation}
+									style:width="{baseBound}px"
+									style:height="{baseBound}px"
+									style:--rotate-duration="{animatingDurationMs}ms"
+									style:transform={allowRotation && totalRotateDeg !== 0
+									  ? `rotate(${totalRotateDeg}deg) scale(${templateScale})`
+									  : `scale(${templateScale})`}
+									style:transform-origin="center center"
+									ontransitionend={(e) => handleRotateTransitionEnd(index, e)}
+								>
+									<div class="template-item-shape">
+										{#each template.shape as shapeRow, rowIdx}
+											<div class="template-item-shape-row">
+												{#each shapeRow as cell, colIdx}
+													{@const filled = cell !== 0}
+													{@const cellPigment = getTemplateCellPigment(template, rowIdx, colIdx)}
+													{@const cellHex = PIGMENT_HEX[cellPigment]}
+													{@const lines = filled ? lineFlags(cellPigment) : { h: false, v: false, d: false }}
+													<div
+														class="template-item-shape-cell"
+														class:filled
+														class:with-lines={showLines && filled && (lines.h || lines.v || lines.d)}
+														style:width="{TEMPLATE_RENDER_CELL}px"
+														style:height="{TEMPLATE_RENDER_CELL}px"
+														style:background={filled
+														  ? monochromeFlip
+														    ? '#1f2937'
+														    : showColor
+														      ? cellHex
+														      : '#e5e7eb'
+														  : '#f9fafb'}
+													>
+														{#if showLines && filled && (lines.h || lines.v || lines.d)}
+															<span class="template-cell-lines" aria-hidden="true">
+																{#if lines.h}<span class="template-line template-line-h"></span>{/if}
+																{#if lines.v}<span class="template-line template-line-v"></span>{/if}
+																{#if lines.d}<span class="template-line template-line-d"></span>{/if}
+															</span>
+														{/if}
+													</div>
+												{/each}
 											</div>
 										{/each}
 									</div>
-								{/each}
+								</div>
 							</div>
 						</div>
-					</div>
+					{/each}
 				</div>
 			{/each}
 		</div>
 	</svelte:fragment>
 
-	<svelte:fragment slot="legend">
-		<PuzzleDevMetadata
-			{puzzleConfig}
-			{packSlug}
-			{packName}
-			{puzzleId}
-			{moveCount}
-		/>
-	</svelte:fragment>
 </PuzzleShell>
+{/key}
 </div>
 
 <style>
@@ -583,23 +631,25 @@
 		flex: 1 1 0;
 		width: 100%;
 		min-height: 0;
+		height: 100%;
 		display: flex;
 		flex-direction: column;
-		align-items: center;
+		align-items: stretch;
 		justify-content: flex-start;
 		overflow: hidden;
 	}
 
 	.templates-divider {
 		height: 1px;
-		background: #000;
-		margin: 0.5rem 0;
+		background: #e5e7eb;
+		margin: 0.25rem 0;
 		border: none;
+		width: 100%;
 	}
 
-	.templates-grid {
+	.templates-area {
 		display: flex;
-		flex-wrap: nowrap;
+		flex-direction: column;
 		align-items: center;
 		justify-content: center;
 		gap: 0.5rem;
@@ -607,6 +657,16 @@
 		max-width: 100%;
 		box-sizing: border-box;
 		overflow: hidden;
+	}
+
+	.templates-row {
+		display: flex;
+		flex-wrap: nowrap;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		width: 100%;
+		max-width: 100%;
 	}
 
 	.template-item {

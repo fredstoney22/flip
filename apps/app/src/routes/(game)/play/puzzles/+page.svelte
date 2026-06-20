@@ -21,6 +21,12 @@
 			</div>
 		{/if}
 
+		{#if data.pack.slug === 'first-steps'}
+			<p class="mb-6 text-sm text-gray-500">
+				Work through each puzzle in order — every one introduces a new idea.
+			</p>
+		{/if}
+
 		<div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 			{#each data.puzzles as puzzle}
 				<a
@@ -32,6 +38,9 @@
 				>
 					<div>
 						<span class="text-sm font-semibold text-gray-800">Puzzle {puzzle.id}</span>
+						{#if puzzle.concept}
+							<p class="mt-0.5 text-xs text-indigo-600">{puzzle.concept}</p>
+						{/if}
 						{#if puzzle.completed && puzzle.bestMoveCount !== null}
 							<p class="mt-0.5 text-xs text-gray-400">Best: {puzzle.bestMoveCount} moves</p>
 						{/if}

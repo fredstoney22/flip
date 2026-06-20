@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { applyTemplate } from './PuzzleFunctions.js';
 
 describe('applyTemplate', () => {
-	it('XORs pigment only where the shape mask is 1', () => {
+	it('XORs pigment only on active template cells', () => {
 		const puzzle = [
 			[0, 0, 0],
 			[0, 0, 0],
@@ -14,8 +14,7 @@ describe('applyTemplate', () => {
 				[1, 1, 1],
 				[1, 0, 1],
 				[1, 1, 1]
-			],
-			pigment: 1 as const
+			]
 		};
 
 		expect(applyTemplate(puzzle, template, 0, 0)).toEqual([
@@ -36,8 +35,7 @@ describe('applyTemplate', () => {
 			shape: [
 				[0, 1],
 				[1, 0]
-			],
-			pigment: 1 as const
+			]
 		};
 
 		expect(applyTemplate(puzzle, template, 1, 1)).toEqual([
@@ -47,27 +45,22 @@ describe('applyTemplate', () => {
 		]);
 	});
 
-	it('XORs RYB pigments on masked cells', () => {
+	it('XORs RYB pigments on active cells', () => {
 		const puzzle = [[3]];
-		const template = { shape: [[1]], pigment: 3 as const };
+		const template = { shape: [[3]] };
 		expect(applyTemplate(puzzle, template, 0, 0)).toEqual([[0]]);
 	});
 
-	it('XORs per-cell pigments when pigments grid is set', () => {
+	it('XORs per-cell pigments on multi-color templates', () => {
 		const puzzle = [
 			[0, 0],
 			[0, 0]
 		];
 		const template = {
 			shape: [
-				[1, 1],
-				[0, 1]
-			],
-			pigment: 1 as const,
-			pigments: [
 				[1, 2],
 				[0, 4]
-			] as const
+			]
 		};
 		expect(applyTemplate(puzzle, template, 0, 0)).toEqual([
 			[1, 2],

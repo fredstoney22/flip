@@ -1,27 +1,37 @@
 import { describe, it, expect } from 'vitest';
-import { applyTemplate, isPuzzleComplete } from './PuzzleFunctions.js';
-import { generateVerifiedPuzzle, monoGeneratorConfig, solveMinMoves } from './PuzzleGenerator.js';
+import {
+	applyTemplate,
+	isPuzzleComplete,
+	isPuzzleSolved
+} from './PuzzleFunctions.js';
+import {
+	generateVerifiedPuzzle,
+	monoGeneratorConfig,
+	solveMinMoves,
+	solveMinMovesGridOnly
+} from './PuzzleGenerator.js';
 import { getPuzzleById } from './packs.js';
 import type { PuzzleConfig } from './types.js';
-import { MONO_FLIP_SOLVED_VALUE } from './types.js';
 
-describe('all-templates-used rule', () => {
-	it('does not complete when the grid is solved but a template was skipped', () => {
+describe('puzzle completion rules', () => {
+	it('player win is grid-only even when a template was skipped', () => {
 		const config: PuzzleConfig = {
 			startState: [
 				[0, 0, 0],
-				[0, 1, 0],
-				[0, 0, 0]
+				[5, 5, 0],
+				[0, 5, 0]
 			],
 			templates: [
-				{ shape: [[1]], pigment: 1 },
-				{ shape: [[1, 1]], pigment: 1 }
+				{ shape: [[0, 0, 0], [0, 5, 5]] },
+				{ shape: [[5, 5], [0, 5]] },
+				{ shape: [[0, 5], [0, 0], [5, 0]] }
 			],
-			solvedValue: MONO_FLIP_SOLVED_VALUE,
+			solvedValue: 0,
 			allowTemplateRotation: true
 		};
-		const solvedGrid = applyTemplate(config.startState, config.templates[0], 1, 1);
-		expect(isPuzzleComplete(config, solvedGrid, 1 << 0)).toBe(false);
+		const solvedGrid = applyTemplate(config.startState, config.templates[1], 1, 0);
+		expect(isPuzzleSolved(config, solvedGrid)).toBe(true);
+		expect(isPuzzleComplete(config, solvedGrid, 1 << 1)).toBe(false);
 	});
 
 	it('validates intro-pack puzzles under the all-templates-used solver', () => {
@@ -35,6 +45,9 @@ describe('all-templates-used rule', () => {
 		);
 		expect(generated.minMovesToSolve).toBeGreaterThanOrEqual(generated.templates.length);
 		expect(solveMinMoves(generated, generated.minMovesToSolve + 2)).toBe(
+			generated.minMovesToSolve
+		);
+		expect(solveMinMovesGridOnly(generated, generated.minMovesToSolve + 2)).toBe(
 			generated.minMovesToSolve
 		);
 	});

@@ -8,32 +8,28 @@ import {
 
 describe('templatePigment', () => {
 	it('builds a template with at least two pigments on active cells', () => {
-		const shape = [
+		const mask = [
 			[1, 1],
 			[1, 0]
 		];
-		const template = buildMultiColoredTemplate(shape, [1, 2]);
+		const template = buildMultiColoredTemplate(mask, [1, 2]);
 		expect(template).not.toBeNull();
 		expect(isMultiColoredTemplate(template!)).toBe(true);
 	});
 
-	it('rotates pigments with the shape', () => {
+	it('rotates unified shape grids with pigments', () => {
 		const template = {
 			shape: [
-				[1, 0],
-				[1, 1]
-			],
-			pigment: 1 as const,
-			pigments: [
 				[1, 0],
 				[2, 4]
 			] as const
 		};
 		const rotated = orientTemplate(template, 1);
-		expect(rotated.pigments).toEqual([
+		expect(rotated.shape).toEqual([
 			[2, 1],
 			[4, 0]
 		]);
 		expect(isMultiColoredTemplate(rotated)).toBe(true);
+		expect(getTemplateCellPigment(rotated, 0, 0)).toBe(2);
 	});
 });

@@ -22,7 +22,6 @@ function invertMonochromeGrid(grid: PuzzleGrid): PuzzleGrid {
 }
 
 function isMonochromeManualPuzzle(cfg: PuzzleConfig): boolean {
-	if (cfg.templates.some((t) => t.pigment !== 1)) return false;
 	return (
 		cfg.startState.every((row) => row.every((cell) => cell === 0 || cell === 1)) &&
 		cfg.templates.every((t) => t.shape.every((row) => row.every((cell) => cell === 0 || cell === 1)))

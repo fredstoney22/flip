@@ -11,18 +11,25 @@ import {
 	ensureDailyPuzzleWindow,
 	DAILY_SCHEDULE_LOOKAHEAD_DAYS
 } from './dailyPuzzleSchedule.js';
+import { packActiveForSeed, resolveSeedActiveMode } from './seedActiveMode.js';
 
 /**
  * Seeds the database with pack and puzzle data from @flip/game, then ensures
  * daily_puzzle rows exist for today + the lookahead window.
  * Safe to re-run — pack and puzzle rows are upserted from packs.ts.
+ *
+ * SEED_ACTIVE_MODE:
+ *   all (default) — every pack in packs.ts is active (local dev / CI)
+ *   production    — only slugs in productionPacks.ts are active
  */
 
 async function seed() {
-	console.log('Seeding packs and puzzles…');
+	const seedActiveMode = resolveSeedActiveMode();
+	console.log(`Seeding packs and puzzles (SEED_ACTIVE_MODE=${seedActiveMode})…`);
 
 	for (let i = 0; i < packs.length; i++) {
 		const packDef = packs[i];
+		const active = packActiveForSeed(packDef.slug, seedActiveMode);
 
 		// Upsert the pack row (slug is unique)
 		await db
@@ -32,7 +39,7 @@ async function seed() {
 				name: packDef.name,
 				slug: packDef.slug,
 				access: packDef.access,
-				active: true,
+				active,
 				sortOrder: i,
 				createdAt: new Date()
 			})
@@ -42,7 +49,7 @@ async function seed() {
 					name: packDef.name,
 					access: packDef.access,
 					sortOrder: i,
-					active: true
+					active
 				}
 			});
 
@@ -89,15 +96,20 @@ async function seed() {
 			}
 		}
 
-		console.log(`  ✓ ${packDef.name} (${packDef.access}) — ${puzzleEntries.length} puzzle(s)`);
+		const activeLabel = active ? 'active' : 'inactive';
+		console.log(
+			`  ✓ ${packDef.name} (${packDef.access}, ${activeLabel}) — ${puzzleEntries.length} puzzle(s)`
+		);
 	}
 
 	console.log(`\nSeeding daily puzzles for the next ${DAILY_SCHEDULE_LOOKAHEAD_DAYS} days…`);
-	const { created, scheduled } = await ensureDailyPuzzleWindow(DAILY_SCHEDULE_LOOKAHEAD_DAYS);
+	const { created, updated, scheduled } = await ensureDailyPuzzleWindow(DAILY_SCHEDULE_LOOKAHEAD_DAYS);
 	for (const dateStr of scheduled) {
 		console.log(`  ✓ ${dateStr}`);
 	}
-	console.log(`  (${created} new row(s), ${scheduled.length} total in window)`);
+	console.log(
+		`  (${created} new, ${updated} updated, ${scheduled.length} total in window)`
+	);
 
 	console.log('\nSeed complete.');
 	process.exit(0);

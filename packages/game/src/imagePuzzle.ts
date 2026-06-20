@@ -4,6 +4,7 @@
  */
 
 import { applyTemplate, isSolved } from './PuzzleFunctions.js';
+import { maskToUnifiedShape } from './templatePigment.js';
 import type { Pigment, PuzzleConfig, PuzzleGrid, PuzzleTemplate } from './types.js';
 import { PIGMENT_CLEAR_SOLVED_VALUE } from './types.js';
 
@@ -89,7 +90,7 @@ export function buildImagePuzzle(grid: PuzzleGrid, options: ImagePuzzleOptions =
 		const mask = maskForPigment(grid, pigment);
 		const parts = splitMaskHorizontally(mask, splitsPerColor);
 		for (const shape of parts) {
-			templates.push({ shape, pigment });
+			templates.push({ shape: maskToUnifiedShape(shape, pigment) });
 		}
 	}
 

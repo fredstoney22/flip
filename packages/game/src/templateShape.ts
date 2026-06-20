@@ -2,13 +2,15 @@
  * Template shape helpers — minimum active (flipped) cell counts.
  */
 
+import type { Pigment } from './types.js';
+
 export const MIN_TEMPLATE_ACTIVE_CELLS = 2;
 
-export function countActiveCells(shape: number[][]): number {
+export function countActiveCells(shape: number[][] | Pigment[][]): number {
 	let count = 0;
 	for (const row of shape) {
 		for (const cell of row) {
-			if (cell === 1) count++;
+			if (cell !== 0) count++;
 		}
 	}
 	return count;

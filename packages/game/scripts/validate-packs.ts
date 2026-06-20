@@ -1,6 +1,7 @@
 import { packs } from '../src/packs.js';
+import { distinctPigmentsInTemplate } from '../src/templatePigment.js';
 import type { PuzzleConfig, PuzzleTemplate } from '../src/types.js';
-import { solveMinMoves } from '../src/PuzzleGenerator.js';
+import { solveMinMoves, solveMinMovesGridOnly } from '../src/PuzzleGenerator.js';
 import { getDistinctRotations, gridToKey } from '../src/puzzleGrid.js';
 import { findTemplateContainment } from '../src/templateContainment.js';
 import {
@@ -123,21 +124,22 @@ function validateConfig(
 			});
 		}
 
-		if (t.pigment === 0) {
-			issues.push({
-				severity: 'error',
-				packSlug,
-				puzzleId,
-				message: `template[${i}] has pigment 0 (no-op)`
-			});
-		}
-
 		if (hasAllZeroShape(t)) {
 			issues.push({
 				severity: 'error',
 				packSlug,
 				puzzleId,
-				message: `template[${i}] has an all-zero shape (no-op)`
+				message: `template[${i}] has no active cells (all zeros)`
+			});
+		}
+
+		const activePigments = distinctPigmentsInTemplate(t);
+		if (activePigments.length === 0) {
+			issues.push({
+				severity: 'error',
+				packSlug,
+				puzzleId,
+				message: `template[${i}] has no active cells (no-op)`
 			});
 		}
 
@@ -198,35 +200,14 @@ function validateConfig(
 		});
 	}
 
-	if (typeof cfg.minMovesToSolve === 'number' && cfg.minMovesToSolve < cfg.templates.length) {
+	const gridOnlyMoves = solveMinMovesGridOnly(cfg, solvableDepth);
+	if (gridOnlyMoves !== null && solvable !== null && gridOnlyMoves < solvable) {
 		issues.push({
 			severity: 'error',
 			packSlug,
 			puzzleId,
-			message: `minMovesToSolve=${cfg.minMovesToSolve} is less than template count ${cfg.templates.length}`
+			message: `shortcut exists: grid clears in ${gridOnlyMoves} moves but verified solution requires ${solvable}`
 		});
-	}
-
-	if (typeof cfg.minMovesToSolve === 'number') {
-		const verified = solveMinMoves(
-			cfg,
-			Math.max(cfg.minMovesToSolve + 2, cfg.templates.length + 2)
-		);
-		if (verified === null) {
-			issues.push({
-				severity: 'error',
-				packSlug,
-				puzzleId,
-				message: `minMovesToSolve=${cfg.minMovesToSolve} but solver found no solution within that window`
-			});
-		} else if (verified !== cfg.minMovesToSolve) {
-			issues.push({
-				severity: 'error',
-				packSlug,
-				puzzleId,
-				message: `minMovesToSolve=${cfg.minMovesToSolve} but solver verified ${verified} moves`
-			});
-		}
 	}
 
 	return issues;

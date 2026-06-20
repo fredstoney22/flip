@@ -45,7 +45,8 @@ With `sk_test_…` in `.env` and local DB seeded:
 
 ```bash
 npm run db:push
-npm run db:seed
+npm run db:seed          # local / CI — all packs active
+npm run db:seed:production   # production — only packs in productionPacks.ts
 npm run stripe:setup-paid-packs
 npm run stripe:status
 ```
@@ -73,8 +74,11 @@ npm run stripe:listen    # terminal 2 — copy whsec_… to .env
 ```bash
 DATABASE_URL="postgresql://..." \
 STRIPE_SECRET_KEY="sk_live_..." \
+npm run db:seed:production
 npm run stripe:setup-paid-packs
 ```
+
+Seed production with `db:seed:production` so only packs listed in `packages/game/src/productionPacks.ts` are active (currently `intro-pack` only). Puzzle data for all packs is still synced; non-allowlisted packs are stored as `active: false`.
 
 This creates live Products/Prices in Stripe and stores `pack.stripeProductId` in production Postgres.
 

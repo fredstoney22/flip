@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { TutorialStep } from '$lib/constants/tutorialSteps';
+	import { isInteractiveTutorialStep, type TutorialStep } from '$lib/constants/tutorialSteps';
 
 	interface Props {
 		steps: TutorialStep[];
@@ -13,83 +13,110 @@
 
 	const step = $derived(steps[currentStep]);
 	const isFirst = $derived(currentStep === 0);
+	const isInfoStep = $derived(step?.action === 'info');
 	const isWaitStep = $derived(step?.action === 'wait');
+	const finishLabel = $derived(step?.finishLabel ?? 'Continue');
+	const finishHref = $derived(step?.finishHref ?? '/');
+	const interactiveStepCount = $derived(steps.filter(isInteractiveTutorialStep).length);
+	const interactivePosition = $derived.by(() => {
+	  let position = 0;
+	  for (let i = 0; i <= currentStep; i++) {
+	    if (isInteractiveTutorialStep(steps[i])) position++;
+	  }
+	  return position;
+	});
+	const showStepIndicator = $derived(
+	  !isInfoStep && interactiveStepCount > 1
+	);
 </script>
 
 {#if step}
-	<div class="walkthrough-card" role="dialog" aria-labelledby="tutorial-title" aria-describedby="tutorial-body">
-		<div class="step-indicator" aria-hidden="true">
-			{currentStep + 1} / {steps.length}
-		</div>
+	<div
+		class="walkthrough-card"
+		role="dialog"
+		aria-labelledby="tutorial-title"
+		aria-describedby="tutorial-body"
+	>
+		{#if showStepIndicator}
+			<div class="step-indicator" aria-hidden="true">
+				{interactivePosition} / {interactiveStepCount}
+			</div>
+		{/if}
 		<h2 id="tutorial-title" class="step-title">{step.title}</h2>
-		<p id="tutorial-body" class="step-body">{step.body}</p>
+		<p id="tutorial-body" class="step-body" class:no-actions={isInfoStep}>{step.body}</p>
+		{#if !isInfoStep}
 		<div class="actions">
 			{#if step.action === 'finish'}
-				<a href="/daily" class="btn-primary" onclick={onComplete}>Try daily puzzle</a>
+				<a href={finishHref} class="btn-primary" onclick={onComplete}>{finishLabel}</a>
 				<button type="button" class="btn-secondary" onclick={onSkip}>Close</button>
 			{:else if isWaitStep}
-				<button type="button" class="btn-secondary" onclick={onSkip}>Skip tutorial</button>
+				<button type="button" class="btn-secondary" onclick={onSkip}>Skip</button>
 			{:else}
 				<button type="button" class="btn-primary" onclick={onNext}>
 					{step.action === 'start' ? 'Start' : 'Next'}
 				</button>
 				{#if !isFirst}
-					<button type="button" class="btn-secondary" onclick={onSkip}>Skip tutorial</button>
+					<button type="button" class="btn-secondary" onclick={onSkip}>Skip</button>
 				{/if}
 			{/if}
 		</div>
+		{/if}
 	</div>
 {/if}
 
 <style>
 	.walkthrough-card {
 		background: white;
-		border-radius: 12px;
+		border-radius: 10px;
 		border: 1px solid #e5e7eb;
-		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
-		padding: 1.5rem 1.75rem;
-		max-width: 22rem;
-		margin-bottom: 1.5rem;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+		padding: 0.625rem 0.75rem;
 	}
 
 	.step-indicator {
-		font-size: 0.75rem;
+		font-size: 0.625rem;
 		font-weight: 600;
 		color: #6366f1;
-		margin-bottom: 0.5rem;
+		margin-bottom: 0.25rem;
+		letter-spacing: 0.02em;
 	}
 
 	.step-title {
-		margin: 0 0 0.5rem;
-		font-size: 1.125rem;
+		margin: 0 0 0.375rem;
+		font-size: 0.8125rem;
 		font-weight: 700;
 		color: #111827;
+		line-height: 1.3;
 	}
 
 	.step-body {
-		margin: 0 0 1.25rem;
-		font-size: 0.9375rem;
-		line-height: 1.5;
+		margin: 0 0 0.625rem;
+		font-size: 0.75rem;
+		line-height: 1.4;
 		color: #4b5563;
+	}
+
+	.step-body.no-actions {
+		margin-bottom: 0;
 	}
 
 	.actions {
 		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-		align-items: center;
+		flex-direction: column;
+		gap: 0.375rem;
+		align-items: stretch;
 	}
 
 	.btn-primary {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		padding: 0.5rem 1.25rem;
+		padding: 0.375rem 0.625rem;
 		background: #6366f1;
 		color: white;
 		border: none;
-		border-radius: 8px;
-		font-size: 0.9375rem;
+		border-radius: 6px;
+		font-size: 0.75rem;
 		font-weight: 600;
 		text-decoration: none;
 		cursor: pointer;
@@ -101,12 +128,12 @@
 	}
 
 	.btn-secondary {
-		padding: 0.5rem 1rem;
+		padding: 0.3125rem 0.625rem;
 		background: white;
 		color: #4b5563;
 		border: 1px solid #d1d5db;
-		border-radius: 8px;
-		font-size: 0.875rem;
+		border-radius: 6px;
+		font-size: 0.6875rem;
 		font-weight: 500;
 		cursor: pointer;
 		transition: background 0.15s;

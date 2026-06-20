@@ -15,8 +15,7 @@ export function getValidPuzzle(
 ): PuzzleConfig {
 	let puzzle: PuzzleGrid = oneSquare(puzzleSize);
 	const templates: PuzzleTemplate[] = randSquares(templateSizes).map((shape) => ({
-		shape: shape.map((row) => row.map((cell) => (cell ? 1 : 0))),
-		pigment: 1 as Pigment
+		shape: shape.map((row) => row.map((cell) => (cell ? 1 : 0) as Pigment))
 	}));
 
 	for (let currMove = 1; currMove <= movesToSolve; currMove++) {
@@ -41,7 +40,7 @@ export function getValidPuzzle(
 
 		puzzle = applyTemplate(
 			puzzle,
-			{ shape: shapeToApply, pigment: 1 },
+			{ shape: shapeToApply },
 			randLocation[0],
 			randLocation[1]
 		);

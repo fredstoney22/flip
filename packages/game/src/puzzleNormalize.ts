@@ -1,4 +1,4 @@
-import { distinctPigmentsInTemplate } from './templatePigment.js';
+import { distinctPigmentsInTemplate, migrateSplitTemplate, normalizeTemplate } from './templatePigment.js';
 import type { Pigment, PuzzleConfig, PuzzleGrid, PuzzleTemplate } from './types.js';
 import { MONO_FLIP_SOLVED_VALUE, PIGMENT_CLEAR_SOLVED_VALUE } from './types.js';
 
@@ -6,7 +6,7 @@ function isPigment(value: number): value is Pigment {
 	return Number.isInteger(value) && value >= 0 && value <= 7;
 }
 
-function isShapeGrid(value: unknown): value is number[][] {
+function isLegacyBinaryTemplateGrid(value: unknown): value is number[][] {
 	return (
 		Array.isArray(value) &&
 		value.length > 0 &&
@@ -19,31 +19,11 @@ function isShapeGrid(value: unknown): value is number[][] {
 	);
 }
 
-function isLegacyTemplateGrid(value: unknown): value is number[][] {
-	return isShapeGrid(value);
-}
-
-function isUnifiedTemplate(value: unknown): value is PuzzleTemplate {
-	if (!value || typeof value !== 'object') return false;
-	const t = value as PuzzleTemplate;
-	if (!isShapeGrid(t.shape) || !isPigment(t.pigment)) return false;
-	if (t.pigments !== undefined) {
-		if (!Array.isArray(t.pigments) || t.pigments.length !== t.shape.length) return false;
-		for (let r = 0; r < t.pigments.length; r++) {
-			if (!Array.isArray(t.pigments[r]) || t.pigments[r].length !== t.shape[r].length) return false;
-			for (const cell of t.pigments[r]) {
-				if (!isPigment(cell)) return false;
-			}
-		}
-	}
-	return true;
-}
-
 function legacyGridToTemplate(grid: number[][]): PuzzleTemplate {
-	return {
+	return migrateSplitTemplate({
 		shape: grid.map((row) => row.map((cell) => (cell ? 1 : 0))),
 		pigment: 1
-	};
+	});
 }
 
 function inferSolvedValue(startState: PuzzleGrid, templates: PuzzleTemplate[]): Pigment {
@@ -67,7 +47,7 @@ export function isMonochromeFlipPuzzle(config: PuzzleConfig): boolean {
 }
 
 /**
- * Normalizes stored puzzle JSON (legacy or unified) into a PuzzleConfig.
+ * Normalizes stored puzzle JSON (legacy split templates or unified shape grids) into a PuzzleConfig.
  */
 export function normalizePuzzleConfig(raw: unknown): PuzzleConfig {
 	if (!raw || typeof raw !== 'object') {
@@ -95,18 +75,12 @@ export function normalizePuzzleConfig(raw: unknown): PuzzleConfig {
 	}
 
 	let templates: PuzzleTemplate[];
-	if (isUnifiedTemplate(rawTemplates[0])) {
-		templates = (rawTemplates as PuzzleTemplate[]).map((t) => ({
-			shape: t.shape.map((row) => [...row]),
-			pigment: t.pigment,
-			...(t.pigments ? { pigments: t.pigments.map((row) => [...row]) } : {})
-		}));
-	} else if (isLegacyTemplateGrid(rawTemplates[0])) {
+	if (isLegacyBinaryTemplateGrid(rawTemplates[0])) {
 		templates = (rawTemplates as number[][][]).map((gridTemplate) =>
 			legacyGridToTemplate(gridTemplate)
 		);
 	} else {
-		throw new Error('Unrecognized template format');
+		templates = rawTemplates.map((t) => normalizeTemplate(t));
 	}
 
 	const solvedValue =

@@ -2,8 +2,8 @@
  * One-time purchase prices for sellable paid packs (USD cents).
  * Only slugs listed here are processed by `stripe:setup-paid-packs`.
  *
- * Auto-generated packs (hard-auto, expert-auto) are omitted — deactivate them
- * in the DB or add prices here if you want to sell them.
+ * Only packs on the production allowlist (productionPacks.ts) should be sold.
+ * Add a slug here after it is promoted to production.
  */
 export const PACK_PRICES_CENTS: Record<string, number> = {
 	'hard-in-3': 499

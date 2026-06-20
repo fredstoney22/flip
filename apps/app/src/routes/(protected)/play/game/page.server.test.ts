@@ -9,7 +9,7 @@ interface ApiPuzzleResponse {
 	puzzleNumber: number;
 	config: {
 		startState: number[][];
-		templates: Array<{ shape: number[][]; pigment: number }>;
+		templates: Array<{ shape: number[][] }>;
 		solvedValue: number;
 		allowTemplateRotation?: boolean;
 	};
@@ -44,7 +44,7 @@ const INTRO_PUZZLE: ApiPuzzleResponse = {
       [1, 0, 1],
       [1, 1, 1]
     ],
-    templates: [{ shape: [[0, 0, 0], [0, 1, 0], [0, 0, 0]], pigment: 1 }],
+    templates: [{ shape: [[0, 0, 0], [0, 1, 0], [0, 0, 0]] }],
     solvedValue: 1,
     allowTemplateRotation: true
   }

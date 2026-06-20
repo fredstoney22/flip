@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { applyTemplate, isPuzzleComplete, rotateRight } from './PuzzleFunctions.js';
+import { applyTemplate, isPuzzleSolved, rotateRight } from './PuzzleFunctions.js';
 import { findHintMove } from './PuzzleHint.js';
 import type { PuzzleConfig } from './types.js';
 
@@ -14,16 +14,14 @@ const twoMovePuzzle: PuzzleConfig = {
 			shape: [
 				[1, 0],
 				[1, 0]
-			],
-			pigment: 1
+			]
 		},
 		{
 			shape: [
 				[1, 1, 1],
 				[0, 1, 1],
 				[0, 0, 0]
-			],
-			pigment: 1
+			]
 		}
 	],
 	solvedValue: 1,
@@ -34,8 +32,7 @@ const twoMovePuzzle: PuzzleConfig = {
 function applyHintMove(
 	config: PuzzleConfig,
 	move: NonNullable<ReturnType<typeof findHintMove>>,
-	grid = config.startState,
-	usedTemplateMask = 0
+	grid = config.startState
 ) {
 	const template = config.templates[move.templateIndex];
 	let shape = template.shape.map((r) => [...r]);
@@ -44,14 +41,11 @@ function applyHintMove(
 	}
 	const nextGrid = applyTemplate(
 		grid,
-		{ shape, pigment: template.pigment },
+		{ shape },
 		move.row,
 		move.col
 	);
-	return {
-		grid: nextGrid,
-		usedTemplateMask: usedTemplateMask | (1 << move.templateIndex)
-	};
+	return { grid: nextGrid };
 }
 
 describe('findHintMove', () => {
@@ -65,64 +59,44 @@ describe('findHintMove', () => {
 
 		const afterFirstMove = applyHintMove(twoMovePuzzle, firstMove!);
 		const hintIgnoringCurrent = findHintMove(twoMovePuzzle, 10);
-		const hintFromCurrent = findHintMove(
-			twoMovePuzzle,
-			10,
-			afterFirstMove.grid,
-			afterFirstMove.usedTemplateMask
-		);
+		const hintFromCurrent = findHintMove(twoMovePuzzle, 10, afterFirstMove.grid);
 
 		expect(hintIgnoringCurrent).toEqual(firstMove);
 		expect(hintFromCurrent).not.toEqual(firstMove);
 	});
 
-	it('uses the templates already applied by the player', () => {
+	it('finds a finishing move from the current grid state', () => {
 		const firstMove = findHintMove(twoMovePuzzle, 10);
 		expect(firstMove).not.toBeNull();
 
 		const afterFirstMove = applyHintMove(twoMovePuzzle, firstMove!);
-		const hintWithoutUsage = findHintMove(twoMovePuzzle, 10, afterFirstMove.grid, 0);
-		const hintWithUsage = findHintMove(
-			twoMovePuzzle,
-			10,
-			afterFirstMove.grid,
-			afterFirstMove.usedTemplateMask
-		);
+		const finishingMove = findHintMove(twoMovePuzzle, 10, afterFirstMove.grid);
+		expect(finishingMove).not.toBeNull();
 
-		expect(hintWithoutUsage?.templateIndex).toBe(0);
-		expect(hintWithUsage).toEqual({ templateIndex: 1, rotation: 1, row: 0, col: 0 });
-
-		const solved = applyHintMove(
-			twoMovePuzzle,
-			hintWithUsage!,
-			afterFirstMove.grid,
-			afterFirstMove.usedTemplateMask
-		);
-		expect(isPuzzleComplete(twoMovePuzzle, solved.grid, solved.usedTemplateMask)).toBe(true);
+		const solved = applyHintMove(twoMovePuzzle, finishingMove!, afterFirstMove.grid);
+		expect(isPuzzleSolved(twoMovePuzzle, solved.grid)).toBe(true);
 	});
 
 	it('does not loop by repeating the same move when following hints', () => {
 		let grid = twoMovePuzzle.startState.map((r) => [...r]);
-		let usedTemplateMask = 0;
 		const seen = new Set<string>();
 
 		for (let step = 0; step < 4; step++) {
-			const move = findHintMove(twoMovePuzzle, 10, grid, usedTemplateMask);
+			const move = findHintMove(twoMovePuzzle, 10, grid);
 			expect(move).not.toBeNull();
 
-			const key = `${move!.templateIndex}:${move!.rotation}:${move!.row}:${move!.col}:${usedTemplateMask}`;
+			const key = `${move!.templateIndex}:${move!.rotation}:${move!.row}:${move!.col}`;
 			expect(seen.has(key)).toBe(false);
 			seen.add(key);
 
-			const next = applyHintMove(twoMovePuzzle, move!, grid, usedTemplateMask);
+			const next = applyHintMove(twoMovePuzzle, move!, grid);
 			grid = next.grid;
-			usedTemplateMask = next.usedTemplateMask;
 
-			if (isPuzzleComplete(twoMovePuzzle, grid, usedTemplateMask)) {
+			if (isPuzzleSolved(twoMovePuzzle, grid)) {
 				return;
 			}
 		}
 
-		throw new Error('Hints did not reach a completed puzzle within 4 steps');
+		throw new Error('Hints did not reach a solved puzzle within 4 steps');
 	});
 });

@@ -27,6 +27,7 @@ import {
 	buildMultiColoredTemplate,
 	getDistinctTemplateOrientations,
 	isMultiColoredTemplate,
+	maskToUnifiedShape,
 	pigmentLayerKey
 } from './templatePigment.js';
 
@@ -193,6 +194,47 @@ export function solveMinMoves(
 	return null;
 }
 
+/** Minimum moves to clear the grid, regardless of which templates were used. */
+export function solveMinMovesGridOnly(
+	config: PuzzleConfig,
+	maxDepth: number = DEFAULT_MAX_DEPTH
+): number | null {
+	const { startState, templates, solvedValue, allowTemplateRotation = true } = config;
+	if (isSolved(startState, solvedValue)) {
+		return 0;
+	}
+
+	const size = startState.length;
+	const moves = enumerateMoves(size, templates, allowTemplateRotation);
+	const useCanonical = allowTemplateRotation && solvedValue === MONO_FLIP_SOLVED_VALUE;
+	const stateKey = (grid: PuzzleGrid) =>
+		useCanonical ? canonicalizeGrid(grid) : gridToKey(grid);
+
+	const visited = new Set<string>([stateKey(startState)]);
+	let queue: PuzzleGrid[] = [startState.map((row) => [...row])];
+
+	for (let depth = 1; depth <= maxDepth; depth++) {
+		const next: PuzzleGrid[] = [];
+		for (const grid of queue) {
+			for (const move of moves) {
+				const newState = applyTemplate(grid, move.template, move.row, move.col);
+				if (isSolved(newState, solvedValue)) {
+					return depth;
+				}
+				const key = stateKey(newState);
+				if (!visited.has(key)) {
+					visited.add(key);
+					next.push(newState);
+				}
+			}
+		}
+		if (next.length === 0) return null;
+		queue = next;
+	}
+
+	return null;
+}
+
 function randomBit(): number {
 	return Math.round(Math.random());
 }
@@ -247,7 +289,7 @@ function squareTemplate(size: number, pigment: Pigment): PuzzleTemplate {
 			ensureMinActiveCells(shape, MIN_TEMPLATE_ACTIVE_CELLS);
 		}
 	} while (!templateMeetsMinActiveCells(shape));
-	return { shape, pigment };
+	return { shape: maskToUnifiedShape(shape, pigment) };
 }
 
 function templateEquivalenceKey(template: PuzzleTemplate): string {
@@ -334,7 +376,7 @@ function buildTemplates(config: GeneratorConfig): PuzzleTemplate[] | null {
 			const shape = randomShape(rows, cols);
 			let candidate: PuzzleTemplate | null = wantMultiColored
 				? buildMultiColoredTemplate(shape, pigments)
-				: { shape, pigment };
+				: { shape: maskToUnifiedShape(shape, pigment) };
 			if (!candidate) continue;
 			if (isUniqueTemplate(candidate, templates)) {
 				templates.push(candidate);

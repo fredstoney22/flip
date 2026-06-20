@@ -1,4 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
+import { getFirstStepsConcept, FIRST_STEPS_SLUG } from '@flip/game';
 import { getUserProgress } from '$lib/progress.server';
 import type { PageServerLoad } from './$types';
 
@@ -37,7 +38,11 @@ export const load: PageServerLoad = async ({ url, fetch, request }) => {
   const puzzleList = packData.puzzles.map((p) => ({
     id: p.puzzleNumber,
     completed: completedIds.has(p.puzzleNumber),
-    bestMoveCount: bestMoves[p.puzzleNumber] ?? null
+    bestMoveCount: bestMoves[p.puzzleNumber] ?? null,
+    concept:
+      packData.packSlug === FIRST_STEPS_SLUG
+        ? (getFirstStepsConcept(p.puzzleNumber) ?? null)
+        : null
   }));
 
   const purchaseSuccess = url.searchParams.get('purchase') === 'success';

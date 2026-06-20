@@ -14,8 +14,7 @@ export const TUTORIAL_PUZZLE_CONFIG: PuzzleConfig = {
         [0, 0, 1],
         [0, 1, 0],
         [1, 0, 0]
-      ],
-      pigment: 1
+      ]
     }
   ],
   solvedValue: MONO_FLIP_SOLVED_VALUE,

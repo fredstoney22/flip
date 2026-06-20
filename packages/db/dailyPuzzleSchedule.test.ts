@@ -42,7 +42,8 @@ describe('puzzleIdForDate', () => {
 });
 
 describe('dailyPuzzleAssignment', () => {
-	it('always uses the intro pack', () => {
+	it('always uses the First Steps pack', () => {
 		expect(dailyPuzzleAssignment('2026-06-17').packSlug).toBe(DAILY_PACK_SLUG);
+		expect(DAILY_PACK_SLUG).toBe('first-steps');
 	});
 });

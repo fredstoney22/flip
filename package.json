@@ -24,6 +24,7 @@
 		"db:push": "npm run push -w @flip/db",
 		"db:studio": "npm run studio -w @flip/db",
 		"db:seed": "npm run seed -w @flip/db",
+		"db:seed:production": "SEED_ACTIVE_MODE=production npm run seed -w @flip/db",
 		"api:dev": "npm run dev -w @flip/api",
 		"app:dev": "npm run dev -w @flip/app",
 		"game:validate": "npx tsx packages/game/scripts/validate-packs.ts",

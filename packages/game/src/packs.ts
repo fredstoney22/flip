@@ -5,6 +5,7 @@
 
 import type { PackDefinition, PuzzleConfig } from './types.js';
 import { animalPack } from './puzzles/monkey.js';
+import { firstStepsPack } from './puzzles/firstSteps.js';
 
 export const packs: PackDefinition[] = [
   {
@@ -41,8 +42,7 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -61,8 +61,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -98,8 +97,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -118,8 +116,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -155,8 +152,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -175,8 +171,7 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -212,8 +207,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -232,8 +226,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -269,8 +262,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -289,8 +281,7 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -333,8 +324,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -346,8 +336,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -366,8 +355,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -403,8 +391,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -416,8 +403,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -436,8 +422,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -473,8 +458,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -486,8 +470,7 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -506,8 +489,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -543,8 +525,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -556,8 +537,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -576,8 +556,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -613,8 +592,7 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -626,8 +604,7 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -646,8 +623,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -690,8 +666,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -710,8 +685,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -730,8 +704,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -767,8 +740,7 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -787,8 +759,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -807,8 +778,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -844,8 +814,7 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -864,8 +833,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -884,8 +852,7 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -921,8 +888,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -941,8 +907,7 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -961,8 +926,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -998,8 +962,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -1018,8 +981,7 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -1038,8 +1000,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -1089,8 +1050,7 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -1109,8 +1069,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -1129,8 +1088,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -1173,8 +1131,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -1193,8 +1150,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -1213,8 +1169,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -1257,8 +1212,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -1277,8 +1231,7 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -1297,8 +1250,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -1341,8 +1293,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -1361,8 +1312,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -1381,8 +1331,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -1425,8 +1374,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -1445,8 +1393,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -1465,8 +1412,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -1516,8 +1462,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -1536,8 +1481,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -1556,8 +1500,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -1600,8 +1543,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -1620,8 +1562,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -1640,8 +1581,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -1684,8 +1624,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -1704,8 +1643,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -1724,8 +1662,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -1768,8 +1705,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -1788,8 +1724,7 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -1808,8 +1743,7 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -1852,8 +1786,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -1872,8 +1805,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -1892,8 +1824,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -1902,6 +1833,7 @@ export const packs: PackDefinition[] = [
       }
     }
   },
+  firstStepsPack,
   {
     "name": "Intro Pack",
     "slug": "intro-pack",
@@ -1936,8 +1868,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -1980,8 +1911,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 0,
@@ -2023,8 +1953,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -2043,8 +1972,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 0,
@@ -2086,8 +2014,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -2106,8 +2033,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 0,
@@ -2149,8 +2075,7 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -2169,8 +2094,7 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 0,
@@ -2205,8 +2129,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -2225,8 +2148,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -2262,8 +2184,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -2282,8 +2203,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -2302,8 +2222,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -2339,8 +2258,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -2359,8 +2277,7 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -2379,8 +2296,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -2416,8 +2332,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -2436,8 +2351,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -2456,8 +2370,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 1,
@@ -2500,8 +2413,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -2520,8 +2432,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -2540,8 +2451,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 0,
@@ -2590,8 +2500,7 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -2610,8 +2519,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -2630,8 +2538,7 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 0,
@@ -2673,8 +2580,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -2693,8 +2599,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -2713,8 +2618,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 0,
@@ -2763,8 +2667,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -2783,8 +2686,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 0,
@@ -2821,43 +2723,40 @@ export const packs: PackDefinition[] = [
               [
                 0,
                 0,
-                1
+                4
               ],
               [
                 0,
                 0,
-                1
+                4
               ]
-            ],
-            "pigment": 4
+            ]
           },
           {
             "shape": [
               [
-                1,
-                1
+                4,
+                4
               ],
               [
                 0,
-                1
+                4
               ]
-            ],
-            "pigment": 4
+            ]
           },
           {
             "shape": [
               [
-                1,
+                4,
                 0,
                 0
               ],
               [
                 0,
-                1,
+                4,
                 0
               ]
-            ],
-            "pigment": 4
+            ]
           }
         ],
         "solvedValue": 0,
@@ -2897,8 +2796,7 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -2914,48 +2812,45 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
               [
                 0,
                 0,
-                1
+                2
               ],
               [
-                1,
+                2,
                 0,
                 0
               ],
               [
                 0,
                 0,
-                1
+                2
               ]
-            ],
-            "pigment": 2
+            ]
           },
           {
             "shape": [
               [
                 0,
-                1,
+                2,
                 0
               ],
               [
                 0,
-                1,
-                1
+                2,
+                2
               ],
               [
                 0,
                 0,
-                1
+                2
               ]
-            ],
-            "pigment": 2
+            ]
           }
         ],
         "solvedValue": 0,
@@ -2998,8 +2893,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -3011,75 +2905,70 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
               [
-                1,
-                1,
+                2,
+                2,
                 0
               ],
               [
-                1,
+                2,
                 0,
-                1
+                2
               ]
-            ],
-            "pigment": 2
+            ]
           },
           {
             "shape": [
               [
                 0,
-                1,
-                1
+                2,
+                2
               ],
               [
-                1,
-                1,
+                2,
+                2,
                 0
               ]
-            ],
-            "pigment": 2
+            ]
           },
           {
             "shape": [
               [
-                1,
-                1
+                4,
+                4
               ],
               [
-                1,
+                4,
                 0
               ],
               [
                 0,
-                1
+                4
               ]
-            ],
-            "pigment": 4
+            ]
           },
           {
             "shape": [
               [
-                1,
-                1,
-                1
+                4,
+                4,
+                4
               ],
               [
                 0,
-                1,
+                4,
                 0
               ],
               [
                 0,
-                1,
+                4,
                 0
               ]
-            ],
-            "pigment": 4
+            ]
           }
         ],
         "solvedValue": 0,
@@ -3109,55 +2998,52 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 0,
-                1
+                3
               ],
               [
-                1,
-                1
+                3,
+                3
               ],
               [
-                1,
+                3,
                 0
               ]
-            ],
-            "pigment": 3
+            ]
           },
           {
             "shape": [
               [
-                1,
-                1
+                3,
+                3
               ],
               [
-                1,
+                3,
                 0
               ],
               [
                 0,
                 0
               ]
-            ],
-            "pigment": 3
+            ]
           },
           {
             "shape": [
               [
                 0,
                 0,
-                1
+                5
               ],
               [
                 0,
-                1,
+                5,
                 0
               ]
-            ],
-            "pigment": 5
+            ]
           },
           {
             "shape": [
               [
-                1,
+                5,
                 0
               ],
               [
@@ -3166,43 +3052,40 @@ export const packs: PackDefinition[] = [
               ],
               [
                 0,
-                1
+                5
               ]
-            ],
-            "pigment": 5
+            ]
           },
           {
             "shape": [
               [
-                1,
-                1
+                6,
+                6
               ],
               [
-                1,
-                1
+                6,
+                6
               ]
-            ],
-            "pigment": 6
+            ]
           },
           {
             "shape": [
               [
-                1,
+                6,
                 0,
                 0
               ],
               [
-                1,
+                6,
                 0,
-                1
+                6
               ],
               [
                 0,
                 0,
-                1
+                6
               ]
-            ],
-            "pigment": 6
+            ]
           }
         ],
         "solvedValue": 0,
@@ -3242,8 +3125,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -3262,55 +3144,51 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
               [
                 0,
-                1
+                3
               ],
               [
-                1,
+                3,
                 0
               ],
               [
-                1,
+                3,
                 0
               ]
-            ],
-            "pigment": 3
+            ]
           },
           {
             "shape": [
               [
                 0,
                 0,
-                1
+                3
               ],
               [
-                1,
+                3,
                 0,
                 0
               ]
-            ],
-            "pigment": 3
+            ]
           },
           {
             "shape": [
               [
                 0,
-                1,
+                6,
                 0
               ],
               [
                 0,
-                1,
-                1
+                6,
+                6
               ]
-            ],
-            "pigment": 6
+            ]
           },
           {
             "shape": [
@@ -3319,15 +3197,14 @@ export const packs: PackDefinition[] = [
                 0
               ],
               [
-                1,
+                6,
                 0
               ],
               [
-                1,
-                1
+                6,
+                6
               ]
-            ],
-            "pigment": 6
+            ]
           }
         ],
         "solvedValue": 0,
@@ -3363,28 +3240,26 @@ export const packs: PackDefinition[] = [
           {
             "shape": [
               [
-                1,
+                2,
                 0
               ],
               [
                 0,
-                1
+                2
               ]
-            ],
-            "pigment": 2
+            ]
           },
           {
             "shape": [
               [
-                1,
+                2,
                 0
               ],
               [
-                1,
+                2,
                 0
               ]
-            ],
-            "pigment": 2
+            ]
           }
         ],
         "solvedValue": 0,
@@ -3422,8 +3297,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -3439,8 +3313,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 0,
@@ -3469,39 +3342,37 @@ export const packs: PackDefinition[] = [
           {
             "shape": [
               [
-                1,
+                4,
                 0
               ],
               [
-                1,
+                4,
                 0
               ],
               [
                 0,
                 0
               ]
-            ],
-            "pigment": 4
+            ]
           },
           {
             "shape": [
               [
-                1,
+                4,
                 0,
                 0
               ],
               [
                 0,
-                1,
+                4,
                 0
               ],
               [
                 0,
                 0,
-                1
+                4
               ]
-            ],
-            "pigment": 4
+            ]
           }
         ],
         "solvedValue": 0,
@@ -3530,59 +3401,56 @@ export const packs: PackDefinition[] = [
           {
             "shape": [
               [
-                1,
-                1
+                3,
+                3
               ],
               [
-                1,
-                1
+                3,
+                3
               ],
               [
                 0,
-                1
+                3
               ]
-            ],
-            "pigment": 3
+            ]
           },
           {
             "shape": [
               [
                 0,
-                1,
+                3,
                 0
               ],
               [
-                1,
+                3,
                 0,
-                1
+                3
               ],
               [
-                1,
-                1,
-                1
+                3,
+                3,
+                3
               ]
-            ],
-            "pigment": 3
+            ]
           },
           {
             "shape": [
               [
-                1,
+                3,
                 0,
-                1
+                3
               ],
               [
                 0,
                 0,
-                1
+                3
               ],
               [
                 0,
-                1,
-                1
+                3,
+                3
               ]
-            ],
-            "pigment": 3
+            ]
           }
         ],
         "solvedValue": 0,
@@ -3611,54 +3479,51 @@ export const packs: PackDefinition[] = [
           {
             "shape": [
               [
-                1,
+                6,
                 0,
                 0
               ],
               [
-                1,
-                1,
+                6,
+                6,
                 0
               ]
-            ],
-            "pigment": 6
+            ]
           },
           {
             "shape": [
               [
-                1,
+                6,
                 0
               ],
               [
-                1,
+                6,
                 0
               ],
               [
                 0,
-                1
+                6
               ]
-            ],
-            "pigment": 6
+            ]
           },
           {
             "shape": [
               [
-                1,
+                6,
                 0,
                 0
               ],
               [
                 0,
                 0,
-                1
+                6
               ],
               [
                 0,
-                1,
+                6,
                 0
               ]
-            ],
-            "pigment": 6
+            ]
           }
         ],
         "solvedValue": 0,
@@ -3693,41 +3558,38 @@ export const packs: PackDefinition[] = [
               ],
               [
                 0,
-                1,
-                1
+                5,
+                5
               ]
-            ],
-            "pigment": 5
+            ]
           },
           {
             "shape": [
               [
-                1,
+                5,
                 0
               ],
               [
-                1,
-                1
+                5,
+                5
               ]
-            ],
-            "pigment": 5
+            ]
           },
           {
             "shape": [
               [
                 0,
-                1
+                5
               ],
               [
                 0,
                 0
               ],
               [
-                1,
+                5,
                 0
               ]
-            ],
-            "pigment": 5
+            ]
           }
         ],
         "solvedValue": 0,
@@ -3765,8 +3627,7 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -3782,18 +3643,17 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
               [
                 0,
-                1,
-                1
+                2,
+                2
               ],
               [
-                1,
+                2,
                 0,
                 0
               ],
@@ -3802,26 +3662,10 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 2
+            ]
           },
           {
             "shape": [
-              [
-                1,
-                1
-              ],
-              [
-                0,
-                1
-              ],
-              [
-                0,
-                1
-              ]
-            ],
-            "pigment": 1,
-            "pigments": [
               [
                 1,
                 2
@@ -3877,8 +3721,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -3897,83 +3740,61 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
               [
                 0,
                 0,
-                1
+                2
               ],
               [
-                1,
-                1,
-                1
+                2,
+                2,
+                2
               ],
               [
-                1,
+                2,
                 0,
                 0
               ]
-            ],
-            "pigment": 2
+            ]
           },
           {
             "shape": [
               [
-                1,
+                2,
                 0
               ],
               [
-                1,
-                1
+                2,
+                2
               ],
               [
-                1,
-                1
+                2,
+                2
               ]
-            ],
-            "pigment": 2
+            ]
           },
           {
             "shape": [
               [
-                1,
-                1
+                4,
+                4
               ],
               [
                 0,
-                1
+                4
               ],
               [
-                1,
-                1
+                4,
+                4
               ]
-            ],
-            "pigment": 4
+            ]
           },
           {
             "shape": [
-              [
-                1,
-                0,
-                1
-              ],
-              [
-                1,
-                0,
-                1
-              ],
-              [
-                1,
-                0,
-                0
-              ]
-            ],
-            "pigment": 1,
-            "pigments": [
               [
                 4,
                 0,
@@ -4023,21 +3844,20 @@ export const packs: PackDefinition[] = [
               ],
               [
                 0,
-                1
+                3
               ],
               [
-                1,
+                3,
                 0
               ]
-            ],
-            "pigment": 3
+            ]
           },
           {
             "shape": [
               [
                 0,
-                1,
-                1
+                3,
+                3
               ],
               [
                 0,
@@ -4049,54 +3869,38 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 3
+            ]
           },
           {
             "shape": [
               [
-                1,
-                1,
-                1
+                5,
+                5,
+                5
               ],
               [
-                1,
+                5,
                 0,
                 0
               ]
-            ],
-            "pigment": 5
+            ]
           },
           {
             "shape": [
               [
-                1,
+                5,
                 0,
-                1
+                5
               ],
               [
                 0,
                 0,
-                1
+                5
               ]
-            ],
-            "pigment": 5
+            ]
           },
           {
             "shape": [
-              [
-                0,
-                1,
-                1
-              ],
-              [
-                0,
-                1,
-                0
-              ]
-            ],
-            "pigment": 3,
-            "pigments": [
               [
                 0,
                 5,
@@ -4111,17 +3915,6 @@ export const packs: PackDefinition[] = [
           },
           {
             "shape": [
-              [
-                1,
-                1
-              ],
-              [
-                1,
-                1
-              ]
-            ],
-            "pigment": 3,
-            "pigments": [
               [
                 5,
                 3
@@ -4173,8 +3966,7 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -4193,66 +3985,48 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
               [
-                1,
+                3,
                 0,
                 0
               ],
               [
-                1,
+                3,
                 0,
                 0
               ],
               [
-                1,
-                1,
-                1
+                3,
+                3,
+                3
               ]
-            ],
-            "pigment": 3
+            ]
           },
           {
             "shape": [
               [
-                1,
+                3,
                 0,
-                1
+                3
               ],
               [
                 0,
-                1,
+                3,
                 0
               ],
               [
-                1,
+                3,
                 0,
-                1
+                3
               ]
-            ],
-            "pigment": 3
+            ]
           },
           {
             "shape": [
-              [
-                0,
-                1
-              ],
-              [
-                1,
-                1
-              ],
-              [
-                0,
-                1
-              ]
-            ],
-            "pigment": 1,
-            "pigments": [
               [
                 0,
                 6
@@ -4269,21 +4043,6 @@ export const packs: PackDefinition[] = [
           },
           {
             "shape": [
-              [
-                1,
-                1
-              ],
-              [
-                0,
-                0
-              ],
-              [
-                1,
-                1
-              ]
-            ],
-            "pigment": 1,
-            "pigments": [
               [
                 6,
                 3
@@ -4332,15 +4091,14 @@ export const packs: PackDefinition[] = [
           {
             "shape": [
               [
-                1,
+                2,
                 0
               ],
               [
                 0,
-                1
+                2
               ]
-            ],
-            "pigment": 2
+            ]
           }
         ],
         "solvedValue": 0,
@@ -4378,8 +4136,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           }
         ],
         "solvedValue": 0,
@@ -4408,17 +4165,16 @@ export const packs: PackDefinition[] = [
           {
             "shape": [
               [
-                1,
+                4,
                 0,
                 0
               ],
               [
                 0,
-                1,
+                4,
                 0
               ]
-            ],
-            "pigment": 4
+            ]
           }
         ],
         "solvedValue": 0,
@@ -4448,16 +4204,15 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 0,
-                1,
+                3,
                 0
               ],
               [
-                1,
-                1,
-                1
+                3,
+                3,
+                3
               ]
-            ],
-            "pigment": 3
+            ]
           }
         ],
         "solvedValue": 0,
@@ -4486,15 +4241,14 @@ export const packs: PackDefinition[] = [
           {
             "shape": [
               [
-                1,
+                6,
                 0
               ],
               [
-                1,
+                6,
                 0
               ]
-            ],
-            "pigment": 6
+            ]
           }
         ],
         "solvedValue": 0,
@@ -4524,18 +4278,17 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 0,
-                1
+                5
               ],
               [
-                1,
-                1
+                5,
+                5
               ],
               [
                 0,
                 0
               ]
-            ],
-            "pigment": 5
+            ]
           }
         ],
         "solvedValue": 0,
@@ -4578,8 +4331,7 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -4591,8 +4343,7 @@ export const packs: PackDefinition[] = [
                 1,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -4602,28 +4353,14 @@ export const packs: PackDefinition[] = [
                 0
               ],
               [
-                1,
-                1,
-                1
+                2,
+                2,
+                2
               ]
-            ],
-            "pigment": 2
+            ]
           },
           {
             "shape": [
-              [
-                0,
-                0,
-                1
-              ],
-              [
-                1,
-                0,
-                1
-              ]
-            ],
-            "pigment": 1,
-            "pigments": [
               [
                 0,
                 0,
@@ -4674,8 +4411,7 @@ export const packs: PackDefinition[] = [
                 1,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -4687,81 +4423,59 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
               [
-                1,
+                2,
                 0,
                 0
               ],
               [
-                1,
+                2,
                 0,
                 0
               ],
               [
-                1,
+                2,
                 0,
                 0
               ]
-            ],
-            "pigment": 2
+            ]
           },
           {
             "shape": [
               [
-                1,
+                2,
                 0
               ],
               [
                 0,
-                1
+                2
               ],
               [
                 0,
-                1
+                2
               ]
-            ],
-            "pigment": 2
+            ]
           },
           {
             "shape": [
               [
-                1,
+                4,
                 0,
-                1
+                4
               ],
               [
                 0,
                 0,
-                1
+                4
               ]
-            ],
-            "pigment": 4
+            ]
           },
           {
             "shape": [
-              [
-                0,
-                0,
-                1
-              ],
-              [
-                0,
-                0,
-                0
-              ],
-              [
-                1,
-                1,
-                0
-              ]
-            ],
-            "pigment": 1,
-            "pigments": [
               [
                 0,
                 0,
@@ -4806,92 +4520,73 @@ export const packs: PackDefinition[] = [
           {
             "shape": [
               [
-                1,
+                3,
                 0
               ],
               [
-                1,
-                1
+                3,
+                3
               ],
               [
-                1,
-                1
+                3,
+                3
               ]
-            ],
-            "pigment": 3
+            ]
           },
           {
             "shape": [
               [
-                1,
-                1,
+                3,
+                3,
                 0
               ],
               [
-                1,
+                3,
                 0,
-                1
+                3
               ],
               [
-                1,
+                3,
                 0,
-                1
+                3
               ]
-            ],
-            "pigment": 3
+            ]
           },
           {
             "shape": [
               [
-                1,
-                1,
+                5,
+                5,
                 0
               ],
               [
                 0,
-                1,
-                1
+                5,
+                5
               ]
-            ],
-            "pigment": 5
+            ]
           },
           {
             "shape": [
               [
-                1,
+                5,
                 0,
                 0
               ],
               [
                 0,
                 0,
-                1
+                5
               ],
               [
-                1,
-                1,
-                1
+                5,
+                5,
+                5
               ]
-            ],
-            "pigment": 5
+            ]
           },
           {
             "shape": [
-              [
-                1,
-                1
-              ],
-              [
-                1,
-                0
-              ],
-              [
-                1,
-                1
-              ]
-            ],
-            "pigment": 3,
-            "pigments": [
               [
                 5,
                 6
@@ -4908,24 +4603,6 @@ export const packs: PackDefinition[] = [
           },
           {
             "shape": [
-              [
-                1,
-                0,
-                1
-              ],
-              [
-                0,
-                1,
-                0
-              ],
-              [
-                1,
-                0,
-                1
-              ]
-            ],
-            "pigment": 3,
-            "pigments": [
               [
                 6,
                 0,
@@ -4984,8 +4661,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
@@ -4999,14 +4675,13 @@ export const packs: PackDefinition[] = [
                 0,
                 1
               ]
-            ],
-            "pigment": 1
+            ]
           },
           {
             "shape": [
               [
                 0,
-                1,
+                4,
                 0
               ],
               [
@@ -5017,17 +4692,16 @@ export const packs: PackDefinition[] = [
               [
                 0,
                 0,
-                1
+                4
               ]
-            ],
-            "pigment": 4
+            ]
           },
           {
             "shape": [
               [
                 0,
                 0,
-                1
+                4
               ],
               [
                 0,
@@ -5036,29 +4710,13 @@ export const packs: PackDefinition[] = [
               ],
               [
                 0,
-                1,
+                4,
                 0
               ]
-            ],
-            "pigment": 4
+            ]
           },
           {
             "shape": [
-              [
-                1,
-                0
-              ],
-              [
-                1,
-                1
-              ],
-              [
-                1,
-                0
-              ]
-            ],
-            "pigment": 1,
-            "pigments": [
               [
                 1,
                 0
@@ -5075,21 +4733,6 @@ export const packs: PackDefinition[] = [
           },
           {
             "shape": [
-              [
-                1,
-                1
-              ],
-              [
-                1,
-                0
-              ],
-              [
-                0,
-                0
-              ]
-            ],
-            "pigment": 1,
-            "pigments": [
               [
                 1,
                 6
@@ -5383,12 +5026,12 @@ export const packs: PackDefinition[] = [
                 0,
                 0,
                 0,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
                 0,
                 0,
                 0,
@@ -5397,22 +5040,22 @@ export const packs: PackDefinition[] = [
               [
                 0,
                 0,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
                 0,
                 0
               ],
               [
                 0,
-                1,
+                3,
                 0,
                 0,
                 0,
@@ -5423,12 +5066,12 @@ export const packs: PackDefinition[] = [
                 0,
                 0,
                 0,
-                1,
+                3,
                 0
               ],
               [
                 0,
-                1,
+                3,
                 0,
                 0,
                 0,
@@ -5439,7 +5082,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0,
                 0,
-                1,
+                3,
                 0
               ],
               [
@@ -5570,8 +5213,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 3
+            ]
           },
           {
             "shape": [
@@ -5596,12 +5238,12 @@ export const packs: PackDefinition[] = [
                 0,
                 0,
                 0,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
+                7,
+                7,
+                7,
+                7,
+                7,
+                7,
                 0,
                 0,
                 0,
@@ -5610,22 +5252,22 @@ export const packs: PackDefinition[] = [
               [
                 0,
                 0,
-                1,
-                1,
+                7,
+                7,
                 0,
                 0,
                 0,
                 0,
                 0,
                 0,
-                1,
-                1,
+                7,
+                7,
                 0,
                 0
               ],
               [
                 0,
-                1,
+                7,
                 0,
                 0,
                 0,
@@ -5636,56 +5278,56 @@ export const packs: PackDefinition[] = [
                 0,
                 0,
                 0,
-                1,
+                7,
                 0
               ],
               [
-                1,
+                7,
                 0,
-                1,
-                1,
-                0,
-                0,
+                7,
+                7,
                 0,
                 0,
                 0,
                 0,
-                1,
-                1,
                 0,
-                1
+                0,
+                7,
+                7,
+                0,
+                7
               ],
               [
-                1,
+                7,
                 0,
-                1,
-                0,
-                0,
+                7,
                 0,
                 0,
                 0,
                 0,
                 0,
                 0,
-                1,
                 0,
-                1
+                0,
+                7,
+                0,
+                7
               ],
               [
-                1,
-                1,
+                7,
+                7,
                 0,
                 0,
-                1,
+                7,
                 0,
                 0,
                 0,
                 0,
-                1,
+                7,
                 0,
                 0,
-                1,
-                1
+                7,
+                7
               ],
               [
                 0,
@@ -5799,8 +5441,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 7
+            ]
           },
           {
             "shape": [
@@ -5918,7 +5559,7 @@ export const packs: PackDefinition[] = [
               ],
               [
                 0,
-                1,
+                7,
                 0,
                 0,
                 0,
@@ -5929,69 +5570,69 @@ export const packs: PackDefinition[] = [
                 0,
                 0,
                 0,
-                1,
+                7,
                 0
               ],
               [
                 0,
-                1,
+                7,
                 0,
-                1,
-                0,
-                0,
+                7,
                 0,
                 0,
                 0,
                 0,
-                1,
                 0,
-                1,
+                0,
+                7,
+                0,
+                7,
                 0
               ],
               [
                 0,
-                1,
+                7,
                 0,
                 0,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
+                7,
+                7,
+                7,
+                7,
+                7,
+                7,
                 0,
                 0,
-                1,
-                0
-              ],
-              [
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
+                7,
                 0
               ],
               [
                 0,
                 0,
+                7,
                 0,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                7,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                7,
+                7,
+                7,
+                7,
+                7,
+                7,
+                7,
+                7,
                 0,
                 0,
                 0
@@ -6028,8 +5669,7 @@ export const packs: PackDefinition[] = [
                 0,
                 0
               ]
-            ],
-            "pigment": 7
+            ]
           }
         ],
         "solvedValue": 0,

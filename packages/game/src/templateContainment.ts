@@ -25,7 +25,7 @@ function filledCells(shape: number[][]): [number, number][] {
 	const cells: [number, number][] = [];
 	for (let r = 0; r < shape.length; r++) {
 		for (let c = 0; c < shape[r].length; c++) {
-			if (shape[r][c] === 1) cells.push([r, c]);
+			if (shape[r][c] !== 0) cells.push([r, c]);
 		}
 	}
 	return cells;
@@ -45,7 +45,7 @@ export function isShapeContainedAt(
 		const or = rowOffset + r;
 		const oc = colOffset + c;
 		if (or < 0 || oc < 0 || or >= outer.length || oc >= outer[0].length) return false;
-		if (outer[or][oc] !== 1) return false;
+		if (outer[or][oc] === 0) return false;
 	}
 	return true;
 }

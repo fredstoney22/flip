@@ -3,6 +3,7 @@
 	import type { Pigment, PuzzleGrid } from '@flip/game';
 	import { settings } from '$lib/stores/settings';
 	import { GRID_CELL_GAP, GRID_PADDING } from '$lib/utils/puzzleLayout';
+	import { WIN_ANIMATION_TIMING as WIN } from '$lib/constants/winAnimationTiming';
 
 	interface Props {
 		grid: PuzzleGrid;
@@ -16,6 +17,8 @@
 		hintHighlightDim?: [number, number];
 		monochromeFlip?: boolean;
 		previewPigment?: Pigment | null;
+		/** Triggers the solve ripple → white-box collapse animation. */
+		winCollapse?: boolean;
 	}
 
 	const GAP = GRID_CELL_GAP;
@@ -34,7 +37,8 @@
 	  hintHighlightStart,
 	  hintHighlightDim,
 	  monochromeFlip = false,
-	  previewPigment = null
+	  previewPigment = null,
+	  winCollapse = false
 	}: Props = $props();
 
 	let gridEl: HTMLDivElement | null = $state(null);
@@ -45,6 +49,15 @@
 	const rows = $derived(grid.length);
 	const cols = $derived(grid[0]?.length ?? 0);
 	const cellStep = $derived(measuredCellStep > 0 ? measuredCellStep : cellSize + GAP);
+	const gridCenterRow = $derived((rows - 1) / 2);
+	const gridCenterCol = $derived((cols - 1) / 2);
+
+	function winCellDelay(rowIndex: number, colIndex: number): number {
+	  if (!winCollapse) return 0;
+	  return Math.round(
+	    (Math.abs(rowIndex - gridCenterRow) + Math.abs(colIndex - gridCenterCol)) * WIN.cellStaggerMs
+	  );
+	}
 
 	function measureCellStep() {
 	  if (!gridEl || cols === 0) {
@@ -162,6 +175,7 @@
 <div
 	bind:this={gridEl}
 	class="puzzle-grid"
+	class:win-collapse={winCollapse}
 	data-testid="puzzle-container"
 	role="grid"
 	tabindex="0"
@@ -185,18 +199,21 @@
 				{@const lines = lineFlags(cell)}
 				{@const isHovered =
 					hoveredCell !== null && hoveredCell[0] === rowIndex && hoveredCell[1] === colIndex}
+				{@const collapseDelay = winCellDelay(rowIndex, colIndex)}
 				<button
 					class="puzzle-cell"
 					class:hover-highlight={hoverZone}
 					class:hint-highlight={hintZone}
 					class:lines-only={showLines && !showColor}
 					class:cell-hovered={isHovered}
+					class:win-collapse-cell={winCollapse}
 					data-testid="puzzle-square-{rowIndex}-{colIndex}"
 					data-grid-row={rowIndex}
 					data-grid-col={colIndex}
 					style:width="{cellSize}px"
 					style:height="{cellSize}px"
 					style:background-color={showColor || monochromeFlip ? bg : '#e5e7eb'}
+					style:--win-delay="{collapseDelay}ms"
 					title={cellLabel(cell)}
 					aria-label="Row {rowIndex + 1} col {colIndex + 1}: {cellLabel(cell)}"
 					role="gridcell"
@@ -262,6 +279,19 @@
 	.puzzle-cell.hint-highlight {
 		outline: 2px dashed #f59e0b;
 		outline-offset: -2px;
+	}
+
+	.puzzle-grid.win-collapse .puzzle-cell.win-collapse-cell {
+		transition:
+			background-color var(--win-cell-duration, 1.2s) ease,
+			box-shadow var(--win-cell-duration, 1.2s) ease,
+			opacity var(--win-cell-duration, 1.2s) ease;
+		transition-delay: var(--win-delay, 0ms);
+	}
+
+	.puzzle-grid.win-collapse .puzzle-cell.win-collapse-cell .cell-lines {
+		transition: opacity var(--win-line-fade-duration, 0.6s) ease;
+		transition-delay: var(--win-delay, 0ms);
 	}
 
 	.cell-lines {

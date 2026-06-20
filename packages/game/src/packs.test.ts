@@ -29,7 +29,7 @@ describe('packs array', () => {
 				expect(cfg.solvedValue).toBeDefined();
 				expect(cfg.templates.length).toBeGreaterThan(0);
 				expect(cfg.templates[0].shape).toBeDefined();
-				expect(cfg.templates[0].pigment).toBeDefined();
+				expect(cfg.templates[0].shape.some((row) => row.some((cell) => cell !== 0))).toBe(true);
 			}
 		}
 	});

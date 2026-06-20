@@ -8,7 +8,7 @@ import type { Pigment, PuzzleConfig, PuzzleGrid, PuzzleTemplate } from './types.
 
 /**
  * Applies a template to the puzzle grid at the given top-left position.
- * XORs the template pigment into every cell covered by the shape mask.
+ * XORs the template pigment into every active cell (non-zero) in the shape grid.
  */
 export function applyTemplate(
 	state: PuzzleGrid,
@@ -24,11 +24,12 @@ export function applyTemplate(
 				tr >= 0 &&
 				tr < template.shape.length &&
 				tc >= 0 &&
-				tc < template.shape[0].length &&
-				template.shape[tr][tc] === 1
+				tc < template.shape[0].length
 			) {
 				const cellPigment = getTemplateCellPigment(template, tr, tc);
-				return ((cell ^ cellPigment) & 0b111) as Pigment;
+				if (cellPigment !== 0) {
+					return ((cell ^ cellPigment) & 0b111) as Pigment;
+				}
 			}
 			return cell;
 		})
@@ -54,7 +55,7 @@ export function allTemplatesUsed(templateCount: number, usedTemplateMask: number
 	return usedTemplateMask === fullTemplateUsedMask(templateCount);
 }
 
-/** Grid is solved and every template has been used at least once. */
+/** Grid is solved and every template has been used at least once (puzzle-generation quality check). */
 export function isPuzzleComplete(
 	config: PuzzleConfig,
 	state: PuzzleGrid,

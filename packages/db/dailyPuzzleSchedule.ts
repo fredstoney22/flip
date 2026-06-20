@@ -1,11 +1,13 @@
 import { randomUUID } from 'crypto';
 import { db, dailyPuzzle, eq } from './index.js';
 
-/** Pack used for the public daily puzzle rotation. */
-export const DAILY_PACK_SLUG = 'intro-pack';
+import { FIRST_STEPS_SLUG } from '../game/src/puzzles/firstSteps.js';
 
-/** Number of intro-pack puzzles to rotate through (puzzles 1–10). */
-export const DAILY_PUZZLE_ROTATION_COUNT = 10;
+/** Pack used for the public daily puzzle rotation. */
+export const DAILY_PACK_SLUG = FIRST_STEPS_SLUG;
+
+/** Number of First Steps puzzles to rotate through (puzzles 1–9). */
+export const DAILY_PUZZLE_ROTATION_COUNT = 9;
 
 /** How many calendar days ahead to pre-schedule (today + future days). */
 export const DAILY_SCHEDULE_LOOKAHEAD_DAYS = 14;
@@ -53,14 +55,29 @@ export async function getDailyPuzzleForDate(dateStr: string): Promise<DailyPuzzl
 }
 
 /**
- * Ensures a daily_puzzle row exists for the given UTC date.
- * Idempotent — existing curated rows are never overwritten.
+ * Ensures a daily_puzzle row exists for the given UTC date and matches the
+ * current rotation (pack + puzzle). Updates stale rows when the source pack changes.
  */
 export async function ensureDailyPuzzleForDate(dateStr: string): Promise<DailyPuzzleRow> {
-	const existing = await getDailyPuzzleForDate(dateStr);
-	if (existing) return existing;
-
 	const { packSlug, puzzleId } = dailyPuzzleAssignment(dateStr);
+	const existing = await getDailyPuzzleForDate(dateStr);
+
+	if (existing) {
+		if (existing.packSlug === packSlug && existing.puzzleId === puzzleId) {
+			return existing;
+		}
+
+		await db
+			.update(dailyPuzzle)
+			.set({ packSlug, puzzleId })
+			.where(eq(dailyPuzzle.date, dateStr));
+
+		const row = await getDailyPuzzleForDate(dateStr);
+		if (!row) {
+			throw new Error(`Failed to update daily puzzle for ${dateStr}`);
+		}
+		return row;
+	}
 
 	await db
 		.insert(dailyPuzzle)
@@ -83,26 +100,32 @@ export async function ensureDailyPuzzleForDate(dateStr: string): Promise<DailyPu
 
 /**
  * Pre-schedules daily puzzles from today through today + (lookaheadDays - 1).
- * Returns how many new rows were created.
+ * Returns how many new rows were created or updated to match the current rotation.
  */
 export async function ensureDailyPuzzleWindow(
 	lookaheadDays = DAILY_SCHEDULE_LOOKAHEAD_DAYS
-): Promise<{ created: number; scheduled: string[] }> {
+): Promise<{ created: number; updated: number; scheduled: string[] }> {
 	const today = formatDateUtc(new Date());
 	let created = 0;
+	let updated = 0;
 	const scheduled: string[] = [];
 
 	for (let offset = 0; offset < lookaheadDays; offset++) {
 		const dateStr = addDaysUtc(today, offset);
 		const before = await getDailyPuzzleForDate(dateStr);
+		const { packSlug, puzzleId } = dailyPuzzleAssignment(dateStr);
 		await ensureDailyPuzzleForDate(dateStr);
 		const after = await getDailyPuzzleForDate(dateStr);
 
 		if (after) {
 			scheduled.push(dateStr);
-			if (!before) created++;
+			if (!before) {
+				created++;
+			} else if (before.packSlug !== packSlug || before.puzzleId !== puzzleId) {
+				updated++;
+			}
 		}
 	}
 
-	return { created, scheduled };
+	return { created, updated, scheduled };
 }
