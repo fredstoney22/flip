@@ -96,12 +96,15 @@ const puzzles: Record<number, PuzzleConfig> = {
 				shape: [[1, 1]]
 			},
 			{
-				shape: [[1], [1]]
+				shape: [
+					[1, 0],
+					[0, 1]
+				]
 			}
 		],
 		solvedValue: 0,
 		allowTemplateRotation: true,
-		minMovesToSolve: 4
+		minMovesToSolve: 3
 	},
 	5: {
 		startState: [
