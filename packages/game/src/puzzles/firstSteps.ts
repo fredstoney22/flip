@@ -24,8 +24,8 @@ const puzzles: Record<number, PuzzleConfig> = {
 	1: {
 		startState: [
 			[0, 1, 0],
-			[0, 0, 0],
-			[0, 0, 0]
+			[0, 0, 1],
+			[0, 1, 0]
 		],
 		templates: [
 			{

@@ -19,6 +19,22 @@
 	const green = PIGMENT_HEX[6];
 	const brown = PIGMENT_HEX[7];
 
+	/** Equilateral 3-circle layout — tuned for label placement. */
+	const R = { cx: 72, cy: 90, r: 50 };
+	const Y = { cx: 148, cy: 90, r: 50 };
+	const B = { cx: 110, cy: 142, r: 50 };
+
+	/** Label anchor inside each region (centroid-ish, inset from overlaps). */
+	const labels = {
+		red: { x: 48, y: 90 },
+		yellow: { x: 172, y: 90 },
+		blue: { x: 110, y: 168 },
+		orange: { x: 109, y: 88 },
+		purple: { x: 92, y: 112 },
+		green: { x: 128, y: 112 },
+		brown: { x: 110, y: 107 }
+	} as const;
+
 	function toggle() {
 	  expanded = !expanded;
 	}
@@ -65,9 +81,9 @@
 				aria-hidden="true"
 				focusable="false"
 			>
-				<circle cx="9" cy="10" r="6.5" fill={red} opacity="0.85" />
-				<circle cx="15" cy="10" r="6.5" fill={yellow} opacity="0.85" />
-				<circle cx="12" cy="15" r="6.5" fill={blue} opacity="0.85" />
+				<circle cx="8.5" cy="9.5" r="6" fill={red} />
+				<circle cx="15.5" cy="9.5" r="6" fill={yellow} />
+				<circle cx="12" cy="15.5" r="6" fill={blue} />
 			</svg>
 		</button>
 
@@ -97,20 +113,151 @@
 				>
 					<title id="venn-diagram-title">Red, yellow, and blue Venn diagram</title>
 
-					<circle cx="82" cy="78" r="54" fill={red} opacity="0.72" />
-					<circle cx="138" cy="78" r="54" fill={yellow} opacity="0.72" />
-					<circle cx="110" cy="128" r="54" fill={blue} opacity="0.72" />
+					<defs>
+						<clipPath id="venn-clip-red">
+							<circle cx={R.cx} cy={R.cy} r={R.r} />
+						</clipPath>
+						<clipPath id="venn-clip-yellow">
+							<circle cx={Y.cx} cy={Y.cy} r={Y.r} />
+						</clipPath>
+						<clipPath id="venn-clip-blue">
+							<circle cx={B.cx} cy={B.cy} r={B.r} />
+						</clipPath>
 
-					<text x="38" y="72" class="label label-primary">Red</text>
-					<text x="168" y="72" class="label label-primary">Yellow</text>
-					<text x="102" y="188" class="label label-primary">Blue</text>
+						<mask id="venn-mask-hide-yellow-blue">
+							<rect width="220" height="200" fill="white" />
+							<circle cx={Y.cx} cy={Y.cy} r={Y.r} fill="black" />
+							<circle cx={B.cx} cy={B.cy} r={B.r} fill="black" />
+						</mask>
+						<mask id="venn-mask-hide-red-blue">
+							<rect width="220" height="200" fill="white" />
+							<circle cx={R.cx} cy={R.cy} r={R.r} fill="black" />
+							<circle cx={B.cx} cy={B.cy} r={B.r} fill="black" />
+						</mask>
+						<mask id="venn-mask-hide-red-yellow">
+							<rect width="220" height="200" fill="white" />
+							<circle cx={R.cx} cy={R.cy} r={R.r} fill="black" />
+							<circle cx={Y.cx} cy={Y.cy} r={Y.r} fill="black" />
+						</mask>
+						<mask id="venn-mask-hide-blue">
+							<rect width="220" height="200" fill="white" />
+							<circle cx={B.cx} cy={B.cy} r={B.r} fill="black" />
+						</mask>
+						<mask id="venn-mask-hide-yellow">
+							<rect width="220" height="200" fill="white" />
+							<circle cx={Y.cx} cy={Y.cy} r={Y.r} fill="black" />
+						</mask>
+						<mask id="venn-mask-hide-red">
+							<rect width="220" height="200" fill="white" />
+							<circle cx={R.cx} cy={R.cy} r={R.r} fill="black" />
+						</mask>
+					</defs>
 
-					<text x="110" y="52" text-anchor="middle" class="label label-mix">Orange</text>
-					<text x="58" y="118" text-anchor="middle" class="label label-mix">Purple</text>
-					<text x="162" y="118" text-anchor="middle" class="label label-mix">Green</text>
+					<!-- Primary lobes — exact game pigments, no alpha blending -->
+					<g clip-path="url(#venn-clip-red)" mask="url(#venn-mask-hide-yellow-blue)">
+						<rect width="220" height="200" fill={red} />
+					</g>
+					<g clip-path="url(#venn-clip-yellow)" mask="url(#venn-mask-hide-red-blue)">
+						<rect width="220" height="200" fill={yellow} />
+					</g>
+					<g clip-path="url(#venn-clip-blue)" mask="url(#venn-mask-hide-red-yellow)">
+						<rect width="220" height="200" fill={blue} />
+					</g>
 
-					<circle cx="110" cy="96" r="14" fill={brown} opacity="0.95" />
-					<text x="110" y="100" text-anchor="middle" class="label label-center">Brown</text>
+					<!-- Pair overlaps -->
+					<g clip-path="url(#venn-clip-red)" mask="url(#venn-mask-hide-blue)">
+						<circle cx={Y.cx} cy={Y.cy} r={Y.r} fill={orange} />
+					</g>
+					<g clip-path="url(#venn-clip-red)" mask="url(#venn-mask-hide-yellow)">
+						<circle cx={B.cx} cy={B.cy} r={B.r} fill={purple} />
+					</g>
+					<g clip-path="url(#venn-clip-yellow)" mask="url(#venn-mask-hide-red)">
+						<circle cx={B.cx} cy={B.cy} r={B.r} fill={green} />
+					</g>
+
+					<!-- Triple overlap -->
+					<g clip-path="url(#venn-clip-red)">
+						<g clip-path="url(#venn-clip-yellow)">
+							<circle cx={B.cx} cy={B.cy} r={B.r} fill={brown} />
+						</g>
+					</g>
+
+					<!-- Region labels — clipped to the same shapes as the fills -->
+					<g clip-path="url(#venn-clip-red)" mask="url(#venn-mask-hide-yellow-blue)">
+						<text
+							x={labels.red.x}
+							y={labels.red.y}
+							text-anchor="middle"
+							dominant-baseline="middle"
+							class="label label-on-primary"
+						>Red</text>
+					</g>
+					<g clip-path="url(#venn-clip-yellow)" mask="url(#venn-mask-hide-red-blue)">
+						<text
+							x={labels.yellow.x}
+							y={labels.yellow.y}
+							text-anchor="middle"
+							dominant-baseline="middle"
+							class="label label-on-primary"
+						>Yellow</text>
+					</g>
+					<g clip-path="url(#venn-clip-blue)" mask="url(#venn-mask-hide-red-yellow)">
+						<text
+							x={labels.blue.x}
+							y={labels.blue.y}
+							text-anchor="middle"
+							dominant-baseline="middle"
+							class="label label-on-primary"
+						>Blue</text>
+					</g>
+
+					<g clip-path="url(#venn-clip-red)">
+						<g clip-path="url(#venn-clip-yellow)" mask="url(#venn-mask-hide-blue)">
+							<text
+								x={labels.orange.x}
+								y={labels.orange.y}
+								text-anchor="middle"
+								dominant-baseline="middle"
+								class="label label-on-mix"
+							>Orange</text>
+						</g>
+					</g>
+					<g clip-path="url(#venn-clip-red)">
+						<g clip-path="url(#venn-clip-blue)" mask="url(#venn-mask-hide-yellow)">
+							<text
+								x={labels.purple.x}
+								y={labels.purple.y}
+								text-anchor="middle"
+								dominant-baseline="middle"
+								class="label label-on-mix"
+							>Purple</text>
+						</g>
+					</g>
+					<g clip-path="url(#venn-clip-yellow)">
+						<g clip-path="url(#venn-clip-blue)" mask="url(#venn-mask-hide-red)">
+							<text
+								x={labels.green.x}
+								y={labels.green.y}
+								text-anchor="middle"
+								dominant-baseline="middle"
+								class="label label-on-mix"
+							>Green</text>
+						</g>
+					</g>
+
+					<g clip-path="url(#venn-clip-red)">
+						<g clip-path="url(#venn-clip-yellow)">
+							<g clip-path="url(#venn-clip-blue)">
+								<text
+									x={labels.brown.x}
+									y={labels.brown.y}
+									text-anchor="middle"
+									dominant-baseline="middle"
+									class="label label-on-brown"
+								>Brown</text>
+							</g>
+						</g>
+					</g>
 				</svg>
 
 				<ul class="venn-legend" aria-label="Color combinations">
@@ -209,26 +356,32 @@
 
 	.venn-diagram .label {
 		font-family: system-ui, -apple-system, sans-serif;
-		font-size: 11px;
-		font-weight: 600;
-		fill: #1f2937;
+		font-weight: 700;
 		pointer-events: none;
 	}
 
-	.venn-diagram .label-primary {
+	.venn-diagram .label-on-primary {
 		font-size: 10px;
-		fill: #374151;
 	}
 
-	.venn-diagram .label-mix {
-		font-size: 9px;
-		fill: #111827;
+	.venn-diagram .label-on-mix {
+		font-size: 7px;
 	}
 
-	.venn-diagram .label-center {
-		font-size: 8px;
+	.venn-diagram .label-on-primary,
+	.venn-diagram .label-on-mix {
 		fill: #ffffff;
-		font-weight: 700;
+		stroke: rgba(0, 0, 0, 0.35);
+		stroke-width: 0.4px;
+		paint-order: stroke fill;
+	}
+
+	.venn-diagram .label-on-brown {
+		fill: #ffffff;
+		font-size: 6px;
+		stroke: rgba(0, 0, 0, 0.4);
+		stroke-width: 0.35px;
+		paint-order: stroke fill;
 	}
 
 	.venn-legend {

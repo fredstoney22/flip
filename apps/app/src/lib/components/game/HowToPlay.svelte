@@ -1,5 +1,16 @@
 <script lang="ts">
+	interface Props {
+		/** Open the help modal on first render (e.g. First Steps puzzle 1). */
+		initialOpen?: boolean;
+	}
+
+	let { initialOpen = false }: Props = $props();
+
 	let isOpen = $state(false);
+
+	$effect.pre(() => {
+	  isOpen = initialOpen;
+	});
 
 	function close() {
 	  isOpen = false;
@@ -53,29 +64,49 @@
 			<h3>How to Play</h3>
 			<ol>
 				<li>
-					<strong>Select a template</strong> — click one of the templates below the grid.
-					The selected template is highlighted.
+					<strong>Goal</strong> — clear the colors from the Prism square.
 				</li>
 				<li>
-					<strong>Rotate (optional)</strong> — tap the selected template again to rotate it 90° clockwise.
+					<strong>Select a lens</strong> — click one of the lenses below the Prism square.
 				</li>
 				<li>
-					<strong>Apply the template</strong> — hover over the grid to see the preview, then click
-					a square to apply at that position.
+					<strong>Rotate</strong> — tap the selected lens again to rotate it.
 				</li>
 				<li>
-					<strong>Goal</strong> — clear the grid to the target color.
+					<strong>Apply the lens to the Prism square</strong> — hover over the grid to see the preview, then click to apply it.
 				</li>
 				<li>
-					<strong>Undo</strong> — click Undo or press Ctrl+Z (⌘Z on Mac).
+					<strong>Undo</strong> — click
+					<span class="action-preview undo-preview" role="img" aria-label="Undo">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="14"
+							height="14"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							aria-hidden="true"
+						>
+							<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+							<path d="M3 3v5h5" />
+						</svg>
+					</span>
+					to undo your last move.
 				</li>
 				<li>
-					<strong>Reset</strong> — click Reset to start over.
+					<strong>Reset</strong> — click
+					<span class="action-preview reset-preview" role="img" aria-label="Reset">Reset</span>
+					to start over.
+				</li>
+				<li>
+					<strong>Hint</strong> — click
+					<span class="action-preview hint-preview" role="img" aria-label="Hint">Hint</span>
+					to see a good next move.
 				</li>
 			</ol>
-			<p class="tip">
-				💡 Templates use XOR logic — they flip squares where the template has a 0.
-			</p>
 		</div>
 	</div>
 {/if}
@@ -160,11 +191,50 @@
 		color: #374151;
 	}
 
-	.help-modal .tip {
-		margin: 0;
-		font-size: 0.8125rem;
-		color: #6b7280;
-		border-top: 1px solid #f3f4f6;
-		padding-top: 0.75rem;
+	.help-modal li {
+		line-height: 1.55;
+	}
+
+	.action-preview {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		vertical-align: middle;
+		margin: 0 0.2rem;
+		pointer-events: none;
+		user-select: none;
+		flex-shrink: 0;
+	}
+
+	.undo-preview {
+		width: 1.625rem;
+		height: 1.625rem;
+		border: 1px solid #d1d5db;
+		border-radius: 50%;
+		background: white;
+		color: #374151;
+		line-height: 0;
+	}
+
+	.hint-preview {
+		padding: 0.2rem 0.55rem;
+		border-radius: 999px;
+		border: 1px solid #6366f1;
+		background: #eef2ff;
+		color: #4338ca;
+		font-size: 0.65rem;
+		font-weight: 600;
+		line-height: 1.2;
+	}
+
+	.reset-preview {
+		padding: 0.18rem 0.55rem;
+		border: 1px solid #fecaca;
+		border-radius: 9999px;
+		background: white;
+		color: #dc2626;
+		font-size: 0.65rem;
+		font-weight: 600;
+		line-height: 1.2;
 	}
 </style>

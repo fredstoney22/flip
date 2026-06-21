@@ -88,5 +88,34 @@ test.describe('Puzzle interactions — tutorial 3x3 board', () => {
     const after = await getGridState(page, 3);
     expect(after).not.toEqual(before);
   });
+
+  test('dragging a template onto the grid shows preview and applies on release', async ({ page }) => {
+    await startTutorial(page);
+
+    const before = await getGridState(page, 3);
+    const template = page.getByTestId('template-0');
+    const templateBox = await template.boundingBox();
+    if (!templateBox) throw new Error('No bounding box for template-0');
+
+    const { x: cellX, y: cellY } = await getCellCenter(page, 0, 0);
+    const startX = templateBox.x + templateBox.width / 2;
+    const startY = templateBox.y + templateBox.height / 2;
+
+    await page.mouse.move(startX, startY);
+    await page.mouse.down();
+    await page.mouse.move(cellX, cellY, { steps: 12 });
+
+    const mask = await getHighlightMask(page, 3);
+    expect(mask).toEqual([
+      [true, true, true],
+      [true, true, true],
+      [true, true, true]
+    ]);
+
+    await page.mouse.up();
+
+    const after = await getGridState(page, 3);
+    expect(after).not.toEqual(before);
+  });
 });
 

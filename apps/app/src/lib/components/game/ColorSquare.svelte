@@ -4,6 +4,7 @@
 	import { settings } from '$lib/stores/settings';
 	import { GRID_CELL_GAP, GRID_PADDING } from '$lib/utils/puzzleLayout';
 	import { WIN_ANIMATION_TIMING as WIN } from '$lib/constants/winAnimationTiming';
+	import LensChrome from './LensChrome.svelte';
 
 	interface Props {
 		grid: PuzzleGrid;
@@ -52,6 +53,17 @@
 	const gridCenterRow = $derived((rows - 1) / 2);
 	const gridCenterCol = $derived((cols - 1) / 2);
 
+	const hoverLensOverlay = $derived(
+	  highlightStart && highlightDim
+	    ? {
+	      left: PADDING + highlightStart[0] * cellStep,
+	      top: PADDING + highlightStart[1] * cellStep,
+	      width: highlightDim[0] * cellSize + (highlightDim[0] - 1) * GAP,
+	      height: highlightDim[1] * cellSize + (highlightDim[1] - 1) * GAP
+	    }
+	    : null
+	);
+
 	function winCellDelay(rowIndex: number, colIndex: number): number {
 	  if (!winCollapse) return 0;
 	  return Math.round(
@@ -95,7 +107,7 @@
 	  return [row, col];
 	}
 
-	function resolveCellFromEvent(e: MouseEvent): [number, number] | null {
+	function resolveCellFromEvent(e: PointerEvent): [number, number] | null {
 	  const hit = document.elementFromPoint(e.clientX, e.clientY);
 	  const cellBtn = hit?.closest?.('button[data-grid-row]');
 	  if (cellBtn) {
@@ -109,7 +121,22 @@
 	  return getCellFromPoint(e.clientX - rect.left, e.clientY - rect.top);
 	}
 
-	function handleContainerPointer(e: MouseEvent) {
+	/** Resolve grid cell from viewport coordinates (used while dragging a template). */
+	export function resolveCellAtClientPoint(clientX: number, clientY: number): [number, number] | null {
+	  if (!gridEl) return null;
+	  const rect = gridEl.getBoundingClientRect();
+	  if (
+	    clientX < rect.left ||
+			clientX > rect.right ||
+			clientY < rect.top ||
+			clientY > rect.bottom
+	  ) {
+	    return null;
+	  }
+	  return getCellFromPoint(clientX - rect.left, clientY - rect.top);
+	}
+
+	function handleContainerPointer(e: PointerEvent) {
 	  const cell = resolveCellFromEvent(e);
 	  if (cell) {
 	    hoveredCell = cell;
@@ -120,7 +147,7 @@
 	}
 
 	function handleContainerClick(e: MouseEvent) {
-	  const cell = resolveCellFromEvent(e);
+	  const cell = resolveCellFromEvent(e as PointerEvent);
 	  if (cell) onCellClick?.(cell[0], cell[1]);
 	}
 
@@ -172,28 +199,32 @@
 	}
 </script>
 
-<div
-	bind:this={gridEl}
-	class="puzzle-grid"
-	class:win-collapse={winCollapse}
-	data-testid="puzzle-container"
-	role="grid"
-	tabindex="0"
-	aria-label="Puzzle grid"
-	onmousemove={handleContainerPointer}
-	onmouseleave={handleContainerLeave}
-	onclick={handleContainerClick}
-	onkeydown={(e) => {
-	  if ((e.key === 'Enter' || e.key === ' ') && hoveredCell) {
-	    e.preventDefault();
-	    onCellClick?.(hoveredCell[0], hoveredCell[1]);
-	  }
-	}}
->
+<div class="prism-square" class:win-collapse={winCollapse}>
+	<span class="inner-corner inner-corner-tl" aria-hidden="true"></span>
+	<span class="inner-corner inner-corner-tr" aria-hidden="true"></span>
+	<span class="inner-corner inner-corner-bl" aria-hidden="true"></span>
+	<span class="inner-corner inner-corner-br" aria-hidden="true"></span>
+	<div
+		bind:this={gridEl}
+		class="puzzle-grid"
+		class:win-collapse={winCollapse}
+		data-testid="puzzle-container"
+		role="grid"
+		tabindex="0"
+		aria-label="Puzzle grid"
+		onpointermove={handleContainerPointer}
+		onpointerleave={handleContainerLeave}
+		onclick={handleContainerClick}
+		onkeydown={(e) => {
+		  if ((e.key === 'Enter' || e.key === ' ') && hoveredCell) {
+		    e.preventDefault();
+		    onCellClick?.(hoveredCell[0], hoveredCell[1]);
+		  }
+		}}
+	>
 	{#each grid as row, rowIndex}
 		<div class="grid-row" role="row">
 			{#each row as cell, colIndex}
-				{@const hoverZone = inZone(rowIndex, colIndex, highlightStart, highlightDim)}
 				{@const hintZone = inZone(rowIndex, colIndex, hintHighlightStart, hintHighlightDim)}
 				{@const bg = cellBackground(cell, rowIndex, colIndex)}
 				{@const lines = lineFlags(cell)}
@@ -202,7 +233,6 @@
 				{@const collapseDelay = winCellDelay(rowIndex, colIndex)}
 				<button
 					class="puzzle-cell"
-					class:hover-highlight={hoverZone}
 					class:hint-highlight={hintZone}
 					class:lines-only={showLines && !showColor}
 					class:cell-hovered={isHovered}
@@ -230,21 +260,140 @@
 			{/each}
 		</div>
 	{/each}
+	{#if hoverLensOverlay}
+		<LensChrome
+			variant="overlay"
+			width={hoverLensOverlay.width}
+			height={hoverLensOverlay.height}
+			style="left: {hoverLensOverlay.left}px; top: {hoverLensOverlay.top}px;"
+		/>
+	{/if}
+	</div>
 </div>
 
 <style>
+	.prism-square {
+		position: relative;
+		display: inline-flex;
+		flex-shrink: 0;
+	}
+	.prism-square.win-collapse .inner-corner {
+		opacity: 0;
+		transition: opacity var(--win-collapse-duration, 1.6s) ease;
+	}
+
 	.puzzle-grid {
+		position: relative;
+		z-index: 1;
 		display: inline-flex;
 		flex-direction: column;
 		gap: 2px;
 		padding: 4px;
-		background: #e5e7eb;
-		border-radius: 6px;
+		background: rgba(255, 255, 255, 0.92);
+		border-radius: 4px;
 		flex-shrink: 0;
+		box-shadow:
+			0 0 0 1px rgba(209, 213, 219, 0.9),
+			inset 0 1px 0 rgba(255, 255, 255, 0.95);
 	}
 
-	:global(.dark) .puzzle-grid {
-		background: #374151;
+	.puzzle-grid::after {
+		content: '';
+		position: absolute;
+		inset: -1px;
+		border-radius: inherit;
+		padding: 1px;
+		background: linear-gradient(
+			135deg,
+			#ef4444,
+			#f59e0b,
+			#eab308,
+			#22c55e,
+			#3b82f6,
+			#8b5cf6
+		);
+		-webkit-mask:
+			linear-gradient(#fff 0 0) content-box,
+			linear-gradient(#fff 0 0);
+		mask:
+			linear-gradient(#fff 0 0) content-box,
+			linear-gradient(#fff 0 0);
+		-webkit-mask-composite: xor;
+		mask-composite: exclude;
+		pointer-events: none;
+		opacity: 0.42;
+		z-index: 3;
+	}
+
+	.inner-corner {
+		position: absolute;
+		width: 10px;
+		height: 10px;
+		pointer-events: none;
+		z-index: 4;
+	}
+
+	.inner-corner::before,
+	.inner-corner::after {
+		content: '';
+		position: absolute;
+		background: rgba(99, 102, 241, 0.7);
+	}
+
+	.inner-corner::before {
+		width: 10px;
+		height: 1.5px;
+	}
+
+	.inner-corner::after {
+		width: 1.5px;
+		height: 10px;
+	}
+
+	.inner-corner-tl {
+		top: 0;
+		left: 0;
+	}
+
+	.inner-corner-tr {
+		top: 0;
+		right: 0;
+	}
+
+	.inner-corner-tr::before {
+		right: 0;
+	}
+
+	.inner-corner-tr::after {
+		right: 0;
+	}
+
+	.inner-corner-bl {
+		bottom: 0;
+		left: 0;
+	}
+
+	.inner-corner-bl::before {
+		bottom: 0;
+	}
+
+	.inner-corner-bl::after {
+		bottom: 0;
+	}
+
+	.inner-corner-br {
+		bottom: 0;
+		right: 0;
+	}
+
+	.inner-corner-br::before {
+		right: 0;
+		bottom: 0;
+	}
+
+	.inner-corner-br::after {
+		right: 0;
+		bottom: 0;
 	}
 
 	.grid-row {
@@ -254,31 +403,29 @@
 
 	.puzzle-cell {
 		border: none;
-		border-radius: 3px;
+		border-radius: 2px;
 		cursor: pointer;
 		padding: 0;
-		transition: opacity 0.1s ease;
-		box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+		transition: opacity 0.1s ease, box-shadow 0.1s ease;
+		box-shadow:
+			inset 0 1px 2px rgba(255, 255, 255, 0.55),
+			0 1px 2px rgba(0, 0, 0, 0.08);
 		position: relative;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		z-index: 1;
 	}
 
 	.puzzle-cell:hover,
 	.puzzle-cell.cell-hovered {
-		opacity: 0.85;
-	}
-
-	.puzzle-cell.hover-highlight {
-		outline: 2px solid #6366f1;
-		outline-offset: -2px;
-		opacity: 0.85;
+		opacity: 0.88;
 	}
 
 	.puzzle-cell.hint-highlight {
-		outline: 2px dashed #f59e0b;
+		outline: 2px dashed #fbbf24;
 		outline-offset: -2px;
+		box-shadow: 0 0 8px rgba(251, 191, 36, 0.45);
 	}
 
 	.puzzle-grid.win-collapse .puzzle-cell.win-collapse-cell {

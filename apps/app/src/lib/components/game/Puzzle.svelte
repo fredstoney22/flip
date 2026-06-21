@@ -2,10 +2,12 @@
 	import { onMount } from 'svelte';
 	import PuzzleShell from './PuzzleShell.svelte';
 	import ColorSquare from './ColorSquare.svelte';
+	import LensChrome from './LensChrome.svelte';
 	import { settings } from '$lib/stores/settings';
 	import {
 	  applyTemplate,
 	  findHintMove,
+	  FIRST_STEPS_SLUG,
 	  isMonochromeFlipPuzzle,
 	  isPuzzleSolved,
 	  PIGMENT_HEX,
@@ -44,6 +46,7 @@
 	const MAX_HISTORY = 20;
 	const ROTATE_DURATION_MS = 280;
 	const TEMPLATE_CELL_GAP = 2;
+	const DRAG_THRESHOLD_PX = 6;
 	/** Fixed render resolution for template previews — display size uses CSS scale. */
 	const TEMPLATE_RENDER_CELL = 10;
 
@@ -81,14 +84,23 @@
 	    : getTemplateIndexRowGroups(puzzleConfig.templates.length, 1)
 	);
 	let layoutRoot: HTMLDivElement | null = $state(null);
+	let colorSquareRef: ColorSquare | null = $state(null);
 	let resizeFrame: number | null = null;
 	let lastLayoutKey = '';
+	let activeTemplateDrag = $state<{
+		templateIndex: number;
+		pointerId: number;
+		startX: number;
+		startY: number;
+		isDragging: boolean;
+	} | null>(null);
 
 	const templateScale = $derived(templateSquareSize / TEMPLATE_RENDER_CELL);
 
 	const monochromeFlip = $derived(isMonochromeFlipPuzzle(puzzleConfig));
 	const allowRotation = $derived(puzzleConfig.allowTemplateRotation ?? true);
 	const showHints = true;
+	const autoOpenHowTo = $derived(packSlug === FIRST_STEPS_SLUG && puzzleId === 1);
 
 	const tileMode = $derived($settings.tileAppearanceMode);
 	const showColor = $derived(
@@ -122,6 +134,7 @@
 	  history = [];
 	  hoverPosition = null;
 	  hintRegion = null;
+	  activeTemplateDrag = null;
 	});
 
 	$effect(() => {
@@ -330,6 +343,7 @@
 	  selectedTemplateIndex = null;
 	  hoverPosition = null;
 	  hintRegion = null;
+	  activeTemplateDrag = null;
 	}
 
 	function resetPuzzle() {
@@ -342,6 +356,7 @@
 	  history = [];
 	  hoverPosition = null;
 	  hintRegion = null;
+	  activeTemplateDrag = null;
 	}
 
 	function commitRotation(index: number) {
@@ -420,6 +435,74 @@
 	    row,
 	    col
 	  );
+	}
+
+	function updateHoverFromClientPoint(clientX: number, clientY: number) {
+	  const cell = colorSquareRef?.resolveCellAtClientPoint(clientX, clientY);
+	  if (cell) {
+	    handleCellHover(cell[0], cell[1]);
+	  } else {
+	    hoverPosition = null;
+	  }
+	}
+
+	function handleTemplatePointerDown(index: number, e: PointerEvent) {
+	  if (animatingTemplateIndex !== null || isSolved || e.button !== 0) return;
+	  activeTemplateDrag = {
+	    templateIndex: index,
+	    pointerId: e.pointerId,
+	    startX: e.clientX,
+	    startY: e.clientY,
+	    isDragging: false
+	  };
+	  (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+	}
+
+	function handleTemplatePointerMove(index: number, e: PointerEvent) {
+	  const drag = activeTemplateDrag;
+	  if (!drag || drag.templateIndex !== index || drag.pointerId !== e.pointerId) return;
+
+	  const dx = e.clientX - drag.startX;
+	  const dy = e.clientY - drag.startY;
+	  if (!drag.isDragging && dx * dx + dy * dy >= DRAG_THRESHOLD_PX ** 2) {
+	    activeTemplateDrag = { ...drag, isDragging: true };
+	    selectedTemplateIndex = index;
+	    onTemplateSelect?.(index);
+	  }
+
+	  if (activeTemplateDrag?.isDragging) {
+	    e.preventDefault();
+	    updateHoverFromClientPoint(e.clientX, e.clientY);
+	  }
+	}
+
+	function handleTemplatePointerUp(index: number, e: PointerEvent) {
+	  const drag = activeTemplateDrag;
+	  if (!drag || drag.templateIndex !== index || drag.pointerId !== e.pointerId) return;
+
+	  const wasDragging = drag.isDragging;
+	  activeTemplateDrag = null;
+
+	  const el = e.currentTarget as HTMLElement;
+	  if (el.hasPointerCapture(e.pointerId)) {
+	    el.releasePointerCapture(e.pointerId);
+	  }
+
+	  if (wasDragging) {
+	    if (hoverPosition !== null) {
+	      applyAt(index, hoverPosition[0], hoverPosition[1]);
+	    }
+	    return;
+	  }
+
+	  handleTemplateTap(index);
+	}
+
+	function handleTemplatePointerCancel(index: number, e: PointerEvent) {
+	  if (activeTemplateDrag?.templateIndex !== index) return;
+	  if (activeTemplateDrag.pointerId !== e.pointerId) return;
+	  activeTemplateDrag = null;
+	  hoverPosition = null;
 	}
 
 	function showHintRegion(move: { templateIndex: number; row: number; col: number }) {
@@ -517,10 +600,12 @@
 	{packName}
 	{puzzleId}
 	showColorGuide={!monochromeFlip}
+	{autoOpenHowTo}
 	enableShareAndRating={true}
 >
 	<svelte:fragment slot="grid">
 		<ColorSquare
+			bind:this={colorSquareRef}
 			grid={renderState}
 			{cellSize}
 			monochromeFlip={monochromeFlip}
@@ -552,14 +637,19 @@
 						{@const boundDim = getTemplateBoundDim(template.shape)}
 						{@const baseBound = getTemplateBoundSize(boundDim, TEMPLATE_RENDER_CELL)}
 						{@const displayBound = baseBound * templateScale}
-						<div
+						<LensChrome
+							variant="housing"
+							selected={isSelected}
+							dragging={activeTemplateDrag?.templateIndex === index && activeTemplateDrag.isDragging}
 							class="template-item"
-							class:selected={isSelected}
 							role="button"
 							tabindex="0"
 							aria-label="Template {index + 1}{isSelected ? ' (selected)' : ''}"
 							data-testid="template-{index}"
-							onclick={() => handleTemplateTap(index)}
+							onpointerdown={(e) => handleTemplatePointerDown(index, e)}
+							onpointermove={(e) => handleTemplatePointerMove(index, e)}
+							onpointerup={(e) => handleTemplatePointerUp(index, e)}
+							onpointercancel={(e) => handleTemplatePointerCancel(index, e)}
 							onkeydown={(e) => e.key === 'Enter' && handleTemplateTap(index)}
 						>
 							<div
@@ -579,43 +669,45 @@
 									style:transform-origin="center center"
 									ontransitionend={(e) => handleRotateTransitionEnd(index, e)}
 								>
-									<div class="template-item-shape">
-										{#each template.shape as shapeRow, rowIdx}
-											<div class="template-item-shape-row">
-												{#each shapeRow as cell, colIdx}
-													{@const filled = cell !== 0}
-													{@const cellPigment = getTemplateCellPigment(template, rowIdx, colIdx)}
-													{@const cellHex = PIGMENT_HEX[cellPigment]}
-													{@const lines = filled ? lineFlags(cellPigment) : { h: false, v: false, d: false }}
-													<div
-														class="template-item-shape-cell"
-														class:filled
-														class:with-lines={showLines && filled && (lines.h || lines.v || lines.d)}
-														style:width="{TEMPLATE_RENDER_CELL}px"
-														style:height="{TEMPLATE_RENDER_CELL}px"
-														style:background={filled
-														  ? monochromeFlip
-														    ? '#1f2937'
-														    : showColor
-														      ? cellHex
-														      : '#e5e7eb'
-														  : '#f9fafb'}
-													>
-														{#if showLines && filled && (lines.h || lines.v || lines.d)}
-															<span class="template-cell-lines" aria-hidden="true">
-																{#if lines.h}<span class="template-line template-line-h"></span>{/if}
-																{#if lines.v}<span class="template-line template-line-v"></span>{/if}
-																{#if lines.d}<span class="template-line template-line-d"></span>{/if}
-															</span>
-														{/if}
-													</div>
-												{/each}
-											</div>
-										{/each}
-									</div>
+									<LensChrome variant="disc">
+										<div class="template-item-shape">
+											{#each template.shape as shapeRow, rowIdx}
+												<div class="template-item-shape-row">
+													{#each shapeRow as cell, colIdx}
+														{@const filled = cell !== 0}
+														{@const cellPigment = getTemplateCellPigment(template, rowIdx, colIdx)}
+														{@const cellHex = PIGMENT_HEX[cellPigment]}
+														{@const lines = filled ? lineFlags(cellPigment) : { h: false, v: false, d: false }}
+														<div
+															class="template-item-shape-cell"
+															class:filled
+															class:with-lines={showLines && filled && (lines.h || lines.v || lines.d)}
+															style:width="{TEMPLATE_RENDER_CELL}px"
+															style:height="{TEMPLATE_RENDER_CELL}px"
+															style:background={filled
+															  ? monochromeFlip
+															    ? '#1f2937'
+															    : showColor
+															      ? cellHex
+															      : '#e5e7eb'
+															  : '#f9fafb'}
+														>
+															{#if showLines && filled && (lines.h || lines.v || lines.d)}
+																<span class="template-cell-lines" aria-hidden="true">
+																	{#if lines.h}<span class="template-line template-line-h"></span>{/if}
+																	{#if lines.v}<span class="template-line template-line-v"></span>{/if}
+																	{#if lines.d}<span class="template-line template-line-d"></span>{/if}
+																</span>
+															{/if}
+														</div>
+													{/each}
+												</div>
+											{/each}
+										</div>
+									</LensChrome>
 								</div>
 							</div>
-						</div>
+						</LensChrome>
 					{/each}
 				</div>
 			{/each}
@@ -670,16 +762,8 @@
 	}
 
 	.template-item {
-		position: relative;
-		display: flex;
-		align-items: center;
-		flex-shrink: 0;
-		padding: 0.35rem;
-		border: 2px solid transparent;
-		border-radius: 8px;
 		cursor: pointer;
-		transition: border-color 0.15s, box-shadow 0.15s;
-		background: white;
+		touch-action: none;
 	}
 
 	.template-scale-slot {
@@ -687,17 +771,9 @@
 		align-items: center;
 		justify-content: center;
 		flex-shrink: 0;
-		overflow: hidden;
-	}
-
-	.template-item:hover {
-		border-color: #c7d2fe;
-		box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-	}
-
-	.template-item.selected {
-		border-color: #6366f1;
-		box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+		overflow: visible;
+		position: relative;
+		z-index: 1;
 	}
 
 	.template-rotate-wrapper {
@@ -727,15 +803,17 @@
 		border-radius: 3px;
 		border: 1px solid #e5e7eb;
 		flex-shrink: 0;
+		box-sizing: border-box;
 	}
 
 	.template-item-shape-cell.filled {
-		border-color: transparent;
+		border-color: rgba(0, 0, 0, 0.06);
 		opacity: 0.9;
 		position: relative;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.18);
 	}
 
 	.template-item-shape-cell.with-lines .template-cell-lines {

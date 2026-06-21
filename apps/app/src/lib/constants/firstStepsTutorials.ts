@@ -78,7 +78,7 @@ export const FIRST_STEPS_TUTORIALS: Record<number, TutorialConfig> = {
   1: config(1, [
     puzzleInfo(
       'Applying your first lens',
-      `${GOAL} The goal of the game is to clear all the color from the puzzle! Select a lens below the grid and tap above to apply that pattern to the puzzle.`
+      `${GOAL} The goal of Prism is to clear all the color from the Prism Square! Select the lens below and tap it again to rotate it. Then tap the Prism Square to apply the lens.`
     ),
   ]),
   2: config(2, [

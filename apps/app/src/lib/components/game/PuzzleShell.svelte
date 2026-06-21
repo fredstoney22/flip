@@ -1,6 +1,7 @@
 <script lang="ts">
 	import ColorVennDiagram from './ColorVennDiagram.svelte';
 	import HowToPlay from './HowToPlay.svelte';
+	import PrismFrame from './PrismFrame.svelte';
 	import StarRating from './StarRating.svelte';
 	import { WIN_ANIMATION_TIMING as WIN } from '$lib/constants/winAnimationTiming';
 
@@ -22,6 +23,8 @@
 		onHint?: () => void;
 		/** Whether to show the inline how-to helper next to the move counter. */
 		showHowTo?: boolean;
+		/** Open the how-to modal automatically when the puzzle loads. */
+		autoOpenHowTo?: boolean;
 		/** Whether to show the RYB color-mixing Venn diagram next to the help button. */
 		showColorGuide?: boolean;
 		/** Whether to render the share + star rating block when solved. */
@@ -41,6 +44,7 @@
 	  packName,
 	  puzzleId,
 	  showHowTo = true,
+	  autoOpenHowTo = false,
 	  showColorGuide = false,
 	  enableShareAndRating = true
 	}: Props = $props();
@@ -183,7 +187,7 @@
 								<ColorVennDiagram />
 							{/if}
 							{#if showHowTo}
-								<HowToPlay />
+								<HowToPlay initialOpen={autoOpenHowTo} />
 							{/if}
 						</div>
 					{/if}
@@ -195,52 +199,55 @@
 				class:win-collapse={winVisualActive}
 				class:win-center={winVisualActive && (winPhase === 'center' || winPhase === 'reveal')}
 			>
-				<div
-					class="grid-slot"
-					class:win-white-box={winVisualActive}
-					class:win-victory-reveal={victoryVisible}
-				>
-					<div class="white-box-shell" class:expanded={victoryVisible}>
-						<div class="white-box-grid" class:dimmed={victoryVisible}>
-							<slot name="grid" />
-						</div>
+				<div class="prism-arena-glow" aria-hidden="true"></div>
+				<PrismFrame winCollapse={winVisualActive}>
+					<div
+						class="grid-slot"
+						class:win-white-box={winVisualActive}
+						class:win-victory-reveal={victoryVisible}
+					>
+						<div class="white-box-shell" class:expanded={victoryVisible}>
+							<div class="white-box-grid" class:dimmed={victoryVisible}>
+								<slot name="grid" />
+							</div>
 
-						{#if showVictoryOnBox}
-							<div
-								class="victory-overlay"
-								class:visible={victoryVisible}
-								role="status"
-								aria-live="polite"
-								data-testid="victory-overlay"
-							>
-								<div class="victory">
-									<h2 class="victory-title">🎉 Puzzle Solved!</h2>
+							{#if showVictoryOnBox}
+								<div
+									class="victory-overlay"
+									class:visible={victoryVisible}
+									role="status"
+									aria-live="polite"
+									data-testid="victory-overlay"
+								>
+									<div class="victory">
+										<h2 class="victory-title">🎉 Puzzle Solved!</h2>
 
-									{#if enableShareAndRating}
-										<StarRating {moveCount} {bestMoveCount} />
+										{#if enableShareAndRating}
+											<StarRating {moveCount} {bestMoveCount} />
 
-										{#if packSlug && puzzleId != null}
-											<button class="share-btn" onclick={share} aria-label="Share this puzzle">
-												{#if copied}
-													✓ Copied!
-												{:else}
-													↗ Share
-												{/if}
-											</button>
+											{#if packSlug && puzzleId != null}
+												<button class="share-btn" onclick={share} aria-label="Share this puzzle">
+													{#if copied}
+														✓ Copied!
+													{:else}
+														↗ Share
+													{/if}
+												</button>
+											{/if}
 										{/if}
-									{/if}
 
-									<div class="victory-actions">
-										{#if onNextPuzzle && packSlug && puzzleId != null}
-											<button class="btn-primary" onclick={handleNextPuzzle}>Next Puzzle →</button>
-										{/if}
-										<button class="btn-secondary" onclick={onReset}>Play Again</button>
+										<div class="victory-actions">
+											{#if onNextPuzzle && packSlug && puzzleId != null}
+												<button class="btn-primary" onclick={handleNextPuzzle}>Next Puzzle →</button>
+											{/if}
+											<button class="btn-secondary" onclick={onReset}>Play Again</button>
+										</div>
 									</div>
 								</div>
-							</div>
-						{/if}
+							{/if}
+						</div>
 					</div>
-				</div>
+				</PrismFrame>
 			</div>
 		</div>
 	</div>
@@ -309,6 +316,13 @@
 	.puzzle-shell.suppress-win-transitions .grid-arena,
 	.puzzle-shell.suppress-win-transitions .grid-slot,
 	.puzzle-shell.suppress-win-transitions .victory-overlay,
+	.puzzle-shell.suppress-win-transitions .prism-arena-glow,
+	.puzzle-shell.suppress-win-transitions :global(.prism-frame),
+	.puzzle-shell.suppress-win-transitions :global(.prism-connectors),
+	.puzzle-shell.suppress-win-transitions :global(.prism-connector-line),
+	.puzzle-shell.suppress-win-transitions :global(.outer-corner),
+	.puzzle-shell.suppress-win-transitions :global(.prism-square),
+	.puzzle-shell.suppress-win-transitions :global(.inner-corner),
 	.puzzle-shell.suppress-win-transitions :global(.puzzle-grid),
 	.puzzle-shell.suppress-win-transitions :global(.puzzle-cell),
 	.puzzle-shell.suppress-win-transitions :global(.grid-row) {
@@ -383,13 +397,47 @@
 	}
 
 	.grid-arena {
+		position: relative;
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		width: 100%;
 		flex: 1 1 0;
 		min-height: 0;
+		padding: 0.5rem;
+		border-radius: 14px;
+		background: transparent;
 		transition: transform var(--win-center-duration, 1.4s) cubic-bezier(0.34, 1.2, 0.64, 1);
+		overflow: visible;
+	}
+
+	.prism-arena-glow {
+		position: absolute;
+		inset: 12% 8%;
+		border-radius: 50%;
+		background: radial-gradient(
+			ellipse at 50% 45%,
+			rgba(129, 140, 248, 0.08) 0%,
+			rgba(99, 102, 241, 0.04) 42%,
+			transparent 72%
+		);
+		pointer-events: none;
+		z-index: 0;
+		transition: opacity var(--win-collapse-duration, 1.6s) ease;
+	}
+
+	.grid-arena.win-collapse {
+		box-shadow: none;
+	}
+
+	.grid-arena.win-collapse .prism-arena-glow {
+		opacity: 0.5;
+	}
+
+	.grid-arena.win-collapse :global(.prism-frame) {
+		border-color: transparent;
+		background: transparent;
+		box-shadow: none;
 	}
 
 	.grid-arena.win-center {
@@ -413,6 +461,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		z-index: 1;
 	}
 
 	.white-box-shell {
@@ -431,6 +480,8 @@
 	.grid-slot.win-white-box .white-box-shell {
 		background: #ffffff;
 		box-shadow:
+			0 0 48px rgba(99, 102, 241, 0.35),
+			0 0 96px rgba(236, 72, 153, 0.16),
 			0 4px 24px rgba(0, 0, 0, 0.08),
 			0 0 0 1px rgba(0, 0, 0, 0.04);
 	}
@@ -470,17 +521,9 @@
 
 	.grid-slot.win-white-box .white-box-grid :global(.puzzle-grid) {
 		background: transparent;
-		border-radius: 10px;
-		transition:
-			background var(--win-collapse-duration, 1.6s) ease,
-			gap var(--win-collapse-duration, 1.6s) cubic-bezier(0.4, 0, 0.2, 1),
-			padding var(--win-collapse-duration, 1.6s) cubic-bezier(0.4, 0, 0.2, 1),
-			border-radius var(--win-collapse-duration, 1.6s) ease;
-	}
-
-	.grid-slot.win-white-box :global(.puzzle-grid) {
-		background: transparent;
-		border-radius: 10px;
+		border-radius: 4px;
+		backdrop-filter: none;
+		-webkit-backdrop-filter: none;
 		box-shadow: none;
 		transition:
 			background var(--win-collapse-duration, 1.6s) ease,
@@ -488,6 +531,30 @@
 			padding var(--win-collapse-duration, 1.6s) cubic-bezier(0.4, 0, 0.2, 1),
 			border-radius var(--win-collapse-duration, 1.6s) ease,
 			box-shadow var(--win-collapse-duration, 1.6s) ease;
+	}
+
+	.grid-slot.win-white-box :global(.puzzle-grid) {
+		background: transparent;
+		border-radius: 4px;
+		backdrop-filter: none;
+		-webkit-backdrop-filter: none;
+		box-shadow: none;
+		transition:
+			background var(--win-collapse-duration, 1.6s) ease,
+			gap var(--win-collapse-duration, 1.6s) cubic-bezier(0.4, 0, 0.2, 1),
+			padding var(--win-collapse-duration, 1.6s) cubic-bezier(0.4, 0, 0.2, 1),
+			border-radius var(--win-collapse-duration, 1.6s) ease,
+			box-shadow var(--win-collapse-duration, 1.6s) ease;
+	}
+
+	.grid-slot.win-white-box :global(.puzzle-grid::after) {
+		opacity: 0;
+		transition: opacity var(--win-collapse-duration, 1.6s) ease;
+	}
+
+	.grid-slot.win-white-box :global(.inner-corner) {
+		opacity: 0;
+		transition: opacity var(--win-collapse-duration, 1.6s) ease;
 	}
 
 	.grid-arena.win-collapse :global(.puzzle-grid) {
@@ -699,9 +766,16 @@
 		.grid-slot,
 		.white-box-shell,
 		.white-box-grid,
+		.prism-arena-glow,
+		:global(.prism-frame),
+		:global(.prism-connector-line),
+		:global(.outer-corner),
 		.grid-slot.win-white-box :global(.puzzle-grid),
+		.grid-slot.win-white-box :global(.puzzle-grid::after),
 		.grid-slot.win-white-box :global(.puzzle-cell),
 		.grid-slot.win-white-box :global(.grid-row),
+		:global(.prism-square),
+		:global(.inner-corner),
 		.victory-overlay,
 		.templates-section,
 		.puzzle-action-bar {

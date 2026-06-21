@@ -8,13 +8,26 @@ export * from 'drizzle-orm';
 type Schema = typeof schema;
 
 let _db: PostgresJsDatabase<Schema> | undefined;
+let _client: ReturnType<typeof postgres> | undefined;
+
+function createPostgresClient() {
+	if (!process.env.DATABASE_URL) {
+		throw new Error('DATABASE_URL environment variable is not set');
+	}
+
+	// Neon pooler + long-lived dev servers: stale TLS sockets cause ECONNRESET.
+	return postgres(process.env.DATABASE_URL, {
+		prepare: false,
+		idle_timeout: 20,
+		max_lifetime: 60 * 30,
+		connect_timeout: 10
+	});
+}
 
 function getDb(): PostgresJsDatabase<Schema> {
 	if (!_db) {
-		if (!process.env.DATABASE_URL) {
-			throw new Error('DATABASE_URL environment variable is not set');
-		}
-		_db = drizzle(postgres(process.env.DATABASE_URL), { schema });
+		_client = createPostgresClient();
+		_db = drizzle(_client, { schema });
 	}
 	return _db;
 }
