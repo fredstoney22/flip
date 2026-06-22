@@ -115,7 +115,7 @@ console.log(`Generating ${PACK_NAME} (${PUZZLE_SPECS.length} puzzles)…`);
 const newPack: PackDefinition = {
 	name: PACK_NAME,
 	slug: PACK_SLUG,
-	access: 'free',
+	access: 'paid',
 	puzzles: generatePackPuzzles(seenCanonicalKeys)
 };
 

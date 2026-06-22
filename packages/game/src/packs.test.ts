@@ -55,6 +55,7 @@ describe('getPackBySlug', () => {
 	it('returns chromatic-ascent pack with 10 puzzles', () => {
 		const pack = getPackBySlug('chromatic-ascent');
 		expect(pack?.name).toBe('Chromatic Ascent');
+		expect(pack?.access).toBe('paid');
 		expect(getPackPuzzleCount('chromatic-ascent')).toBe(10);
 	});
 });

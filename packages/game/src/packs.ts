@@ -4067,7 +4067,7 @@ export const packs: PackDefinition[] = [
   {
     "name": "Chromatic Ascent",
     "slug": "chromatic-ascent",
-    "access": "free",
+    "access": "paid",
     "puzzles": {
       "1": {
         "startState": [

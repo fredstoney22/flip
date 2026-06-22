@@ -15,7 +15,7 @@ Run from `app-template/`:
 | `npm run stripe:status` | Show key mode, paid packs, webhook endpoints |
 | `npm run stripe:setup-paid-packs` | Create Stripe products for packs in `pack-pricing.ts` |
 | `npm run stripe:setup-webhook` | Register production webhook (prints signing secret) |
-| `npm run stripe:create-pack-product -- --slug=hard-in-3 --price-cents=499` | Single pack setup |
+| `npm run stripe:create-pack-product -- --slug=chromatic-ascent --price-cents=499` | Single pack setup |
 
 Point scripts at production by prefixing env vars:
 
@@ -31,11 +31,11 @@ Edit `apps/api/scripts/lib/pack-pricing.ts`:
 
 ```ts
 export const PACK_PRICES_CENTS: Record<string, number> = {
-  'hard-in-3': 499   // $4.99
+  'chromatic-ascent': 499   // $4.99
 };
 ```
 
-Only slugs listed here get Stripe products. Auto packs (`hard-auto`, `expert-auto`) are omitted by default.
+Production sells **Chromatic Ascent** only. Other paid packs in `packs.ts` (e.g. `hard-in-3`) stay inactive in production via `productionPacks.ts`.
 
 ---
 
@@ -78,7 +78,7 @@ npm run db:seed:production
 npm run stripe:setup-paid-packs
 ```
 
-Seed production with `db:seed:production` so only packs listed in `packages/game/src/productionPacks.ts` are active (currently `intro-pack` only). Puzzle data for all packs is still synced; non-allowlisted packs are stored as `active: false`.
+Seed production with `db:seed:production` so only packs listed in `packages/game/src/productionPacks.ts` are active: **first-steps** (free) and **chromatic-ascent** (paid). Puzzle data for all packs is still synced; non-allowlisted packs are stored as `active: false`.
 
 This creates live Products/Prices in Stripe and stores `pack.stripeProductId` in production Postgres.
 

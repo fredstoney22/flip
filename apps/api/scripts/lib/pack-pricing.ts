@@ -6,7 +6,7 @@
  * Add a slug here after it is promoted to production.
  */
 export const PACK_PRICES_CENTS: Record<string, number> = {
-	'hard-in-3': 499
+	'chromatic-ascent': 499
 };
 
 export function formatUsd(cents: number): string {

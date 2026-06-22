@@ -28,6 +28,11 @@ The app deploys as a **single Vercel project**: SvelteKit serves the frontend an
 1. In Vercel → **Add New Project** → import this repository.
 2. Set **Root Directory** to `app-template` (the npm workspace root).
 3. Vercel reads `vercel.json` for build/install commands.
+4. **Settings → Git → Production Branch** → set to **`main`**.
+
+Only merges (or direct pushes) to `main` update the production domain (`flip.frederickstoney.com`). Other branches get preview URLs (`*.vercel.app`) and do **not** replace production.
+
+**Recommended workflow:** develop on `app-template-cursor` or feature branches → open PR → merge to `main` when ready to ship.
 
 Or from the CLI:
 
@@ -85,7 +90,7 @@ DATABASE_URL="postgresql://..." npm run db:push
 DATABASE_URL="postgresql://..." npm run db:seed:production
 ```
 
-Use `db:seed:production` (not plain `db:seed`) on production so only packs in `packages/game/src/productionPacks.ts` are active. Local dev and CI use `npm run db:seed`, which activates every pack for vetting.
+Use `db:seed:production` (not plain `db:seed`) on production so only packs in `packages/game/src/productionPacks.ts` are active. Currently: **First Steps** (free) and **Chromatic Ascent** (paid). All other packs are stored as `active: false`.
 
 ---
 
