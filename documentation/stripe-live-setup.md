@@ -15,7 +15,7 @@ Run from `app-template/`:
 | `npm run stripe:status` | Show key mode, paid packs, webhook endpoints |
 | `npm run stripe:setup-paid-packs` | Create Stripe products for packs in `pack-pricing.ts` |
 | `npm run stripe:setup-webhook` | Register production webhook (prints signing secret) |
-| `npm run stripe:create-pack-product -- --slug=chromatic-ascent --price-cents=499` | Single pack setup |
+| `npm run stripe:create-pack-product -- --slug=chromatic-ascent --price-cents=99` | Single pack setup |
 
 Point scripts at production by prefixing env vars:
 
@@ -31,7 +31,7 @@ Edit `apps/api/scripts/lib/pack-pricing.ts`:
 
 ```ts
 export const PACK_PRICES_CENTS: Record<string, number> = {
-  'chromatic-ascent': 499   // $4.99
+  'chromatic-ascent': 99   // $0.99
 };
 ```
 

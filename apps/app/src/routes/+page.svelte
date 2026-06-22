@@ -80,7 +80,7 @@
 					href="/pricing"
 					class="block rounded-2xl border border-gray-200 bg-white p-6 shadow-sm text-left transition-shadow hover:shadow-md hover:border-gray-300"
 				>
-					<span class="inline-block rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700 mb-3">Paid · $4.99</span>
+					<span class="inline-block rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700 mb-3">Paid · $0.99</span>
 					<h3 class="font-semibold text-gray-900">Chromatic Ascent</h3>
 					<p class="mt-1 text-sm text-gray-500">10 puzzles · Pigment mixing from easy to expert</p>
 					<p class="mt-3 text-xs font-medium text-indigo-600">Unlock pack →</p>

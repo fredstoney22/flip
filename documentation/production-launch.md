@@ -1,6 +1,6 @@
 # Production launch checklist
 
-Ship **First Steps** (free) + **Chromatic Ascent** (paid, $4.99) to `https://flip.frederickstoney.com`.
+Ship **First Steps** (free) + **Chromatic Ascent** (paid, $0.99) to `https://flip.frederickstoney.com`.
 
 ---
 
@@ -25,7 +25,7 @@ Confirm **Settings → Domains**: `flip.frederickstoney.com` is assigned to **Pr
 |------|---------|
 | `packages/game/src/productionPacks.ts` | Active packs: `first-steps`, `chromatic-ascent` |
 | `packages/game/src/packs.ts` | Chromatic Ascent `access: 'paid'` |
-| `apps/api/scripts/lib/pack-pricing.ts` | Stripe price: `chromatic-ascent` → 499¢ |
+| `apps/api/src/stripe/pack-pricing.ts` | Stripe price: `chromatic-ascent` → 99¢ |
 
 ---
 

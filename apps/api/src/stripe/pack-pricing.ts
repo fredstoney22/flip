@@ -5,7 +5,7 @@
  * Only packs on the production allowlist (productionPacks.ts) should be sold.
  */
 export const PACK_PRICES_CENTS: Record<string, number> = {
-	'chromatic-ascent': 499
+	'chromatic-ascent': 99
 };
 
 export function formatUsd(cents: number): string {
