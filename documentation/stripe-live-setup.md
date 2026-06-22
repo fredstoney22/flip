@@ -67,6 +67,29 @@ npm run stripe:listen    # terminal 2 — copy whsec_… to .env
 
 ## Step 3 — Live mode: Stripe products on production DB
 
+### Option A — Automated (no local CLI)
+
+After `STRIPE_SECRET_KEY` (`sk_live_…`) is in **Vercel Production**:
+
+1. Ensure **`CRON_SECRET`** is set in Vercel Production (`openssl rand -hex 32`).
+2. Deploy `main` (includes `POST /api/cron/stripe-bootstrap`).
+3. Run **GitHub Actions → “Stripe production bootstrap” → Run workflow**  
+   (add `CRON_SECRET` to GitHub repo secrets first — same value as Vercel).
+
+Or trigger once with curl (paste `CRON_SECRET` from Vercel dashboard):
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer <CRON_SECRET>" \
+  "https://flip.frederickstoney.com/api/cron/stripe-bootstrap?recreateWebhook=1"
+```
+
+If the response includes `webhook.signingSecret`, add it to Vercel as `STRIPE_WEBHOOK_SECRET` and redeploy.
+
+The endpoint uses Vercel’s runtime env (`STRIPE_SECRET_KEY`, `DATABASE_URL`) — your live key never leaves the server.
+
+### Option B — Local CLI
+
 1. In [Stripe Dashboard](https://dashboard.stripe.com), switch to **Live** mode.
 2. Copy the **live** secret key (`sk_live_…`).
 3. Run against your **Neon production** `DATABASE_URL`:

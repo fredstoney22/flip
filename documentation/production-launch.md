@@ -50,6 +50,10 @@ DATABASE_URL="postgresql://..." npm run stripe:status
 
 ## 4. Stripe live mode
 
+**Automated (recommended):** see [`stripe-live-setup.md`](./stripe-live-setup.md) → Option A (GitHub Actions or curl). Requires `sk_live_…` in Vercel Production + `CRON_SECRET`.
+
+**CLI alternative:**
+
 ```bash
 DATABASE_URL="postgresql://..." \
 STRIPE_SECRET_KEY="sk_live_..." \

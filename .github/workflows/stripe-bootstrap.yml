@@ -1,0 +1,34 @@
+name: Stripe production bootstrap
+
+# Sync live Stripe products + webhook using secrets already on Vercel.
+# No local CLI or Stripe key on your machine required.
+#
+# Setup (once):
+#   GitHub repo → Settings → Secrets → Actions:
+#     CRON_SECRET — same value as Vercel Production CRON_SECRET
+
+on:
+  workflow_dispatch:
+
+jobs:
+  stripe-bootstrap:
+    name: Bootstrap live Stripe on production
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync products and webhook
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          PRODUCTION_URL: https://flip.frederickstoney.com
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "Add CRON_SECRET to GitHub Actions secrets (copy from Vercel Production env)."
+            exit 1
+          fi
+          curl -sf -X POST \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "${PRODUCTION_URL}/api/cron/stripe-bootstrap?recreateWebhook=1" \
+            | tee bootstrap-response.json
+          echo ""
+          if grep -q signingSecret bootstrap-response.json; then
+            echo "::notice::New webhook signing secret returned. Add it to Vercel as STRIPE_WEBHOOK_SECRET and redeploy."
+          fi
