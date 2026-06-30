@@ -7,7 +7,7 @@ const GOAL = '';
 
 /** How applying a lens changes color — used from puzzle 5 onward. */
 const LENS_TOGGLE =
-	'Applying a lens toggles color on each square it covers: if the square does not have that color, the lens adds it; if it already does, the lens removes it.';
+	'Applying a lens toggles the colors in its pattern where its applied: if a square does not have that color, the lens adds the color. If it already has that color, the lens removes it.';
 
 function puzzleInfo(title: string, body: string): TutorialStep {
   return { title, body, action: 'info' };
@@ -78,7 +78,7 @@ export const FIRST_STEPS_TUTORIALS: Record<number, TutorialConfig> = {
   1: config(1, [
     puzzleInfo(
       'Applying your first lens',
-      `${GOAL} The goal of Prism is to clear all the color from the Prism Square! Select the lens below and tap it again to rotate it. Then tap the Prism Square to apply the lens.`
+      `${GOAL} The goal of Prism is to clear all the color from the Prism Square! Select the lens below and tap it to rotate it. Then tap the Prism Square to apply the lens.`
     ),
   ]),
   2: config(2, [
@@ -114,7 +114,7 @@ export const FIRST_STEPS_TUTORIALS: Record<number, TutorialConfig> = {
   7: config(7, [
     puzzleInfo(
       'Color mixing',
-      `${GOAL} ${LENS_TOGGLE} Red + Yellow + Blue = Brown!`
+      `${GOAL} ${LENS_TOGGLE} Red + Yellow + Blue = Prism!`
     )
   ]),
   8: config(8, [

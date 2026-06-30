@@ -32,8 +32,7 @@ function invertPuzzle(cfg: PuzzleConfig): PuzzleConfig {
 	return {
 		...cfg,
 		startState: invertMonochromeGrid(cfg.startState),
-		solvedValue: PIGMENT_CLEAR_SOLVED_VALUE,
-		allowTemplateRotation: cfg.allowTemplateRotation ?? true
+		solvedValue: PIGMENT_CLEAR_SOLVED_VALUE
 	};
 }
 
@@ -43,6 +42,10 @@ const updated: PackDefinition[] = packs.map((pack) => {
 	const puzzles: PackDefinition['puzzles'] = {};
 	for (const [idStr, cfg] of Object.entries(pack.puzzles)) {
 		const id = Number(idStr);
+		if (cfg.solvedValue === PIGMENT_CLEAR_SOLVED_VALUE) {
+			puzzles[id] = cfg;
+			continue;
+		}
 		if (!isMonochromeManualPuzzle(cfg)) {
 			puzzles[id] = cfg;
 			continue;

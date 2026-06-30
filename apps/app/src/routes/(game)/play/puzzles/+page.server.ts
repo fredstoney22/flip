@@ -1,6 +1,7 @@
 import { error, redirect } from '@sveltejs/kit';
-import { getFirstStepsConcept, FIRST_STEPS_SLUG } from '@flip/game';
+import { getFirstStepsConcept, getPuzzleById, FIRST_STEPS_SLUG } from '@flip/game';
 import { getUserProgress } from '$lib/progress.server';
+import { isOptimalSolve } from '$lib/utils/starRating';
 import type { PageServerLoad } from './$types';
 
 import { apiUrl } from '$lib/api-url.server';
@@ -16,7 +17,7 @@ export const load: PageServerLoad = async ({ url, fetch, request }) => {
     getUserProgress(fetch, request.headers)
   ]);
 
-  if (packRes.status === 403) redirect(302, '/pricing');
+  if (packRes.status === 403) redirect(302, '/store');
   if (packRes.status === 404) error(404, 'Pack not found');
   if (!packRes.ok) error(500, 'Failed to load pack');
 
@@ -35,15 +36,22 @@ export const load: PageServerLoad = async ({ url, fetch, request }) => {
     bestMoves[p.puzzleId] = p.bestMoveCount;
   }
 
-  const puzzleList = packData.puzzles.map((p) => ({
-    id: p.puzzleNumber,
-    completed: completedIds.has(p.puzzleNumber),
-    bestMoveCount: bestMoves[p.puzzleNumber] ?? null,
-    concept:
-      packData.packSlug === FIRST_STEPS_SLUG
-        ? (getFirstStepsConcept(p.puzzleNumber) ?? null)
-        : null
-  }));
+  const puzzleList = packData.puzzles.map((p) => {
+    const bestMoveCount = bestMoves[p.puzzleNumber] ?? null;
+    const par = getPuzzleById(packData.packSlug, p.puzzleNumber)?.minMovesToSolve ?? null;
+    const completed = completedIds.has(p.puzzleNumber);
+
+    return {
+      id: p.puzzleNumber,
+      completed,
+      optimal: completed && bestMoveCount !== null && isOptimalSolve(bestMoveCount, par),
+      bestMoveCount,
+      concept:
+        packData.packSlug === FIRST_STEPS_SLUG
+          ? (getFirstStepsConcept(p.puzzleNumber) ?? null)
+          : null
+    };
+  });
 
   const purchaseSuccess = url.searchParams.get('purchase') === 'success';
 

@@ -107,10 +107,13 @@ describe('/play/puzzles load — happy path', () => {
 
     expect(result.puzzles[0].completed).toBe(true);
     expect(result.puzzles[0].bestMoveCount).toBe(4);
+    expect(result.puzzles[0].optimal).toBe(false);
     expect(result.puzzles[1].completed).toBe(true);
     expect(result.puzzles[1].bestMoveCount).toBe(2);
+    expect(result.puzzles[1].optimal).toBe(true);
     expect(result.puzzles[2].completed).toBe(false);
     expect(result.puzzles[2].bestMoveCount).toBeNull();
+    expect(result.puzzles[2].optimal).toBe(false);
   });
 
   it('sets purchaseSuccess false when the purchase query param is absent', async () => {
@@ -136,7 +139,7 @@ describe('/play/puzzles load — happy path', () => {
 });
 
 describe('/play/puzzles load — access guard', () => {
-  it('redirects to /pricing when the pack API returns 403', async () => {
+  it('redirects to /play when the pack API returns 403', async () => {
     const fetchFn = buildFetch([
       { match: '/packs/hard-in-3/puzzles', body: {}, status: 403 },
       { match: '/progress', body: EMPTY_PROGRESS }
@@ -144,7 +147,7 @@ describe('/play/puzzles load — access guard', () => {
 
     await expect(
       load(makeLoadArgs('hard-in-3', fetchFn))
-    ).rejects.toMatchObject({ status: 302, location: '/pricing' });
+    ).rejects.toMatchObject({ status: 302, location: '/play' });
   });
 
   it('throws 404 when the pack is not found', async () => {

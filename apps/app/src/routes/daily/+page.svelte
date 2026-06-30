@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Puzzle from '$lib/components/game/Puzzle.svelte';
+	import DifficultyDebugPanel from '$lib/components/game/DifficultyDebugPanel.svelte';
 	import PuzzlePlayLayout from '$lib/components/game/PuzzlePlayLayout.svelte';
 	import { formatLongDate } from '$lib/utils/date';
 	import type { PageData } from './$types';
@@ -14,6 +15,7 @@
 </svelte:head>
 
 <PuzzlePlayLayout backHref="/" backLabel="← Back" trailingLabel={dateLabel}>
+	<DifficultyDebugPanel config={data.daily.config} />
 	<Puzzle
 		puzzleConfig={data.daily.config}
 		packSlug={data.daily.packSlug}

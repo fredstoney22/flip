@@ -11,10 +11,11 @@ interface DailyResponse {
 }
 
 export const load: PageServerLoad = async ({ fetch, locals }) => {
-  const res = await fetch(apiUrl('/api/daily'));
-  const daily = !res.ok
+  const dailyRes = await fetch(apiUrl('/api/daily'));
+
+  const daily = !dailyRes.ok
     ? null
-    : ((await res.json()) as DailyResponse);
+    : ((await dailyRes.json()) as DailyResponse);
 
   return {
     daily,

@@ -25,7 +25,6 @@ const twoMovePuzzle: PuzzleConfig = {
 		}
 	],
 	solvedValue: 1,
-	allowTemplateRotation: true,
 	minMovesToSolve: 2
 };
 

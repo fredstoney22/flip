@@ -16,34 +16,22 @@ export const load: PageServerLoad = async ({ url, fetch, request }) => {
 
   if (isNaN(puzzleNumber)) redirect(302, `/play/puzzles?pack=${slug}`);
 
-  const [puzzleRes, listRes, progress] = await Promise.all([
+  const [puzzleRes, progress] = await Promise.all([
     fetch(apiUrl(`/api/packs/${slug}/puzzles/${puzzleNumber}`), { headers: { cookie } }),
-    fetch(apiUrl(`/api/packs/${slug}/puzzles`), { headers: { cookie } }),
     getUserProgress(fetch, request.headers)
   ]);
 
-  if (puzzleRes.status === 403 || listRes.status === 403) redirect(302, '/pricing');
+  if (puzzleRes.status === 403) redirect(302, '/store');
   if (puzzleRes.status === 404) error(404, 'Puzzle not found');
   if (!puzzleRes.ok) error(500, 'Failed to load puzzle');
 
   const puzzleData: {
 		packSlug: string;
+		packName: string;
 		puzzleNumber: number;
+		nextPuzzleNumber: number | null;
 		config: PuzzleConfig;
 	} = await puzzleRes.json();
-
-  let nextPuzzleId: number | null = null;
-  let packName = slug;
-  if (listRes.ok) {
-    const listData: {
-			packName: string;
-			puzzles: Array<{ puzzleNumber: number }>;
-		} = await listRes.json();
-    packName = listData.packName;
-    const numbers = listData.puzzles.map((p) => p.puzzleNumber).sort((a, b) => a - b);
-    const idx = numbers.indexOf(puzzleNumber);
-    nextPuzzleId = idx !== -1 && idx < numbers.length - 1 ? numbers[idx + 1] : null;
-  }
 
   const bestMoveCount =
 		progress.progress.find((p) => p.packSlug === slug && p.puzzleId === puzzleNumber)
@@ -53,11 +41,12 @@ export const load: PageServerLoad = async ({ url, fetch, request }) => {
 		slug === FIRST_STEPS_SLUG ? getTutorialConfig(slug, puzzleNumber) : null;
 
   return {
-    pack: { name: packName, slug },
+    pack: { name: puzzleData.packName, slug },
     puzzleId: puzzleNumber,
     config: puzzleData.config,
     bestMoveCount,
-    nextPuzzleId,
-    tutorial
+    nextPuzzleId: puzzleData.nextPuzzleNumber,
+    tutorial,
+    pedagogyConceptId: slug === FIRST_STEPS_SLUG ? puzzleNumber : undefined
   };
 };

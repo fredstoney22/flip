@@ -13,21 +13,15 @@ async function getCellCenter(page: Parameters<typeof test>[0]['page'], row: numb
 }
 
 async function moveToCellCenter(page: Parameters<typeof test>[0]['page'], row: number, col: number) {
-  const { x, y } = await getCellCenter(page, row, col);
-  await page.mouse.move(x, y);
+  await cellLocator(page, row, col).hover();
 }
 
-async function getHighlightMask(page: Parameters<typeof test>[0]['page'], size: number) {
-  const mask: boolean[][] = [];
-  for (let r = 0; r < size; r++) {
-    const row: boolean[] = [];
-    for (let c = 0; c < size; c++) {
-      const classes = await cellLocator(page, r, c).getAttribute('class');
-      row.push(!!classes && classes.includes('hover-highlight'));
-    }
-    mask.push(row);
-  }
-  return mask;
+async function cellAriaLabel(
+  page: Parameters<typeof test>[0]['page'],
+  row: number,
+  col: number
+) {
+  return (await cellLocator(page, row, col).getAttribute('aria-label')) ?? '';
 }
 
 async function getGridState(page: Parameters<typeof test>[0]['page'], size: number) {
@@ -57,24 +51,17 @@ test.describe('Puzzle interactions — tutorial 3x3 board', () => {
     // Select first template
     await page.getByTestId('template-0').click();
 
-    // Hover top-left cell
+    const beforePreview = await cellAriaLabel(page, 1, 1);
+
+    // Hover top-left cell — preview snaps to the only valid 3×3 placement
     await moveToCellCenter(page, 0, 0);
-    let mask = await getHighlightMask(page, 3);
-    // All cells should be highlighted (3x3 template over 3x3 board)
-    expect(mask).toEqual([
-      [true, true, true],
-      [true, true, true],
-      [true, true, true]
-    ]);
+    const afterHoverTopLeft = await cellAriaLabel(page, 1, 1);
+    expect(afterHoverTopLeft).not.toEqual(beforePreview);
 
     // Hover bottom-right cell — still snapped to the same center
     await moveToCellCenter(page, 2, 2);
-    mask = await getHighlightMask(page, 3);
-    expect(mask).toEqual([
-      [true, true, true],
-      [true, true, true],
-      [true, true, true]
-    ]);
+    const afterHoverBottomRight = await cellAriaLabel(page, 1, 1);
+    expect(afterHoverBottomRight).toEqual(afterHoverTopLeft);
   });
 
   test('tutorial: selecting a template and placing it changes the board', async ({ page }) => {
@@ -105,17 +92,66 @@ test.describe('Puzzle interactions — tutorial 3x3 board', () => {
     await page.mouse.down();
     await page.mouse.move(cellX, cellY, { steps: 12 });
 
-    const mask = await getHighlightMask(page, 3);
-    expect(mask).toEqual([
-      [true, true, true],
-      [true, true, true],
-      [true, true, true]
-    ]);
+    await expect(page.getByTestId('template-drag-ghost')).toBeVisible();
 
     await page.mouse.up();
 
+    await expect(page.getByTestId('template-drag-ghost')).toHaveCount(0);
+
     const after = await getGridState(page, 3);
     expect(after).not.toEqual(before);
+  });
+
+  test('drag ghost follows pointer on mobile viewport', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await startTutorial(page);
+
+    const template = page.getByTestId('template-0');
+    const templateBox = await template.boundingBox();
+    if (!templateBox) throw new Error('No bounding box for template-0');
+
+    const { x: cellX, y: cellY } = await getCellCenter(page, 0, 0);
+    const startX = templateBox.x + templateBox.width / 2;
+    const startY = templateBox.y + templateBox.height / 2;
+
+    await page.mouse.move(startX, startY);
+    await page.mouse.down();
+    await page.mouse.move(cellX, cellY, { steps: 12 });
+
+    const ghost = page.getByTestId('template-drag-ghost');
+    await expect(ghost).toBeVisible();
+
+    const ghostBox = await ghost.boundingBox();
+    if (!ghostBox) throw new Error('No bounding box for drag ghost');
+
+    const ghostCenterX = ghostBox.x + ghostBox.width / 2;
+    const ghostCenterY = ghostBox.y + ghostBox.height / 2;
+    expect(Math.abs(ghostCenterX - cellX)).toBeLessThan(40);
+    expect(Math.abs(ghostCenterY - cellY)).toBeLessThan(40);
+
+    await page.mouse.up();
+  });
+
+  test('releasing drag outside the grid does not apply the template', async ({ page }) => {
+    await startTutorial(page);
+
+    const before = await getGridState(page, 3);
+    const template = page.getByTestId('template-0');
+    const templateBox = await template.boundingBox();
+    if (!templateBox) throw new Error('No bounding box for template-0');
+
+    const startX = templateBox.x + templateBox.width / 2;
+    const startY = templateBox.y + templateBox.height / 2;
+    const releaseX = templateBox.x - 20;
+    const releaseY = templateBox.y;
+
+    await page.mouse.move(startX, startY);
+    await page.mouse.down();
+    await page.mouse.move(releaseX, releaseY, { steps: 8 });
+    await page.mouse.up();
+
+    const after = await getGridState(page, 3);
+    expect(after).toEqual(before);
   });
 });
 

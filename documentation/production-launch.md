@@ -25,7 +25,7 @@ Confirm **Settings → Domains**: `flip.frederickstoney.com` is assigned to **Pr
 |------|---------|
 | `packages/game/src/productionPacks.ts` | Active packs: `first-steps`, `chromatic-ascent` |
 | `packages/game/src/packs.ts` | Chromatic Ascent `access: 'paid'` |
-| `apps/api/src/stripe/pack-pricing.ts` | Stripe price: `chromatic-ascent` → 99¢ |
+| `packages/game/src/packPricing.ts` | Stripe price: `chromatic-ascent` → 99¢ (UI + Stripe) |
 
 ---
 

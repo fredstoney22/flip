@@ -45,6 +45,44 @@ export function meetsMinTemplatesPerPigment(
 	return pigments.every((pigment) => (counts.get(pigment) ?? 0) >= minPerPigment);
 }
 
+/** Distinct non-zero pigments used across all templates in a puzzle. */
+export function distinctPigmentsInPuzzle(templates: PuzzleTemplate[]): Pigment[] {
+	const seen = new Set<Pigment>();
+	for (const template of templates) {
+		for (const pigment of distinctPigmentsInTemplate(template)) {
+			seen.add(pigment);
+		}
+	}
+	return [...seen].sort((a, b) => a - b);
+}
+
+export function meetsDistinctPigmentCount(
+	templates: PuzzleTemplate[],
+	distinctPigmentCount: number
+): boolean {
+	return distinctPigmentsInPuzzle(templates).length === distinctPigmentCount;
+}
+
+export function meetsMaxPigmentsPerTemplate(
+	templates: PuzzleTemplate[],
+	maxPigmentsPerTemplate: number
+): boolean {
+	return templates.every(
+		(template) => distinctPigmentsInTemplate(template).length <= maxPigmentsPerTemplate
+	);
+}
+
+export function pickPigmentPalette(
+	allowedPigments: Pigment[],
+	distinctPigmentCount: number
+): Pigment[] | null {
+	const pool = nonZeroPigments(allowedPigments);
+	if (distinctPigmentCount > pool.length) return null;
+	if (distinctPigmentCount === pool.length) return pool;
+	const shuffled = [...pool].sort(() => Math.random() - 0.5);
+	return shuffled.slice(0, distinctPigmentCount).sort((a, b) => a - b);
+}
+
 export function isMultiPigmentPuzzle(config: {
 	solvedValue: Pigment;
 	templates: PuzzleTemplate[];

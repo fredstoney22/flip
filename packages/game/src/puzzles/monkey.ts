@@ -35,8 +35,7 @@ export const monkeyImage = parseArtRows(MONKEY_ART, MONKEY_ART_CHARS);
 
 /** Two pigment layers (brown + tan), each split top/bottom → 4 moves. */
 export const monkeyPuzzle: PuzzleConfig = buildImagePuzzle(monkeyImage, {
-	splitsPerColor: 2,
-	allowTemplateRotation: true
+	splitsPerColor: 2
 });
 
 export const animalPack: PackDefinition = {

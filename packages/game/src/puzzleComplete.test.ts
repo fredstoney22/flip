@@ -4,9 +4,9 @@ import {
 	isPuzzleComplete,
 	isPuzzleSolved
 } from './PuzzleFunctions.js';
+import { buildGeneratorConfig } from './packGeneration.js';
 import {
 	generateVerifiedPuzzle,
-	monoGeneratorConfig,
 	solveMinMoves,
 	solveMinMovesGridOnly
 } from './PuzzleGenerator.js';
@@ -26,24 +26,22 @@ describe('puzzle completion rules', () => {
 				{ shape: [[5, 5], [0, 5]] },
 				{ shape: [[0, 5], [0, 0], [5, 0]] }
 			],
-			solvedValue: 0,
-			allowTemplateRotation: true
+			solvedValue: 0
 		};
 		const solvedGrid = applyTemplate(config.startState, config.templates[1], 1, 0);
 		expect(isPuzzleSolved(config, solvedGrid)).toBe(true);
 		expect(isPuzzleComplete(config, solvedGrid, 1 << 1)).toBe(false);
 	});
 
-	it('validates intro-pack puzzles under the all-templates-used solver', () => {
+	it('validates intro-pack puzzles under the grid-clear solver', () => {
 		const config = getPuzzleById('intro-pack', 3)!;
 		expect(solveMinMoves(config, 12)).not.toBeNull();
 	});
 
-	it('generated puzzles require at least as many moves as templates', () => {
+	it('generated puzzles match the grid-clear solver minimum', () => {
 		const generated = generateVerifiedPuzzle(
-			monoGeneratorConfig({ puzzleSize: 3, templateSizes: [2, 3], targetMinMoves: 2 })
+			buildGeneratorConfig({ kind: 'mono', puzzleSize: 3, templateSizes: [2, 3], targetMinMoves: 2 })
 		);
-		expect(generated.minMovesToSolve).toBeGreaterThanOrEqual(generated.templates.length);
 		expect(solveMinMoves(generated, generated.minMovesToSolve + 2)).toBe(
 			generated.minMovesToSolve
 		);

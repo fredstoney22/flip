@@ -16,13 +16,24 @@ describe('seedActiveMode', () => {
 		}
 	});
 
-	it('defaults to all packs active', () => {
+	it('defaults to dev mode with only dev packs active', () => {
+		expect(resolveSeedActiveMode()).toBe('dev');
+		expect(packActiveForSeed('first-steps', 'dev')).toBe(true);
+		expect(packActiveForSeed('chromatic-ascent', 'dev')).toBe(true);
+		expect(packActiveForSeed('grid-4x4-dev', 'dev')).toBe(true);
+		expect(packActiveForSeed('intro-pack', 'dev')).toBe(false);
+		expect(packActiveForSeed('tutorial-auto', 'dev')).toBe(false);
+	});
+
+	it('all mode activates every pack', () => {
+		process.env.SEED_ACTIVE_MODE = 'all';
 		expect(resolveSeedActiveMode()).toBe('all');
 		expect(packActiveForSeed('tutorial-auto', 'all')).toBe(true);
+		expect(packActiveForSeed('intro-pack', 'all')).toBe(true);
 	});
 
 	it('production mode only activates allowlisted packs', () => {
-		expect(resolveSeedActiveMode()).toBe('all');
+		expect(resolveSeedActiveMode()).toBe('dev');
 		process.env.SEED_ACTIVE_MODE = 'production';
 		expect(resolveSeedActiveMode()).toBe('production');
 		expect(packActiveForSeed('first-steps', 'production')).toBe(true);

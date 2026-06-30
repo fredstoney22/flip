@@ -3,8 +3,12 @@
 	import type { Pigment, PuzzleGrid } from '@flip/game';
 	import { settings } from '$lib/stores/settings';
 	import { GRID_CELL_GAP, GRID_PADDING } from '$lib/utils/puzzleLayout';
-	import { WIN_ANIMATION_TIMING as WIN } from '$lib/constants/winAnimationTiming';
-	import LensChrome from './LensChrome.svelte';
+	import {
+	  isIridescentPigment,
+	  iridescentGapCoverRects,
+	  iridescentSheetMaskImage,
+	  iridescentSheetSize
+	} from '$lib/constants/iridescentPigment';
 
 	interface Props {
 		grid: PuzzleGrid;
@@ -18,14 +22,17 @@
 		hintHighlightDim?: [number, number];
 		monochromeFlip?: boolean;
 		previewPigment?: Pigment | null;
-		/** Triggers the solve ripple → white-box collapse animation. */
-		winCollapse?: boolean;
 	}
 
 	const GAP = GRID_CELL_GAP;
 	const PADDING = GRID_PADDING;
 	const MONO_OFF = '#1f2937';
 	const MONO_ON = '#f9fafb';
+	const YELLOW_BADGE = {
+	  fill: PIGMENT_HEX[2],
+	  border: '#CA8A04',
+	  accent: '#854D0E'
+	} as const;
 
 	let {
 	  grid,
@@ -38,55 +45,99 @@
 	  hintHighlightStart,
 	  hintHighlightDim,
 	  monochromeFlip = false,
-	  previewPigment = null,
-	  winCollapse = false
+	  previewPigment = null
 	}: Props = $props();
 
 	let gridEl: HTMLDivElement | null = $state(null);
 	let hoveredCell = $state<[number, number] | null>(null);
 	/** Measured distance between cell origins (cell width + gap) from the live DOM. */
 	let measuredCellStep = $state(0);
+	let measuredSheet = $state({ width: 0, height: 0, top: PADDING, left: PADDING });
 
 	const rows = $derived(grid.length);
 	const cols = $derived(grid[0]?.length ?? 0);
 	const cellStep = $derived(measuredCellStep > 0 ? measuredCellStep : cellSize + GAP);
-	const gridCenterRow = $derived((rows - 1) / 2);
-	const gridCenterCol = $derived((cols - 1) / 2);
+	const iridescentGap = $derived(
+	  measuredCellStep > 0 ? Math.max(0, measuredCellStep - cellSize) : GAP
+	);
+	const iridescentSheetDims = $derived(
+	  iridescentSheetSize(rows, cols, cellSize, iridescentGap)
+	);
+	const iridescentSheet = $derived({
+	  top: measuredSheet.top || PADDING,
+	  left: measuredSheet.left || PADDING,
+	  width: iridescentSheetDims.width,
+	  height: iridescentSheetDims.height
+	});
 
-	const hoverLensOverlay = $derived(
-	  highlightStart && highlightDim
-	    ? {
-	      left: PADDING + highlightStart[0] * cellStep,
-	      top: PADDING + highlightStart[1] * cellStep,
-	      width: highlightDim[0] * cellSize + (highlightDim[0] - 1) * GAP,
-	      height: highlightDim[1] * cellSize + (highlightDim[1] - 1) * GAP
+	const prismCellPositions = $derived.by(() => {
+	  if (!showColor || monochromeFlip) return [];
+	  const positions: { row: number; col: number }[] = [];
+	  for (let r = 0; r < rows; r++) {
+	    for (let c = 0; c < cols; c++) {
+	      if (isIridescentPigment(displayPigment(grid[r][c], r, c))) {
+	        positions.push({ row: r, col: c });
+	      }
 	    }
-	    : null
+	  }
+	  return positions;
+	});
+
+	const hasIridescentSheet = $derived(prismCellPositions.length > 0);
+
+	const iridescentMaskImage = $derived(
+	  iridescentSheetMaskImage(
+	    prismCellPositions,
+	    iridescentSheet.width,
+	    iridescentSheet.height,
+	    cellSize,
+	    iridescentGap
+	  )
 	);
 
-	function winCellDelay(rowIndex: number, colIndex: number): number {
-	  if (!winCollapse) return 0;
-	  return Math.round(
-	    (Math.abs(rowIndex - gridCenterRow) + Math.abs(colIndex - gridCenterCol)) * WIN.cellStaggerMs
-	  );
-	}
+	const iridescentGapCovers = $derived(
+	  iridescentGapCoverRects(
+	    rows,
+	    cols,
+	    iridescentSheet.top,
+	    iridescentSheet.left,
+	    cellSize,
+	    iridescentGap
+	  )
+	);
 
-	function measureCellStep() {
-	  if (!gridEl || cols === 0) {
+	function measureGridLayout() {
+	  if (!gridEl || cols === 0 || rows === 0) {
 	    measuredCellStep = 0;
+	    measuredSheet = { width: 0, height: 0, top: PADDING, left: PADDING };
 	    return;
 	  }
+
 	  const firstRow = gridEl.querySelector('.grid-row');
 	  const cells = firstRow?.querySelectorAll<HTMLElement>('.puzzle-cell');
 	  if (!cells || cells.length === 0) {
 	    measuredCellStep = 0;
 	    return;
 	  }
+
 	  if (cells.length >= 2) {
 	    measuredCellStep = cells[1].offsetLeft - cells[0].offsetLeft;
-	    return;
+	  } else {
+	    measuredCellStep = cells[0].offsetWidth + GAP;
 	  }
-	  measuredCellStep = cells[0].offsetWidth + GAP;
+
+	  const rowEls = gridEl.querySelectorAll<HTMLElement>('.grid-row');
+	  const topLeft = rowEls[0]?.querySelector<HTMLElement>('.puzzle-cell');
+	  const bottomRow = rowEls[rowEls.length - 1];
+	  const bottomRight = bottomRow?.querySelector<HTMLElement>('.puzzle-cell:last-child');
+	  if (!topLeft || !bottomRight) return;
+
+	  measuredSheet = {
+	    left: topLeft.offsetLeft,
+	    top: topLeft.offsetTop,
+	    width: bottomRight.offsetLeft + bottomRight.offsetWidth - topLeft.offsetLeft,
+	    height: bottomRight.offsetTop + bottomRight.offsetHeight - topLeft.offsetTop
+	  };
 	}
 
 	$effect(() => {
@@ -94,34 +145,27 @@
 	  void rows;
 	  void cols;
 	  void grid;
-	  queueMicrotask(measureCellStep);
+	  queueMicrotask(measureGridLayout);
 	});
 
-	function getCellFromPoint(offsetX: number, offsetY: number): [number, number] | null {
+	/** Fractional grid coordinates (0–rows, 0–cols) from a point relative to the grid element. */
+	function getGridPointFromPoint(offsetX: number, offsetY: number): [number, number] | null {
 	  const x = offsetX - PADDING;
 	  const y = offsetY - PADDING;
-	  if (x < 0 || y < 0 || cols === 0 || rows === 0) return null;
+	  if (cols === 0 || rows === 0) return null;
 	  const step = cellStep;
-	  const col = Math.min(cols - 1, Math.max(0, Math.floor(x / step)));
-	  const row = Math.min(rows - 1, Math.max(0, Math.floor(y / step)));
+	  const col = x / step;
+	  const row = y / step;
+	  if (row < 0 || col < 0 || row >= rows || col >= cols) return null;
 	  return [row, col];
 	}
 
 	function resolveCellFromEvent(e: PointerEvent): [number, number] | null {
-	  const hit = document.elementFromPoint(e.clientX, e.clientY);
-	  const cellBtn = hit?.closest?.('button[data-grid-row]');
-	  if (cellBtn) {
-	    const row = Number(cellBtn.getAttribute('data-grid-row'));
-	    const col = Number(cellBtn.getAttribute('data-grid-col'));
-	    if (Number.isInteger(row) && Number.isInteger(col)) {
-	      return [row, col];
-	    }
-	  }
-	  const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-	  return getCellFromPoint(e.clientX - rect.left, e.clientY - rect.top);
+	  const rect = gridEl?.getBoundingClientRect() ?? (e.currentTarget as HTMLElement).getBoundingClientRect();
+	  return getGridPointFromPoint(e.clientX - rect.left, e.clientY - rect.top);
 	}
 
-	/** Resolve grid cell from viewport coordinates (used while dragging a template). */
+	/** Resolve fractional grid position from viewport coordinates (used while dragging a template). */
 	export function resolveCellAtClientPoint(clientX: number, clientY: number): [number, number] | null {
 	  if (!gridEl) return null;
 	  const rect = gridEl.getBoundingClientRect();
@@ -133,14 +177,14 @@
 	  ) {
 	    return null;
 	  }
-	  return getCellFromPoint(clientX - rect.left, clientY - rect.top);
+	  return getGridPointFromPoint(clientX - rect.left, clientY - rect.top);
 	}
 
 	function handleContainerPointer(e: PointerEvent) {
-	  const cell = resolveCellFromEvent(e);
-	  if (cell) {
-	    hoveredCell = cell;
-	    onCellHover?.(cell[0], cell[1]);
+	  const point = resolveCellFromEvent(e);
+	  if (point) {
+	    hoveredCell = [Math.floor(point[0]), Math.floor(point[1])];
+	    onCellHover?.(point[0], point[1]);
 	  } else {
 	    hoveredCell = null;
 	  }
@@ -179,14 +223,32 @@
 	  );
 	}
 
-	function cellBackground(cell: Pigment, row: number, col: number): string {
+	function displayPigment(cell: Pigment, row: number, col: number): Pigment {
+	  if (previewPigment !== null && inZone(row, col, highlightStart, highlightDim)) {
+	    return ((cell ^ previewPigment) & 0b111) as Pigment;
+	  }
+	  return cell;
+	}
+
+	function cellBackground(cell: Pigment, row: number, col: number): string | null {
 	  if (monochromeFlip) {
 	    return cell === 0 ? MONO_ON : MONO_OFF;
 	  }
-	  if (previewPigment !== null && inZone(row, col, highlightStart, highlightDim)) {
-	    return PIGMENT_HEX[((cell ^ previewPigment) & 0b111) as Pigment];
-	  }
-	  return PIGMENT_HEX[cell];
+	  const pigment = displayPigment(cell, row, col);
+	  if (isIridescentPigment(pigment)) return null;
+	  if (pigment === 2) return YELLOW_BADGE.fill;
+	  return PIGMENT_HEX[pigment];
+	}
+
+	function cellInlineBackground(
+	  iridescent: boolean,
+	  bg: string | null,
+	  showColorMode: boolean,
+	  mono: boolean
+	): string | undefined {
+	  if (iridescent) return undefined;
+	  if ((showColorMode || mono) && bg !== null) return bg;
+	  return '#e5e7eb';
 	}
 
 	function lineFlags(cell: Pigment) {
@@ -199,15 +261,11 @@
 	}
 </script>
 
-<div class="prism-square" class:win-collapse={winCollapse}>
-	<span class="inner-corner inner-corner-tl" aria-hidden="true"></span>
-	<span class="inner-corner inner-corner-tr" aria-hidden="true"></span>
-	<span class="inner-corner inner-corner-bl" aria-hidden="true"></span>
-	<span class="inner-corner inner-corner-br" aria-hidden="true"></span>
+<div class="prism-square">
 	<div
 		bind:this={gridEl}
 		class="puzzle-grid"
-		class:win-collapse={winCollapse}
+		data-prism-inner
 		data-testid="puzzle-container"
 		role="grid"
 		tabindex="0"
@@ -218,32 +276,57 @@
 		onkeydown={(e) => {
 		  if ((e.key === 'Enter' || e.key === ' ') && hoveredCell) {
 		    e.preventDefault();
-		    onCellClick?.(hoveredCell[0], hoveredCell[1]);
+		    onCellClick?.(hoveredCell[0] + 0.5, hoveredCell[1] + 0.5);
 		  }
 		}}
 	>
+	{#if hasIridescentSheet}
+		<div
+			class="pigment-iridescent-sheet"
+			data-testid="prism-foil-sheet"
+			style:top="{iridescentSheet.top}px"
+			style:left="{iridescentSheet.left}px"
+			style:width="{iridescentSheet.width}px"
+			style:height="{iridescentSheet.height}px"
+			style:mask-image={iridescentMaskImage}
+			style:-webkit-mask-image={iridescentMaskImage}
+			aria-hidden="true"
+		></div>
+		{#each iridescentGapCovers as cover (cover.top + '-' + cover.left + '-' + cover.width)}
+			<div
+				class="prism-gap-cover"
+				data-testid="prism-gap-cover"
+				style:top="{cover.top}px"
+				style:left="{cover.left}px"
+				style:width="{cover.width}px"
+				style:height="{cover.height}px"
+				aria-hidden="true"
+			></div>
+		{/each}
+	{/if}
 	{#each grid as row, rowIndex}
 		<div class="grid-row" role="row">
 			{#each row as cell, colIndex}
 				{@const hintZone = inZone(rowIndex, colIndex, hintHighlightStart, hintHighlightDim)}
+				{@const pigment = displayPigment(cell, rowIndex, colIndex)}
 				{@const bg = cellBackground(cell, rowIndex, colIndex)}
+				{@const iridescent = showColor && !monochromeFlip && isIridescentPigment(pigment)}
 				{@const lines = lineFlags(cell)}
 				{@const isHovered =
 					hoveredCell !== null && hoveredCell[0] === rowIndex && hoveredCell[1] === colIndex}
-				{@const collapseDelay = winCellDelay(rowIndex, colIndex)}
 				<button
 					class="puzzle-cell"
 					class:hint-highlight={hintZone}
 					class:lines-only={showLines && !showColor}
 					class:cell-hovered={isHovered}
-					class:win-collapse-cell={winCollapse}
+					class:prism-reveal={iridescent}
+					class:badge-yellow-cell={showColor && !monochromeFlip && pigment === 2}
 					data-testid="puzzle-square-{rowIndex}-{colIndex}"
 					data-grid-row={rowIndex}
 					data-grid-col={colIndex}
 					style:width="{cellSize}px"
 					style:height="{cellSize}px"
-					style:background-color={showColor || monochromeFlip ? bg : '#e5e7eb'}
-					style:--win-delay="{collapseDelay}ms"
+					style:background-color={cellInlineBackground(iridescent, bg, showColor, monochromeFlip)}
 					title={cellLabel(cell)}
 					aria-label="Row {rowIndex + 1} col {colIndex + 1}: {cellLabel(cell)}"
 					role="gridcell"
@@ -260,14 +343,6 @@
 			{/each}
 		</div>
 	{/each}
-	{#if hoverLensOverlay}
-		<LensChrome
-			variant="overlay"
-			width={hoverLensOverlay.width}
-			height={hoverLensOverlay.height}
-			style="left: {hoverLensOverlay.left}px; top: {hoverLensOverlay.top}px;"
-		/>
-	{/if}
 	</div>
 </div>
 
@@ -277,10 +352,6 @@
 		display: inline-flex;
 		flex-shrink: 0;
 	}
-	.prism-square.win-collapse .inner-corner {
-		opacity: 0;
-		transition: opacity var(--win-collapse-duration, 1.6s) ease;
-	}
 
 	.puzzle-grid {
 		position: relative;
@@ -289,12 +360,13 @@
 		flex-direction: column;
 		gap: 2px;
 		padding: 4px;
-		background: rgba(255, 255, 255, 0.92);
-		border-radius: 4px;
+		background: #eef2f6;
+		border: 1px solid rgba(148, 163, 184, 0.45);
+		border-radius: 0;
 		flex-shrink: 0;
-		box-shadow:
-			0 0 0 1px rgba(209, 213, 219, 0.9),
-			inset 0 1px 0 rgba(255, 255, 255, 0.95);
+		box-shadow: var(--shadow-soft);
+		transition: box-shadow 0.3s ease;
+		isolation: isolate;
 	}
 
 	.puzzle-grid::after {
@@ -305,9 +377,9 @@
 		padding: 1px;
 		background: linear-gradient(
 			135deg,
-			#ef4444,
-			#f59e0b,
-			#eab308,
+			#DC2626,
+			#F38A44,
+			#FACC15,
 			#22c55e,
 			#3b82f6,
 			#8b5cf6
@@ -321,105 +393,53 @@
 		-webkit-mask-composite: xor;
 		mask-composite: exclude;
 		pointer-events: none;
-		opacity: 0.42;
+		opacity: 0.3;
 		z-index: 3;
-	}
-
-	.inner-corner {
-		position: absolute;
-		width: 10px;
-		height: 10px;
-		pointer-events: none;
-		z-index: 4;
-	}
-
-	.inner-corner::before,
-	.inner-corner::after {
-		content: '';
-		position: absolute;
-		background: rgba(99, 102, 241, 0.7);
-	}
-
-	.inner-corner::before {
-		width: 10px;
-		height: 1.5px;
-	}
-
-	.inner-corner::after {
-		width: 1.5px;
-		height: 10px;
-	}
-
-	.inner-corner-tl {
-		top: 0;
-		left: 0;
-	}
-
-	.inner-corner-tr {
-		top: 0;
-		right: 0;
-	}
-
-	.inner-corner-tr::before {
-		right: 0;
-	}
-
-	.inner-corner-tr::after {
-		right: 0;
-	}
-
-	.inner-corner-bl {
-		bottom: 0;
-		left: 0;
-	}
-
-	.inner-corner-bl::before {
-		bottom: 0;
-	}
-
-	.inner-corner-bl::after {
-		bottom: 0;
-	}
-
-	.inner-corner-br {
-		bottom: 0;
-		right: 0;
-	}
-
-	.inner-corner-br::before {
-		right: 0;
-		bottom: 0;
-	}
-
-	.inner-corner-br::after {
-		right: 0;
-		bottom: 0;
 	}
 
 	.grid-row {
 		display: flex;
 		gap: 2px;
+		position: relative;
+		z-index: 2;
+	}
+
+	.prism-gap-cover {
+		position: absolute;
+		z-index: 1;
+		pointer-events: none;
+		background: #eef2f6;
+	}
+
+	.puzzle-cell.badge-yellow-cell {
+		border-color: #CA8A04;
 	}
 
 	.puzzle-cell {
-		border: none;
-		border-radius: 2px;
+		border: 1px solid rgba(15, 23, 42, 0.12);
+		border-radius: 0;
 		cursor: pointer;
 		padding: 0;
-		transition: opacity 0.1s ease, box-shadow 0.1s ease;
-		box-shadow:
-			inset 0 1px 2px rgba(255, 255, 255, 0.55),
-			0 1px 2px rgba(0, 0, 0, 0.08);
+		appearance: none;
+		-webkit-appearance: none;
+		transition: filter 0.15s ease, box-shadow 0.15s ease;
+		box-shadow: none;
 		position: relative;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		z-index: 1;
+		z-index: 2;
+		overflow: hidden;
+		background-clip: padding-box;
+	}
+
+	.puzzle-cell.prism-reveal {
+		background: transparent !important;
 	}
 
 	.puzzle-cell:hover,
 	.puzzle-cell.cell-hovered {
-		opacity: 0.88;
+		filter: brightness(0.94);
 	}
 
 	.puzzle-cell.hint-highlight {
@@ -428,22 +448,10 @@
 		box-shadow: 0 0 8px rgba(251, 191, 36, 0.45);
 	}
 
-	.puzzle-grid.win-collapse .puzzle-cell.win-collapse-cell {
-		transition:
-			background-color var(--win-cell-duration, 1.2s) ease,
-			box-shadow var(--win-cell-duration, 1.2s) ease,
-			opacity var(--win-cell-duration, 1.2s) ease;
-		transition-delay: var(--win-delay, 0ms);
-	}
-
-	.puzzle-grid.win-collapse .puzzle-cell.win-collapse-cell .cell-lines {
-		transition: opacity var(--win-line-fade-duration, 0.6s) ease;
-		transition-delay: var(--win-delay, 0ms);
-	}
-
 	.cell-lines {
 		position: absolute;
 		inset: 0;
+		z-index: 1;
 		display: flex;
 		align-items: center;
 		justify-content: center;

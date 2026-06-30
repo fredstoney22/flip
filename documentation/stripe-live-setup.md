@@ -27,7 +27,7 @@ DATABASE_URL="postgresql://..." STRIPE_SECRET_KEY="sk_live_..." npm run stripe:s
 
 ## Step 1 — Configure sellable packs
 
-Edit `apps/api/scripts/lib/pack-pricing.ts`:
+Edit `packages/game/src/packPricing.ts`:
 
 ```ts
 export const PACK_PRICES_CENTS: Record<string, number> = {

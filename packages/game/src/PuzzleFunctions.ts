@@ -55,7 +55,7 @@ export function allTemplatesUsed(templateCount: number, usedTemplateMask: number
 	return usedTemplateMask === fullTemplateUsedMask(templateCount);
 }
 
-/** Grid is solved and every template has been used at least once (puzzle-generation quality check). */
+/** Grid is solved and every template has been used at least once (optional pedagogy check). */
 export function isPuzzleComplete(
 	config: PuzzleConfig,
 	state: PuzzleGrid,

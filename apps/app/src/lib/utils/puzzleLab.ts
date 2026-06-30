@@ -23,7 +23,6 @@ export interface LabState {
   startState: PuzzleGrid;
   templates: PuzzleTemplate[];
   selectedTemplateIndex: number;
-  allowTemplateRotation: boolean;
   minMovesToSolve: number | null;
 }
 
@@ -58,7 +57,6 @@ export function defaultLabState(): LabState {
       }
     ],
     selectedTemplateIndex: 0,
-    allowTemplateRotation: true,
     minMovesToSolve: null
   };
 }
@@ -183,7 +181,6 @@ export function labStateToConfig(state: LabState): PuzzleConfig {
     startState: state.startState.map((row) => [...row]),
     templates: state.templates.map((t) => normalizeTemplateForExport(t)),
     solvedValue: LAB_SOLVED_VALUE,
-    allowTemplateRotation: state.allowTemplateRotation,
     ...(state.minMovesToSolve !== null ? { minMovesToSolve: state.minMovesToSolve } : {})
   };
 }
@@ -195,7 +192,6 @@ export function configToLabState(config: PuzzleConfig): LabState {
     startState: config.startState.map((row) => [...row]),
     templates: config.templates.map((t) => cloneTemplate(t)),
     selectedTemplateIndex: 0,
-    allowTemplateRotation: config.allowTemplateRotation ?? true,
     minMovesToSolve: config.minMovesToSolve ?? null
   };
 }
@@ -233,7 +229,7 @@ export function validateLabConfig(config: PuzzleConfig): LabValidation {
 
   const minMoves = solveMinMoves(labConfig);
   if (minMoves === null) {
-    messages.push('Puzzle is not solvable (using every template once).');
+    messages.push('Puzzle is not solvable (grid cannot be cleared).');
   } else {
     messages.push(`Minimum moves: ${minMoves}`);
     if (config.minMovesToSolve !== undefined && config.minMovesToSolve !== minMoves) {

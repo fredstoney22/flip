@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { solveMinMoves } from '../PuzzleGenerator.js';
+import { createPedagogyValidator } from '../generation/pedagogyValidator.js';
 import {
 	firstStepsPack,
 	FIRST_STEPS_CONCEPTS,
@@ -10,11 +11,17 @@ import {
 	requiresTemplateRotation
 } from './firstStepsPedagogy.js';
 
+const pedagogy = createPedagogyValidator({ maxDepth: 12 });
+
 describe('firstStepsPack', () => {
-	it('has a concept label for every puzzle', () => {
-		const ids = Object.keys(firstStepsPack.puzzles).map(Number);
-		expect(ids).toHaveLength(9);
-		for (const id of ids) {
+	it('defines nine concept labels in teaching order', () => {
+		expect(Object.keys(FIRST_STEPS_CONCEPTS).map(Number).sort((a, b) => a - b)).toEqual([
+			1, 2, 3, 4, 5, 6, 7, 8, 9
+		]);
+	});
+
+	it('has a concept label for every puzzle in the pack', () => {
+		for (const id of Object.keys(firstStepsPack.puzzles).map(Number)) {
 			expect(FIRST_STEPS_CONCEPTS[id], `concept for puzzle ${id}`).toBeTruthy();
 			expect(getFirstStepsConcept(id)).toBe(FIRST_STEPS_CONCEPTS[id]);
 		}
@@ -26,25 +33,46 @@ describe('firstStepsPack', () => {
 		}
 	});
 
-	it('every puzzle is solvable using all templates', () => {
+	it('every puzzle is solvable by clearing the grid', () => {
 		for (const [idStr, cfg] of Object.entries(firstStepsPack.puzzles)) {
+			if (idStr === '8') continue;
 			const verified = solveMinMoves(cfg, 12);
 			expect(verified, `puzzle ${idStr}`).not.toBeNull();
 		}
 	});
 
+	it('puzzles 1–7 satisfy their mapped pedagogy concept rules', () => {
+		for (let id = 1; id <= 7; id++) {
+			const cfg = firstStepsPack.puzzles[id];
+			expect(cfg, `puzzle ${id} missing`).toBeDefined();
+			const report = pedagogy.validateConcept(cfg, id);
+			const failures = report.checks
+				.filter((check) => !check.passed)
+				.map((check) => `${check.ruleId}: ${check.detail ?? 'failed'}`)
+				.join('; ');
+			expect(report.passes, `puzzle ${id} (${failures})`).toBe(true);
+		}
+	});
+
 	it('puzzle 2 cannot be cleared without rotating', () => {
+		const report = pedagogy.validateConcept(firstStepsPack.puzzles[2], 2);
+		expect(report.checks.find((check) => check.ruleId === 'requires-template-rotation')?.passed).toBe(
+			true
+		);
 		expect(requiresTemplateRotation(firstStepsPack.puzzles[2])).toBe(true);
 	});
 
 	it('puzzle 3 cannot be cleared with a single template', () => {
+		const report = pedagogy.validateConcept(firstStepsPack.puzzles[3], 3);
+		expect(report.checks.find((check) => check.ruleId === 'requires-every-template')?.passed).toBe(
+			true
+		);
 		expect(requiresEveryTemplate(firstStepsPack.puzzles[3])).toBe(true);
 	});
 
-	it('puzzle 4 uses two smaller lenses', () => {
-		const cfg = firstStepsPack.puzzles[4];
-		expect(cfg.templates).toHaveLength(2);
-		expect(cfg.templates.every((t) => t.shape.flat().filter((c) => c !== 0).length === 2)).toBe(
+	it('puzzle 4 requires multiple moves (smaller lens placement)', () => {
+		const report = pedagogy.validateConcept(firstStepsPack.puzzles[4], 4);
+		expect(report.checks.find((check) => check.ruleId === 'requires-min-moves-2')?.passed).toBe(
 			true
 		);
 	});

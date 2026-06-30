@@ -37,7 +37,6 @@ const puzzles: Record<number, PuzzleConfig> = {
 			}
 		],
 		solvedValue: 0,
-		allowTemplateRotation: false,
 		minMovesToSolve: 1
 	},
 	2: {
@@ -56,7 +55,6 @@ const puzzles: Record<number, PuzzleConfig> = {
 			}
 		],
 		solvedValue: 0,
-		allowTemplateRotation: true,
 		minMovesToSolve: 3
 	},
 	3: {
@@ -82,7 +80,6 @@ const puzzles: Record<number, PuzzleConfig> = {
 			}
 		],
 		solvedValue: 0,
-		allowTemplateRotation: true,
 		minMovesToSolve: 2
 	},
 	4: {
@@ -94,23 +91,16 @@ const puzzles: Record<number, PuzzleConfig> = {
 		templates: [
 			{
 				shape: [[1, 1]]
-			},
-			{
-				shape: [
-					[1, 0],
-					[0, 1]
-				]
 			}
 		],
 		solvedValue: 0,
-		allowTemplateRotation: true,
 		minMovesToSolve: 3
 	},
 	5: {
 		startState: [
-			[0, 0, 0],
-			[2, 3, 0],
-			[0, 1, 0]
+			[2, 2, 0],
+			[2, 3, 1],
+			[0, 1, 1]
 		],
 		templates: [
 			{
@@ -121,7 +111,6 @@ const puzzles: Record<number, PuzzleConfig> = {
 			}
 		],
 		solvedValue: 0,
-		allowTemplateRotation: true,
 		minMovesToSolve: 2
 	},
 	6: {
@@ -154,7 +143,6 @@ const puzzles: Record<number, PuzzleConfig> = {
 			}
 		],
 		solvedValue: 0,
-		allowTemplateRotation: true,
 		minMovesToSolve: 3
 	},
 	7: {
@@ -178,62 +166,15 @@ const puzzles: Record<number, PuzzleConfig> = {
 			}
 		],
 		solvedValue: 0,
-		allowTemplateRotation: true,
 		minMovesToSolve: 6
 	},
 	8: {
-		startState: [
-			[1, 2, 2],
-			[0, 1, 1],
-			[1, 1, 0]
-		],
-		templates: [
-			{
-				shape: [
-					[1, 1, 0],
-					[0, 1, 0]
-				]
-			},
-			{
-				shape: [
-					[0, 1],
-					[0, 1],
-					[1, 0]
-				]
-			},
-			{
-				shape: [
-					[0, 2, 2],
-					[2, 0, 0],
-					[0, 0, 0]
-				]
-			},
-			{
-				shape: [
-					[1, 2],
-					[0, 1],
-					[0, 1]
-				]
-			}
-		],
-		solvedValue: 0,
-		allowTemplateRotation: true,
-		minMovesToSolve: 4
-	},
-	9: {
 		startState: [
 			[0, 1, 1],
 			[2, 1, 0],
 			[2, 2, 1]
 		],
 		templates: [
-			{
-				shape: [
-					[1, 0, 0],
-					[0, 0, 0],
-					[1, 0, 1]
-				]
-			},
 			{
 				shape: [
 					[0, 1],
@@ -254,7 +195,6 @@ const puzzles: Record<number, PuzzleConfig> = {
 			}
 		],
 		solvedValue: 0,
-		allowTemplateRotation: true,
 		minMovesToSolve: 4
 	}
 };

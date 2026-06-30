@@ -3,6 +3,8 @@
 	import PuzzleShell from './PuzzleShell.svelte';
 	import ColorSquare from './ColorSquare.svelte';
 	import LensChrome from './LensChrome.svelte';
+	import TemplateLensPreview from './TemplateLensPreview.svelte';
+	import TemplateDragGhost from './TemplateDragGhost.svelte';
 	import { settings } from '$lib/stores/settings';
 	import {
 	  applyTemplate,
@@ -10,19 +12,17 @@
 	  FIRST_STEPS_SLUG,
 	  isMonochromeFlipPuzzle,
 	  isPuzzleSolved,
-	  PIGMENT_HEX,
 	  orientTemplate,
-	  getTemplateCellPigment
 	} from '@flip/game';
-	import type { Pigment, PuzzleConfig, PuzzleGrid, PuzzleTemplate } from '@flip/game';
-	import { computePuzzleLayout, getTemplateIndexRowGroups } from '$lib/utils/puzzleLayout';
+	import type { PuzzleConfig, PuzzleGrid, PuzzleTemplate } from '@flip/game';
+	import { computePuzzleLayout, getTemplateIndexRowGroups, TEMPLATE_RENDER_CELL } from '$lib/utils/puzzleLayout';
+	import { getSnapToCenterPosition } from '$lib/utils/templateSnap';
 
 	interface Props {
 		puzzleConfig: PuzzleConfig;
 		packSlug?: string;
 		packName?: string;
 		puzzleId?: number | null;
-		bestMoveCount?: number | null;
 		onSolve?: (data: { packSlug: string; puzzleId: number; moveCount: number }) => void;
 		onNextPuzzle?: () => void;
 		onTemplateSelect?: (index: number) => void;
@@ -35,7 +35,6 @@
 	  packSlug,
 	  packName,
 	  puzzleId,
-	  bestMoveCount = null,
 	  onSolve,
 	  onNextPuzzle,
 	  onTemplateSelect,
@@ -47,8 +46,6 @@
 	const ROTATE_DURATION_MS = 280;
 	const TEMPLATE_CELL_GAP = 2;
 	const DRAG_THRESHOLD_PX = 6;
-	/** Fixed render resolution for template previews — display size uses CSS scale. */
-	const TEMPLATE_RENDER_CELL = 10;
 
 	function getTemplateBoundDim(shape: number[][]): number {
 	  return Math.max(shape.length, shape[0]?.length ?? 0);
@@ -92,13 +89,34 @@
 		pointerId: number;
 		startX: number;
 		startY: number;
+		clientX: number;
+		clientY: number;
 		isDragging: boolean;
+		rotationSteps: number;
+		captureTarget: HTMLElement | null;
 	} | null>(null);
 
 	const templateScale = $derived(templateSquareSize / TEMPLATE_RENDER_CELL);
+	const dragGhost = $derived(
+	  activeTemplateDrag?.isDragging
+	    ? (() => {
+	      const template = puzzleConfig.templates[activeTemplateDrag.templateIndex];
+	      const oriented = orientTemplate(template, activeTemplateDrag.rotationSteps);
+	      const boundDim = getTemplateBoundDim(oriented.shape);
+	      const baseBound = getTemplateBoundSize(boundDim, TEMPLATE_RENDER_CELL);
+	      const pickerBound = baseBound * templateScale;
+	      return {
+	        clientX: activeTemplateDrag.clientX,
+	        clientY: activeTemplateDrag.clientY,
+	        templateIndex: activeTemplateDrag.templateIndex,
+	        rotationSteps: activeTemplateDrag.rotationSteps,
+	        boundPx: pickerBound
+	      };
+	    })()
+	    : null
+	);
 
 	const monochromeFlip = $derived(isMonochromeFlipPuzzle(puzzleConfig));
-	const allowRotation = $derived(puzzleConfig.allowTemplateRotation ?? true);
 	const showHints = true;
 	const autoOpenHowTo = $derived(packSlug === FIRST_STEPS_SLUG && puzzleId === 1);
 
@@ -107,10 +125,6 @@
 	  !monochromeFlip && (tileMode === 'color' || tileMode === 'colorAndLines')
 	);
 	const showLines = $derived(tileMode === 'lines' || tileMode === 'colorAndLines');
-
-	function lineFlags(pigment: Pigment) {
-	  return { h: (pigment & 1) !== 0, v: (pigment & 2) !== 0, d: (pigment & 4) !== 0 };
-	}
 
 	$effect.pre(() => {
 	  void puzzleConfig;
@@ -182,6 +196,8 @@
 	}
 
 	function updateSizes() {
+	  if (isSolved) return;
+
 	  const rows = puzzleState.length;
 	  const cols = puzzleState[0]?.length ?? 3;
 	  if (rows === 0 || cols === 0) return;
@@ -221,6 +237,7 @@
 	}
 
 	$effect(() => {
+	  if (isSolved) return;
 	  void puzzleConfig;
 	  void puzzleState.length;
 	  void puzzleState[0]?.length;
@@ -276,42 +293,31 @@
 	  return orientTemplate(base, getPreviewRotation(index));
 	}
 
-	function getSnapToCenterPosition(
-	  templateRows: number,
-	  templateCols: number,
-	  hoverRow: number,
-	  hoverCol: number
-	): [number, number] | null {
-	  const gridRows = puzzleState.length;
-	  const gridCols = puzzleState[0]?.length ?? 0;
-	  if (!templateRows || !templateCols || !gridRows || !gridCols) return null;
-		type Candidate = { centerRow: number; centerCol: number; startRow: number; startCol: number };
-		const candidates: Candidate[] = [];
-		for (let centerRow = 0; centerRow < gridRows; centerRow++) {
-		  for (let centerCol = 0; centerCol < gridCols; centerCol++) {
-		    const startRow = centerRow - Math.floor(templateRows / 2);
-		    const startCol = centerCol - Math.floor(templateCols / 2);
-		    if (
-		      startRow >= 0 &&
-					startCol >= 0 &&
-					startRow + templateRows <= gridRows &&
-					startCol + templateCols <= gridCols
-		    ) {
-		      candidates.push({ centerRow, centerCol, startRow, startCol });
-		    }
-		  }
-		}
-		if (candidates.length === 0) return null;
-		let best = candidates[0];
-		let bestDist = Number.POSITIVE_INFINITY;
-		for (const c of candidates) {
-		  const distSq = (c.centerRow - hoverRow) ** 2 + (c.centerCol - hoverCol) ** 2;
-		  if (distSq < bestDist) {
-		    bestDist = distSq;
-		    best = c;
-		  }
-		}
-		return [best.startRow, best.startCol];
+	function handleCellClick(row: number, col: number) {
+	  if (selectedTemplateIndex === null) return;
+	  const template = getOrientedTemplate(selectedTemplateIndex);
+	  const pos = getSnapToCenterPosition(
+	    template.shape.length,
+	    template.shape[0]?.length ?? 0,
+	    puzzleState.length,
+	    puzzleState[0]?.length ?? 0,
+	    row,
+	    col
+	  );
+	  if (pos) applyAt(selectedTemplateIndex, pos[0], pos[1]);
+	}
+
+	function handleCellHover(row: number, col: number) {
+	  if (selectedTemplateIndex === null) return;
+	  const template = getOrientedTemplate(selectedTemplateIndex);
+	  hoverPosition = getSnapToCenterPosition(
+	    template.shape.length,
+	    template.shape[0]?.length ?? 0,
+	    puzzleState.length,
+	    puzzleState[0]?.length ?? 0,
+	    row,
+	    col
+	  );
 	}
 
 	function applyAt(templateIndex: number, row: number, col: number) {
@@ -326,10 +332,10 @@
 	  const oriented = getOrientedTemplate(templateIndex);
 	  puzzleState = applyTemplate(puzzleState, oriented, row, col);
 	  usedTemplateMask |= 1 << templateIndex;
+	  selectedTemplateIndex = null;
 	  hoverPosition = null;
 	  hintRegion = null;
 	  moveCount += 1;
-	  selectedTemplateIndex = null;
 	  onMove?.(moveCount);
 	}
 
@@ -407,34 +413,12 @@
 	function handleTemplateTap(index: number) {
 	  if (animatingTemplateIndex !== null) return;
 	  if (selectedTemplateIndex === index) {
-	    if (allowRotation) {
-	      startRotationAnimation(index, 90);
-	    } else {
-	      selectedTemplateIndex = null;
-	    }
+	    startRotationAnimation(index, 90);
 	  } else {
 	    selectedTemplateIndex = index;
 	  }
 	  hoverPosition = null;
 	  onTemplateSelect?.(index);
-	}
-
-	function handleCellClick(row: number, col: number) {
-	  if (selectedTemplateIndex === null) return;
-	  const template = getOrientedTemplate(selectedTemplateIndex);
-	  const pos = getSnapToCenterPosition(template.shape.length, template.shape[0]?.length ?? 0, row, col);
-	  if (pos) applyAt(selectedTemplateIndex, pos[0], pos[1]);
-	}
-
-	function handleCellHover(row: number, col: number) {
-	  if (selectedTemplateIndex === null) return;
-	  const template = getOrientedTemplate(selectedTemplateIndex);
-	  hoverPosition = getSnapToCenterPosition(
-	    template.shape.length,
-	    template.shape[0]?.length ?? 0,
-	    row,
-	    col
-	  );
 	}
 
 	function updateHoverFromClientPoint(clientX: number, clientY: number) {
@@ -446,56 +430,79 @@
 	  }
 	}
 
-	function handleTemplatePointerDown(index: number, e: PointerEvent) {
-	  if (animatingTemplateIndex !== null || isSolved || e.button !== 0) return;
-	  activeTemplateDrag = {
-	    templateIndex: index,
-	    pointerId: e.pointerId,
-	    startX: e.clientX,
-	    startY: e.clientY,
-	    isDragging: false
-	  };
-	  (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-	}
-
-	function handleTemplatePointerMove(index: number, e: PointerEvent) {
+	function processTemplatePointerMove(e: PointerEvent) {
 	  const drag = activeTemplateDrag;
-	  if (!drag || drag.templateIndex !== index || drag.pointerId !== e.pointerId) return;
+	  if (!drag || drag.pointerId !== e.pointerId) return;
 
 	  const dx = e.clientX - drag.startX;
 	  const dy = e.clientY - drag.startY;
-	  if (!drag.isDragging && dx * dx + dy * dy >= DRAG_THRESHOLD_PX ** 2) {
-	    activeTemplateDrag = { ...drag, isDragging: true };
-	    selectedTemplateIndex = index;
-	    onTemplateSelect?.(index);
+	  let next = { ...drag, clientX: e.clientX, clientY: e.clientY };
+
+	  if (!next.isDragging && dx * dx + dy * dy >= DRAG_THRESHOLD_PX ** 2) {
+	    next = { ...next, isDragging: true };
+	    selectedTemplateIndex = next.templateIndex;
+	    onTemplateSelect?.(next.templateIndex);
 	  }
 
-	  if (activeTemplateDrag?.isDragging) {
+	  activeTemplateDrag = next;
+
+	  if (next.isDragging) {
 	    e.preventDefault();
 	    updateHoverFromClientPoint(e.clientX, e.clientY);
 	  }
 	}
 
-	function handleTemplatePointerUp(index: number, e: PointerEvent) {
+	function finishTemplateDrag(e: PointerEvent) {
 	  const drag = activeTemplateDrag;
-	  if (!drag || drag.templateIndex !== index || drag.pointerId !== e.pointerId) return;
+	  if (!drag || drag.pointerId !== e.pointerId) return;
 
 	  const wasDragging = drag.isDragging;
+	  const index = drag.templateIndex;
 	  activeTemplateDrag = null;
 
-	  const el = e.currentTarget as HTMLElement;
-	  if (el.hasPointerCapture(e.pointerId)) {
-	    el.releasePointerCapture(e.pointerId);
+	  if (drag.captureTarget?.hasPointerCapture(e.pointerId)) {
+	    drag.captureTarget.releasePointerCapture(e.pointerId);
 	  }
 
 	  if (wasDragging) {
 	    if (hoverPosition !== null) {
 	      applyAt(index, hoverPosition[0], hoverPosition[1]);
+	    } else {
+	      hoverPosition = null;
 	    }
 	    return;
 	  }
 
 	  handleTemplateTap(index);
+	}
+
+	function handleTemplatePointerDown(index: number, e: PointerEvent) {
+	  if (animatingTemplateIndex !== null || isSolved || e.button !== 0) return;
+	  const target = e.currentTarget as HTMLElement;
+	  activeTemplateDrag = {
+	    templateIndex: index,
+	    pointerId: e.pointerId,
+	    startX: e.clientX,
+	    startY: e.clientY,
+	    clientX: e.clientX,
+	    clientY: e.clientY,
+	    isDragging: false,
+	    rotationSteps: getPreviewRotation(index),
+	    captureTarget: target
+	  };
+	  target.setPointerCapture(e.pointerId);
+	}
+
+	function handleTemplatePointerMove(index: number, e: PointerEvent) {
+	  const drag = activeTemplateDrag;
+	  if (!drag || drag.templateIndex !== index || drag.pointerId !== e.pointerId) return;
+	  processTemplatePointerMove(e);
+	}
+
+	function handleTemplatePointerUp(index: number, e: PointerEvent) {
+	  const drag = activeTemplateDrag;
+	  if (!drag || drag.templateIndex !== index || drag.pointerId !== e.pointerId) return;
+	  finishTemplateDrag(e);
 	}
 
 	function handleTemplatePointerCancel(index: number, e: PointerEvent) {
@@ -504,6 +511,28 @@
 	  activeTemplateDrag = null;
 	  hoverPosition = null;
 	}
+
+	$effect(() => {
+	  if (!activeTemplateDrag?.isDragging) return;
+
+	  function onDocPointerMove(e: PointerEvent) {
+	    processTemplatePointerMove(e);
+	  }
+
+	  function onDocPointerEnd(e: PointerEvent) {
+	    finishTemplateDrag(e);
+	  }
+
+	  document.addEventListener('pointermove', onDocPointerMove, { passive: false });
+	  document.addEventListener('pointerup', onDocPointerEnd);
+	  document.addEventListener('pointercancel', onDocPointerEnd);
+
+	  return () => {
+	    document.removeEventListener('pointermove', onDocPointerMove);
+	    document.removeEventListener('pointerup', onDocPointerEnd);
+	    document.removeEventListener('pointercancel', onDocPointerEnd);
+	  };
+	});
 
 	function showHintRegion(move: { templateIndex: number; row: number; col: number }) {
 	  const oriented = getOrientedTemplate(move.templateIndex);
@@ -535,12 +564,7 @@
 	  const currentRotation = templateRotations[move.templateIndex] ?? 0;
 	  const rotationSteps = (move.rotation - currentRotation + 4) % 4;
 
-	  if (rotationSteps === 0 || !allowRotation) {
-	    if (!allowRotation && move.rotation !== currentRotation) {
-	      const rotations = [...templateRotations];
-	      rotations[move.templateIndex] = move.rotation;
-	      templateRotations = rotations;
-	    }
+	  if (rotationSteps === 0) {
 	    showHintRegion(move);
 	    return;
 	  }
@@ -590,7 +614,7 @@
 <PuzzleShell
 	moveCount={moveCount}
 	isSolved={isSolved}
-	{bestMoveCount}
+	par={puzzleConfig.minMovesToSolve ?? null}
 	canUndo={history.length > 0}
 	onUndo={handleUndo}
 	onReset={resetPuzzle}
@@ -602,6 +626,9 @@
 	showColorGuide={!monochromeFlip}
 	{autoOpenHowTo}
 	enableShareAndRating={true}
+	prismLightGrid={monochromeFlip ? null : renderState}
+	prismLightCellSize={cellSize}
+	prismLightMonochrome={monochromeFlip}
 >
 	<svelte:fragment slot="grid">
 		<ColorSquare
@@ -609,7 +636,6 @@
 			grid={renderState}
 			{cellSize}
 			monochromeFlip={monochromeFlip}
-			winCollapse={isSolved}
 			highlightStart={hoverHighlight?.start}
 			highlightDim={hoverHighlight?.dim}
 			hintHighlightStart={hintHighlight?.start}
@@ -654,57 +680,30 @@
 						>
 							<div
 								class="template-scale-slot"
+								class:shape-hidden={activeTemplateDrag?.templateIndex === index && activeTemplateDrag.isDragging}
 								style:width="{displayBound}px"
 								style:height="{displayBound}px"
 							>
 								<div
 									class="template-rotate-wrapper"
-									class:animating={isAnimating && allowRotation}
+									class:animating={isAnimating}
 									style:width="{baseBound}px"
 									style:height="{baseBound}px"
 									style:--rotate-duration="{animatingDurationMs}ms"
-									style:transform={allowRotation && totalRotateDeg !== 0
+									style:transform={totalRotateDeg !== 0
 									  ? `rotate(${totalRotateDeg}deg) scale(${templateScale})`
 									  : `scale(${templateScale})`}
 									style:transform-origin="center center"
 									ontransitionend={(e) => handleRotateTransitionEnd(index, e)}
 								>
-									<LensChrome variant="disc">
-										<div class="template-item-shape">
-											{#each template.shape as shapeRow, rowIdx}
-												<div class="template-item-shape-row">
-													{#each shapeRow as cell, colIdx}
-														{@const filled = cell !== 0}
-														{@const cellPigment = getTemplateCellPigment(template, rowIdx, colIdx)}
-														{@const cellHex = PIGMENT_HEX[cellPigment]}
-														{@const lines = filled ? lineFlags(cellPigment) : { h: false, v: false, d: false }}
-														<div
-															class="template-item-shape-cell"
-															class:filled
-															class:with-lines={showLines && filled && (lines.h || lines.v || lines.d)}
-															style:width="{TEMPLATE_RENDER_CELL}px"
-															style:height="{TEMPLATE_RENDER_CELL}px"
-															style:background={filled
-															  ? monochromeFlip
-															    ? '#1f2937'
-															    : showColor
-															      ? cellHex
-															      : '#e5e7eb'
-															  : '#f9fafb'}
-														>
-															{#if showLines && filled && (lines.h || lines.v || lines.d)}
-																<span class="template-cell-lines" aria-hidden="true">
-																	{#if lines.h}<span class="template-line template-line-h"></span>{/if}
-																	{#if lines.v}<span class="template-line template-line-v"></span>{/if}
-																	{#if lines.d}<span class="template-line template-line-d"></span>{/if}
-																</span>
-															{/if}
-														</div>
-													{/each}
-												</div>
-											{/each}
-										</div>
-									</LensChrome>
+									<TemplateLensPreview
+										{template}
+										cellSize={TEMPLATE_RENDER_CELL}
+										cellGap={TEMPLATE_CELL_GAP}
+										{monochromeFlip}
+										{showColor}
+										{showLines}
+									/>
 								</div>
 							</div>
 						</LensChrome>
@@ -718,6 +717,19 @@
 {/key}
 </div>
 
+{#if dragGhost}
+	<TemplateDragGhost
+		clientX={dragGhost.clientX}
+		clientY={dragGhost.clientY}
+		template={puzzleConfig.templates[dragGhost.templateIndex]}
+		rotationSteps={dragGhost.rotationSteps}
+		boundPx={dragGhost.boundPx}
+		{monochromeFlip}
+		{showColor}
+		{showLines}
+	/>
+{/if}
+
 <style>
 	.puzzle-layout-root {
 		flex: 1 1 0;
@@ -728,13 +740,22 @@
 		flex-direction: column;
 		align-items: stretch;
 		justify-content: flex-start;
-		overflow: hidden;
+		overflow-x: visible;
+		overflow-y: hidden;
 	}
 
 	.templates-divider {
 		height: 1px;
-		background: #e5e7eb;
-		margin: 0.25rem 0;
+		flex-shrink: 0;
+		background: linear-gradient(
+			90deg,
+			transparent,
+			rgba(255, 255, 255, 0.7) 20%,
+			rgba(209, 213, 219, 0.5) 50%,
+			rgba(255, 255, 255, 0.7) 80%,
+			transparent
+		);
+		margin: 0.35rem 0;
 		border: none;
 		width: 100%;
 	}
@@ -744,11 +765,19 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
+		flex-shrink: 0;
 		gap: 0.5rem;
 		width: 100%;
 		max-width: 100%;
 		box-sizing: border-box;
-		overflow: hidden;
+		overflow-x: auto;
+		overflow-y: visible;
+		-webkit-overflow-scrolling: touch;
+		scrollbar-width: none;
+	}
+
+	.templates-area::-webkit-scrollbar {
+		display: none;
 	}
 
 	.templates-row {
@@ -756,12 +785,13 @@
 		flex-wrap: nowrap;
 		align-items: center;
 		justify-content: center;
-		gap: 0.5rem;
-		width: 100%;
-		max-width: 100%;
+		flex-shrink: 0;
+		gap: 0.75rem;
+		width: max-content;
+		max-width: none;
 	}
 
-	.template-item {
+	:global(.lens-housing.template-item) {
 		cursor: pointer;
 		touch-action: none;
 	}
@@ -776,6 +806,10 @@
 		z-index: 1;
 	}
 
+	.template-scale-slot.shape-hidden {
+		visibility: hidden;
+	}
+
 	.template-rotate-wrapper {
 		display: flex;
 		align-items: center;
@@ -786,64 +820,5 @@
 
 	.template-rotate-wrapper.animating {
 		transition: transform var(--rotate-duration, 280ms) ease-out;
-	}
-
-	.template-item-shape {
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
-	}
-
-	.template-item-shape-row {
-		display: flex;
-		gap: 2px;
-	}
-
-	.template-item-shape-cell {
-		border-radius: 3px;
-		border: 1px solid #e5e7eb;
-		flex-shrink: 0;
-		box-sizing: border-box;
-	}
-
-	.template-item-shape-cell.filled {
-		border-color: rgba(0, 0, 0, 0.06);
-		opacity: 0.9;
-		position: relative;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.18);
-	}
-
-	.template-item-shape-cell.with-lines .template-cell-lines {
-		position: absolute;
-		inset: 0;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		pointer-events: none;
-	}
-
-	.template-line {
-		position: absolute;
-		background: #1f2937;
-		border-radius: 1px;
-	}
-
-	.template-line-h {
-		width: 65%;
-		height: 2px;
-	}
-
-	.template-line-v {
-		width: 2px;
-		height: 65%;
-	}
-
-	.template-line-d {
-		width: 90%;
-		height: 2px;
-		transform: rotate(-45deg);
 	}
 </style>

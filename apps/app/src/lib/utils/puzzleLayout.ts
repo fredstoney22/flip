@@ -2,6 +2,10 @@
 export const GRID_CELL_GAP = 2;
 export const GRID_PADDING = 4;
 export const TEMPLATE_CELL_GAP = 2;
+/** Fixed render resolution for template previews — keep in sync with Puzzle.svelte. */
+export const TEMPLATE_RENDER_CELL = 10;
+/** Extra horizontal inset so scaled lens cards do not clip at container edges. */
+export const TEMPLATE_WIDTH_SAFETY = 4;
 
 /** Outer pixel size of a square grid (cells + gaps + padding). */
 export function gridPixelSize(dim: number, cellSize: number): number {
@@ -16,26 +20,34 @@ export function cellSizeForDimension(dim: number, available: number): number {
   return Math.floor((available - chrome) / dim);
 }
 
-/** Outer pixel size of a template preview (cells + gaps, no extra padding). */
-export function templatePixelSize(boundDim: number, squareSize: number): number {
+/** Unscaled pixel bound of a template preview (matches Puzzle baseBound). */
+export function templateBaseBound(boundDim: number): number {
   if (boundDim <= 0) return 0;
-  return boundDim * squareSize + (boundDim - 1) * TEMPLATE_CELL_GAP;
+  return boundDim * TEMPLATE_RENDER_CELL + (boundDim - 1) * TEMPLATE_CELL_GAP;
 }
 
+/** Outer pixel size of a template preview after CSS scale (cells + scaled gaps). */
+export function templatePixelSize(boundDim: number, squareSize: number): number {
+  if (boundDim <= 0 || squareSize <= 0) return 0;
+  return (templateBaseBound(boundDim) * squareSize) / TEMPLATE_RENDER_CELL;
+}
+
+/** Legacy helper — prefer templatePixelSize for template previews. */
 export function templateSquareSizeForDimension(boundDim: number, available: number): number {
   if (boundDim <= 0 || available <= 0) return 0;
-  const chrome = (boundDim - 1) * TEMPLATE_CELL_GAP;
-  return Math.floor((available - chrome) / boundDim);
+  const baseBound = templateBaseBound(boundDim);
+  if (baseBound <= 0) return 0;
+  return Math.floor((available * TEMPLATE_RENDER_CELL) / baseBound);
 }
 
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
-/** Template card padding + border (matches .template-item in Puzzle.svelte). */
+/** Template card padding + border (matches lens-housing chrome) + subpixel safety. */
 export const TEMPLATE_ITEM_CHROME = 20;
-/** Gap between template cards in a row (matches .templates-row gap: 0.5rem). */
-export const TEMPLATE_ITEM_GAP = 8;
+/** Gap between template cards in a row (matches .templates-row gap: 0.75rem). */
+export const TEMPLATE_ITEM_GAP = 12;
 /** Gap between template rows (matches .templates-area gap). */
 export const TEMPLATE_ROW_GAP = 8;
 /** Move counter + divider + action bar + vertical gaps in PuzzleShell. */
@@ -71,14 +83,10 @@ export function templateSquareSizeForRow(
   const remaining = availableWidth - gaps - chrome;
   if (remaining <= 0) return 0;
 
-  const dimSum = templateBoundDims.reduce((sum, dim) => sum + dim, 0);
-  const cellGapSum = templateBoundDims.reduce(
-    (sum, dim) => sum + (dim - 1) * TEMPLATE_CELL_GAP,
-    0
-  );
-  if (dimSum <= 0) return 0;
+  const baseBoundSum = templateBoundDims.reduce((sum, dim) => sum + templateBaseBound(dim), 0);
+  if (baseBoundSum <= 0) return 0;
 
-  return Math.floor((remaining - cellGapSum) / dimSum);
+  return Math.floor((remaining * TEMPLATE_RENDER_CELL) / baseBoundSum);
 }
 
 /** Split `count` items across `rowCount` rows as evenly as possible. */
@@ -138,7 +146,7 @@ function estimateTemplateAreaHeight(
   });
 
   const rowGaps = Math.max(0, rowHeights.length - 1) * TEMPLATE_ROW_GAP;
-  return rowHeights.reduce((sum, h) => sum + h, 0) + rowGaps + 8;
+  return rowHeights.reduce((sum, h) => sum + h, 0) + rowGaps + 12;
 }
 
 function templateSquareSizeForRowGroups(
@@ -210,7 +218,7 @@ function computeLayoutForRowCount(
   const templateIndexRowGroups = getTemplateIndexRowGroups(templateCount, rowCount);
 
   const contentHeight = Math.max(80, availableHeight - shellChrome);
-  const contentWidth = availableWidth;
+  const contentWidth = Math.max(1, availableWidth - TEMPLATE_WIDTH_SAFETY);
 
   let templateSquareSize = clamp(
     minTemplateSquare,

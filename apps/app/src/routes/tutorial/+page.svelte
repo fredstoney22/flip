@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Puzzle from '$lib/components/game/Puzzle.svelte';
+	import DifficultyDebugPanel from '$lib/components/game/DifficultyDebugPanel.svelte';
 	import PuzzlePlayLayout from '$lib/components/game/PuzzlePlayLayout.svelte';
 	import TutorialWalkthrough from '$lib/components/game/TutorialWalkthrough.svelte';
 	import { createTutorialProgressCallbacks } from '$lib/utils/tutorialProgress';
@@ -9,6 +10,7 @@
 
 	let currentStep = $state(0);
 	let skipped = $state(false);
+	let puzzleSolved = $state(false);
 
 	const tutorialCallbacks = createTutorialProgressCallbacks({
 	  getSteps: () => data.tutorial.steps,
@@ -30,13 +32,29 @@
 	);
 
 	const backLabel = $derived(data.pack ? `← ${data.pack.name}` : '← Back');
+
+	$effect.pre(() => {
+	  void `${data.pack?.slug ?? ''}-${data.puzzleId ?? ''}`;
+	  currentStep = 0;
+	  skipped = false;
+	  puzzleSolved = false;
+	});
+
+	function handleSolve() {
+	  puzzleSolved = true;
+	  tutorialCallbacks.onSolve();
+	}
+
+	function handlePuzzleReset() {
+	  puzzleSolved = false;
+	}
 </script>
 
 <svelte:head>
 	<title>{pageTitle} — Flip</title>
 </svelte:head>
 
-<PuzzlePlayLayout {backHref} {backLabel} title="Tutorial">
+<PuzzlePlayLayout {backHref} {backLabel} title="Tutorial" sidePanelHidden={puzzleSolved}>
 	{#snippet sidePanel()}
 		{#if !skipped}
 			<TutorialWalkthrough
@@ -61,6 +79,7 @@
 		{/if}
 	{/snippet}
 
+	<DifficultyDebugPanel config={data.config} pedagogyConceptId={data.pedagogyConceptId} />
 	<Puzzle
 		puzzleConfig={data.config}
 		packSlug={data.pack?.slug}
@@ -69,7 +88,8 @@
 		onTemplateSelect={tutorialCallbacks.onTemplateSelect}
 		onMove={tutorialCallbacks.onMove}
 		onTemplateRotate={tutorialCallbacks.onTemplateRotate}
-		onSolve={tutorialCallbacks.onSolve}
+		onSolve={handleSolve}
+		onReset={handlePuzzleReset}
 	/>
 </PuzzlePlayLayout>
 

@@ -2,27 +2,33 @@
  * Verified puzzle generator for Flip (monochrome and multi-pigment).
  */
 
-import {
-	applyTemplate,
-	allTemplatesUsed,
-	isSolved
-} from './PuzzleFunctions.js';
+import { applyTemplate, isSolved } from './PuzzleFunctions.js';
 import type { Pigment, PuzzleConfig, PuzzleGrid, PuzzleTemplate } from './types.js';
-import { MONO_FLIP_SOLVED_VALUE, PIGMENT_CLEAR_SOLVED_VALUE } from './types.js';
+import { PIGMENT_CLEAR_SOLVED_VALUE } from './types.js';
 import { isTemplateFreeOfContainment, hasTemplateContainment } from './templateContainment.js';
 import { canonicalPuzzleKey } from './puzzleCanonical.js';
+import { shortestSolutionUsesAllTemplates, type DifficultyReport } from './puzzleDifficulty.js';
+import {
+	defaultGenerationServices,
+	type GenerationServices
+} from './generation/generationServices.js';
+import { solveMinMoves } from './puzzleSolver.js';
 import {
 	ensureMinActiveCells,
 	MIN_TEMPLATE_ACTIVE_CELLS,
-	templateMeetsMinActiveCells
+	templateMeetsMinActiveCells,
+	templateMeetsMonoSquareFillRule
 } from './templateShape.js';
 import {
+	meetsDistinctPigmentCount,
+	meetsMaxPigmentsPerTemplate,
 	meetsMinTemplatesPerPigment,
 	minTemplatesPerPigmentForAllowed,
 	nonZeroPigments,
+	pickPigmentPalette,
 	requiredTemplateCount
 } from './pigmentTemplates.js';
-import { gridToKey, canonicalizeGrid } from './puzzleGrid.js';
+import { gridToKey } from './puzzleGrid.js';
 import {
 	buildMultiColoredTemplate,
 	getDistinctTemplateOrientations,
@@ -31,7 +37,8 @@ import {
 	pigmentLayerKey
 } from './templatePigment.js';
 
-export { gridToKey, canonicalizeGrid, getDistinctRotations };
+export { gridToKey, canonicalizeGrid, getDistinctRotations } from './puzzleGrid.js';
+export { solveMinMoves, solveMinMovesGridOnly } from './puzzleSolver.js';
 
 interface Move {
 	templateIndex: number;
@@ -43,12 +50,7 @@ interface Move {
 export interface GeneratedPuzzleConfig extends PuzzleConfig {
 	minMovesToSolve: number;
 	canonicalKey: string;
-}
-
-export interface DifficultyPreset {
-	puzzleSize: number;
-	templateSizes: number[];
-	targetMinMoves: number;
+	difficultyReport?: DifficultyReport;
 }
 
 export interface GeneratorConfig {
@@ -62,7 +64,6 @@ export interface GeneratorConfig {
 	templateCount?: number;
 	minShapeSize?: number;
 	maxShapeSize?: number;
-	allowTemplateRotation?: boolean;
 	maxAttempts?: number;
 	/** Reject puzzles whose canonical key is already in this set (cross-pack dedup). */
 	seenCanonicalKeys?: Set<string>;
@@ -70,64 +71,22 @@ export interface GeneratorConfig {
 	minTemplatesPerPigment?: number;
 	/** Min count of templates with multiple pigments on one stencil (color puzzles). */
 	minMultiColoredTemplates?: number;
+	/** Exact count of distinct pigments across all templates (color puzzles). */
+	distinctPigmentCount?: number;
+	/** Max distinct pigments on any single template (color puzzles). */
+	maxPigmentsPerTemplate?: number;
 }
 
-export const DIFFICULTY_PRESETS: Record<string, DifficultyPreset> = {
-	tutorial: { puzzleSize: 3, templateSizes: [2, 3], targetMinMoves: 2 },
-	easy: { puzzleSize: 3, templateSizes: [2, 2, 3], targetMinMoves: 3 },
-	medium: { puzzleSize: 3, templateSizes: [2, 3, 3], targetMinMoves: 3 },
-	hard: { puzzleSize: 3, templateSizes: [3, 3, 3], targetMinMoves: 4 },
-	expert: { puzzleSize: 3, templateSizes: [3, 3, 3], targetMinMoves: 5 }
-};
-
-export function monoGeneratorConfig(
-	preset: DifficultyPreset,
-	overrides: Partial<GeneratorConfig> = {}
-): GeneratorConfig {
-	return {
-		puzzleSize: preset.puzzleSize,
-		templateSizes: preset.templateSizes,
-		targetMinMoves: preset.targetMinMoves,
-		solvedValue: MONO_FLIP_SOLVED_VALUE,
-		allowedPigments: [1],
-		allowTemplateRotation: true,
-		...overrides
-	};
-}
-
-export function pigmentGeneratorConfig(
-	overrides: Partial<GeneratorConfig> & Pick<GeneratorConfig, 'targetMinMoves'>
-): GeneratorConfig {
-	const allowedPigments = overrides.allowedPigments ?? [1, 2, 4];
-	const minTemplatesPerPigment =
-		overrides.minTemplatesPerPigment ?? minTemplatesPerPigmentForAllowed(allowedPigments);
-	const defaultTemplateCount = requiredTemplateCount(allowedPigments, minTemplatesPerPigment);
-
-	return {
-		puzzleSize: 3,
-		solvedValue: PIGMENT_CLEAR_SOLVED_VALUE,
-		allowedPigments,
-		templateCount: defaultTemplateCount,
-		minTemplatesPerPigment,
-		minShapeSize: 2,
-		maxShapeSize: 3,
-		allowTemplateRotation: true,
-		maxAttempts: 800,
-		...overrides,
-		templateCount: overrides.templateCount ?? defaultTemplateCount,
-		minTemplatesPerPigment
-	};
-}
 
 function enumerateMoves(
 	puzzleSize: number,
 	templates: PuzzleTemplate[],
-	allowTemplateRotation: boolean
+	includeRotations = true
 ): Move[] {
 	const moves: Move[] = [];
 	for (let templateIndex = 0; templateIndex < templates.length; templateIndex++) {
 		const template = templates[templateIndex];
-		const orientedList = allowTemplateRotation
+		const orientedList = includeRotations
 			? getDistinctTemplateOrientations(template)
 			: [template];
 		for (const oriented of orientedList) {
@@ -141,98 +100,6 @@ function enumerateMoves(
 		}
 	}
 	return moves;
-}
-
-const DEFAULT_MAX_DEPTH = 12;
-
-export function solveMinMoves(
-	config: PuzzleConfig,
-	maxDepth: number = DEFAULT_MAX_DEPTH
-): number | null {
-	const { startState, templates, solvedValue, allowTemplateRotation = true } = config;
-	if (isSolved(startState, solvedValue)) {
-		return templates.length === 0 ? 0 : null;
-	}
-
-	const size = startState.length;
-	const moves = enumerateMoves(size, templates, allowTemplateRotation);
-	const useCanonical = allowTemplateRotation && solvedValue === MONO_FLIP_SOLVED_VALUE;
-	const stateKey = (grid: PuzzleGrid, usedMask: number) =>
-		`${useCanonical ? canonicalizeGrid(grid) : gridToKey(grid)}:${usedMask}`;
-
-	interface SearchNode {
-		grid: PuzzleGrid;
-		usedMask: number;
-	}
-
-	const visited = new Set<string>([stateKey(startState, 0)]);
-	let queue: SearchNode[] = [{ grid: startState.map((row) => [...row]), usedMask: 0 }];
-
-	for (let depth = 1; depth <= maxDepth; depth++) {
-		const next: SearchNode[] = [];
-		for (const node of queue) {
-			for (const move of moves) {
-				const newState = applyTemplate(node.grid, move.template, move.row, move.col);
-				const newUsedMask = node.usedMask | (1 << move.templateIndex);
-				if (
-					isSolved(newState, solvedValue) &&
-					allTemplatesUsed(templates.length, newUsedMask)
-				) {
-					return depth;
-				}
-				const key = stateKey(newState, newUsedMask);
-				if (!visited.has(key)) {
-					visited.add(key);
-					next.push({ grid: newState, usedMask: newUsedMask });
-				}
-			}
-		}
-		if (next.length === 0) return null;
-		queue = next;
-	}
-
-	return null;
-}
-
-/** Minimum moves to clear the grid, regardless of which templates were used. */
-export function solveMinMovesGridOnly(
-	config: PuzzleConfig,
-	maxDepth: number = DEFAULT_MAX_DEPTH
-): number | null {
-	const { startState, templates, solvedValue, allowTemplateRotation = true } = config;
-	if (isSolved(startState, solvedValue)) {
-		return 0;
-	}
-
-	const size = startState.length;
-	const moves = enumerateMoves(size, templates, allowTemplateRotation);
-	const useCanonical = allowTemplateRotation && solvedValue === MONO_FLIP_SOLVED_VALUE;
-	const stateKey = (grid: PuzzleGrid) =>
-		useCanonical ? canonicalizeGrid(grid) : gridToKey(grid);
-
-	const visited = new Set<string>([stateKey(startState)]);
-	let queue: PuzzleGrid[] = [startState.map((row) => [...row])];
-
-	for (let depth = 1; depth <= maxDepth; depth++) {
-		const next: PuzzleGrid[] = [];
-		for (const grid of queue) {
-			for (const move of moves) {
-				const newState = applyTemplate(grid, move.template, move.row, move.col);
-				if (isSolved(newState, solvedValue)) {
-					return depth;
-				}
-				const key = stateKey(newState);
-				if (!visited.has(key)) {
-					visited.add(key);
-					next.push(newState);
-				}
-			}
-		}
-		if (next.length === 0) return null;
-		queue = next;
-	}
-
-	return null;
 }
 
 function randomBit(): number {
@@ -280,6 +147,14 @@ function randomShape(rows: number, cols: number): number[][] {
 }
 
 function squareTemplate(size: number, pigment: Pigment): PuzzleTemplate {
+	if (size === 2) {
+		const shape = [
+			[1, 1],
+			[1, 1]
+		];
+		return { shape: maskToUnifiedShape(shape, pigment) };
+	}
+
 	let shape: number[][];
 	do {
 		shape = Array.from({ length: size }, () =>
@@ -288,7 +163,7 @@ function squareTemplate(size: number, pigment: Pigment): PuzzleTemplate {
 		if (isEffectiveShape(shape)) {
 			ensureMinActiveCells(shape, MIN_TEMPLATE_ACTIVE_CELLS);
 		}
-	} while (!templateMeetsMinActiveCells(shape));
+	} while (!templateMeetsMonoSquareFillRule(size, shape));
 	return { shape: maskToUnifiedShape(shape, pigment) };
 }
 
@@ -310,7 +185,8 @@ function isUniqueTemplate(candidate: PuzzleTemplate, existing: PuzzleTemplate[])
 	);
 }
 
-function buildTemplates(config: GeneratorConfig): PuzzleTemplate[] | null {
+/** Builds a valid random template set for generator / pool configs. */
+export function buildGeneratorTemplates(config: GeneratorConfig): PuzzleTemplate[] | null {
 	const {
 		allowedPigments,
 		puzzleSize,
@@ -319,7 +195,9 @@ function buildTemplates(config: GeneratorConfig): PuzzleTemplate[] | null {
 		minShapeSize = 2,
 		maxShapeSize = puzzleSize,
 		minTemplatesPerPigment = minTemplatesPerPigmentForAllowed(allowedPigments),
-		minMultiColoredTemplates
+		minMultiColoredTemplates,
+		distinctPigmentCount,
+		maxPigmentsPerTemplate = minMultiColoredTemplates ? 2 : 1
 	} = config;
 
 	if (templateSizes && templateSizes.length > 0) {
@@ -339,10 +217,23 @@ function buildTemplates(config: GeneratorConfig): PuzzleTemplate[] | null {
 			}
 			if (!added) return null;
 		}
+		if (
+			templates.some(
+				(template, index) =>
+					templateSizes[index] === 2 && !templateMeetsMonoSquareFillRule(2, template.shape)
+			)
+		) {
+			return null;
+		}
 		return templates;
 	}
 
-	const pigments = nonZeroPigments(allowedPigments);
+	const pigments =
+		distinctPigmentCount !== undefined
+			? pickPigmentPalette(allowedPigments, distinctPigmentCount)
+			: nonZeroPigments(allowedPigments);
+	if (!pigments || pigments.length === 0) return null;
+
 	const multiColor = pigments.length > 1;
 	const pigmentSlots: Pigment[] = multiColor
 		? pigments.flatMap((pigment) => Array(minTemplatesPerPigment).fill(pigment) as Pigment[])
@@ -368,14 +259,14 @@ function buildTemplates(config: GeneratorConfig): PuzzleTemplate[] | null {
 	for (let slotIndex = 0; slotIndex < pigmentSlots.length; slotIndex++) {
 		const pigment = pigmentSlots[slotIndex];
 		if (pigment === 0) continue;
-		const wantMultiColored = multiColoredSlots.has(slotIndex);
+		const wantMultiColored = multiColoredSlots.has(slotIndex) && maxPigmentsPerTemplate >= 2;
 		let added = false;
 		for (let tryNum = 0; tryNum < 40; tryNum++) {
 			const rows = randomInt(minShapeSize, Math.min(maxShapeSize, puzzleSize));
 			const cols = randomInt(minShapeSize, Math.min(maxShapeSize, puzzleSize));
 			const shape = randomShape(rows, cols);
 			let candidate: PuzzleTemplate | null = wantMultiColored
-				? buildMultiColoredTemplate(shape, pigments)
+				? buildMultiColoredTemplate(shape, pigments, maxPigmentsPerTemplate)
 				: { shape: maskToUnifiedShape(shape, pigment) };
 			if (!candidate) continue;
 			if (isUniqueTemplate(candidate, templates)) {
@@ -398,6 +289,12 @@ function buildTemplates(config: GeneratorConfig): PuzzleTemplate[] | null {
 	) {
 		return null;
 	}
+	if (distinctPigmentCount !== undefined && !meetsDistinctPigmentCount(templates, distinctPigmentCount)) {
+		return null;
+	}
+	if (!meetsMaxPigmentsPerTemplate(templates, maxPigmentsPerTemplate)) {
+		return null;
+	}
 	return templates;
 }
 
@@ -406,45 +303,37 @@ function moveKey(move: Move): string {
 	return `${move.templateIndex}:${pigmentKey}:${move.template.shape.map((r) => r.join('')).join(';')}@${move.row},${move.col}`;
 }
 
-export function generateVerifiedPuzzle(config: GeneratorConfig): GeneratedPuzzleConfig {
+export function generateVerifiedPuzzle(
+	config: GeneratorConfig,
+	services: GenerationServices = defaultGenerationServices
+): GeneratedPuzzleConfig {
 	const {
 		puzzleSize,
 		targetMinMoves,
 		solvedValue,
-		allowTemplateRotation = true,
 		maxAttempts = 500,
 		seenCanonicalKeys
 	} = config;
 
 	for (let attempt = 0; attempt < maxAttempts; attempt++) {
-		const templates = buildTemplates(config);
+		const templates = buildGeneratorTemplates(config);
 		if (!templates) continue;
 
-		const moves = enumerateMoves(puzzleSize, templates, allowTemplateRotation);
-		if (moves.length < targetMinMoves || targetMinMoves < templates.length) continue;
+		const moves = enumerateMoves(puzzleSize, templates);
+		if (moves.length < targetMinMoves) continue;
 
 		let state = solvedGrid(puzzleSize, solvedValue);
 		const usedMoveKeys = new Set<string>();
-		const usedTemplateIndices = new Set<number>();
 		const stateHistory = new Set<string>([gridToKey(state)]);
 		let valid = true;
 
 		for (let step = 0; step < targetMinMoves; step++) {
-			const remainingSteps = targetMinMoves - step;
-			const unusedIndices = templates
-				.map((_, index) => index)
-				.filter((index) => !usedTemplateIndices.has(index));
-
-			let candidates = moves.filter((m) => {
+			const candidates = moves.filter((m) => {
 				const key = moveKey(m);
 				if (usedMoveKeys.has(key)) return false;
 				const nextState = applyTemplate(state, m.template, m.row, m.col);
 				return !stateHistory.has(gridToKey(nextState));
 			});
-
-			if (unusedIndices.length > 0 && remainingSteps <= unusedIndices.length) {
-				candidates = candidates.filter((m) => !usedTemplateIndices.has(m.templateIndex));
-			}
 
 			if (candidates.length === 0) {
 				valid = false;
@@ -453,23 +342,21 @@ export function generateVerifiedPuzzle(config: GeneratorConfig): GeneratedPuzzle
 
 			const chosen = randomItem(candidates);
 			usedMoveKeys.add(moveKey(chosen));
-			usedTemplateIndices.add(chosen.templateIndex);
 			state = applyTemplate(state, chosen.template, chosen.row, chosen.col);
 			stateHistory.add(gridToKey(state));
 		}
 
 		if (!valid) continue;
 		if (isSolved(state, solvedValue)) continue;
-		if (usedTemplateIndices.size !== templates.length) continue;
 
 		const puzzleConfig: PuzzleConfig = {
 			startState: state,
 			templates,
-			solvedValue,
-			allowTemplateRotation
+			solvedValue
 		};
-		const actualMin = solveMinMoves(puzzleConfig, targetMinMoves + 2);
+		const actualMin = services.solver.solve(puzzleConfig, targetMinMoves + 2);
 		if (actualMin !== targetMinMoves) continue;
+		if (!shortestSolutionUsesAllTemplates(puzzleConfig, targetMinMoves + 2)) continue;
 
 		const puzzleKey = canonicalPuzzleKey(puzzleConfig);
 		if (seenCanonicalKeys?.has(puzzleKey)) continue;

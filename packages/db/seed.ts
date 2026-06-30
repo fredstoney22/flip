@@ -19,7 +19,8 @@ import { packActiveForSeed, resolveSeedActiveMode } from './seedActiveMode.js';
  * Safe to re-run — pack and puzzle rows are upserted from packs.ts.
  *
  * SEED_ACTIVE_MODE:
- *   all (default) — every pack in packs.ts is active (local dev / CI)
+ *   dev (default) — only slugs in devPacks.ts are active (local dev)
+ *   all           — every pack in packs.ts is active (CI / full catalog)
  *   production    — only slugs in productionPacks.ts are active
  */
 
@@ -96,7 +97,8 @@ async function seed() {
 			}
 		}
 
-		const activeLabel = active ? 'active' : 'inactive';
+		const activeLabel =
+			active ? 'active' : seedActiveMode === 'dev' ? 'archived' : 'inactive';
 		console.log(
 			`  ✓ ${packDef.name} (${packDef.access}, ${activeLabel}) — ${puzzleEntries.length} puzzle(s)`
 		);

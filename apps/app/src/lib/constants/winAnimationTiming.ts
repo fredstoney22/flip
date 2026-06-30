@@ -1,16 +1,17 @@
-/** Shared win-animation timings (JS phases + CSS transitions). */
+/** Shared win-animation phase timings (JS + CSS). */
 export const WIN_ANIMATION_TIMING = {
-  /** When the white box begins centering. */
-  centerPhaseMs: 1700,
-  /** When the victory overlay fades in. */
-  revealPhaseMs: 2400,
-  /** Per-cell ripple stagger (multiplied by Manhattan distance from center). */
-  cellStaggerMs: 120,
-  collapseDurationS: 1.6,
-  centerSettleDurationS: 0.45,
-  revealFadeDurationS: 1.2,
-  expandDurationS: 0.55,
-  templateHideDurationS: 0.9,
-  cellDurationS: 1.2,
-  lineFadeDurationS: 0.6
+  /** Grid removed; empty white box appears. */
+  stripMs: 300,
+  stripDurationS: 0.3,
+  /** Brief hold on empty white box at puzzle size. */
+  holdMs: 200,
+  /** Resize white box to fit win content. */
+  resizeMs: 2000,
+  resizeDurationS: 2,
+  /** Win copy fade-in (overlaps end of resize). */
+  contentFadeMs: 600,
+  contentFadeDelayMs: 1400,
+  contentFadeDurationS: 0.6,
+  contentFadeDelayS: 1.4,
+  templateHideDurationS: 0.9
 } as const;

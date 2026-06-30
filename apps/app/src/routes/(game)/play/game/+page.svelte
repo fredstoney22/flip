@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import Puzzle from '$lib/components/game/Puzzle.svelte';
+  import DifficultyDebugPanel from '$lib/components/game/DifficultyDebugPanel.svelte';
   import PuzzlePlayLayout from '$lib/components/game/PuzzlePlayLayout.svelte';
   import TutorialWalkthrough from '$lib/components/game/TutorialWalkthrough.svelte';
   import { createTutorialProgressCallbacks } from '$lib/utils/tutorialProgress';
@@ -10,6 +11,7 @@
 
   let currentStep = $state(0);
   let skipped = $state(false);
+  let puzzleSolved = $state(false);
 
   const tutorialCallbacks = $derived(
     data.tutorial
@@ -30,15 +32,21 @@
     void `${data.pack.slug}-${data.puzzleId}`;
     currentStep = 0;
     skipped = false;
+    puzzleSolved = false;
   });
 
   function handleSolve(event: { packSlug: string; puzzleId: number; moveCount: number }) {
+    puzzleSolved = true;
     fetch('/api/progress', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(event)
     }).catch(console.error);
     tutorialCallbacks?.onSolve();
+  }
+
+  function handlePuzzleReset() {
+    puzzleSolved = false;
   }
 
   function handleNextPuzzle() {
@@ -62,6 +70,7 @@
     backHref="/play/puzzles?pack={data.pack.slug}"
     backLabel="← {data.pack.name}"
     trailingLabel={data.puzzleId !== null ? `Puzzle ${data.puzzleId}` : 'Puzzle'}
+    sidePanelHidden={puzzleSolved}
   >
     {#snippet sidePanel()}
       {#if !skipped}
@@ -88,17 +97,18 @@
     {/snippet}
 
     {#key `${data.pack.slug}-${data.puzzleId}`}
+      <DifficultyDebugPanel config={data.config} pedagogyConceptId={data.pedagogyConceptId} />
       <Puzzle
         puzzleConfig={data.config}
         packSlug={data.pack.slug}
         packName={data.pack.name}
         puzzleId={data.puzzleId}
-        bestMoveCount={data.bestMoveCount}
         onSolve={handleSolve}
         onNextPuzzle={data.nextPuzzleId !== null || data.puzzleId !== null ? handleNextPuzzle : undefined}
         onTemplateSelect={tutorialCallbacks?.onTemplateSelect}
         onMove={tutorialCallbacks?.onMove}
         onTemplateRotate={tutorialCallbacks?.onTemplateRotate}
+        onReset={handlePuzzleReset}
       />
     {/key}
   </PuzzlePlayLayout>
@@ -109,12 +119,12 @@
     trailingLabel={data.puzzleId !== null ? `Puzzle ${data.puzzleId}` : 'Puzzle'}
   >
     {#key `${data.pack.slug}-${data.puzzleId}`}
+      <DifficultyDebugPanel config={data.config} pedagogyConceptId={data.pedagogyConceptId} />
       <Puzzle
         puzzleConfig={data.config}
         packSlug={data.pack.slug}
         packName={data.pack.name}
         puzzleId={data.puzzleId}
-        bestMoveCount={data.bestMoveCount}
         onSolve={handleSolve}
         onNextPuzzle={data.nextPuzzleId !== null || data.puzzleId !== null ? handleNextPuzzle : undefined}
       />

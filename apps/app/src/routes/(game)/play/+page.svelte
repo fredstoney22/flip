@@ -16,35 +16,22 @@
 		<h1 class="mb-2 text-2xl font-bold text-gray-900">Choose a pack</h1>
 		<p class="mb-8 text-gray-500">Pick a puzzle pack to start playing.</p>
 
-		<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-			{#each data.packs as pack}
-				<a
-					href={pack.unlocked ? `/play/puzzles?pack=${pack.slug}` : '/pricing'}
-					class="relative block rounded-2xl border bg-white p-6 shadow-sm transition-shadow hover:border-gray-300 hover:shadow-md"
-					class:border-gray-200={pack.unlocked}
-					class:border-gray-100={!pack.unlocked}
-					class:opacity-70={!pack.unlocked}
-				>
-					{#if !pack.unlocked}
-						<span class="absolute right-4 top-4 text-gray-400" aria-label="Locked">🔒</span>
-					{/if}
+		{#if data.packs.length === 0}
+			<div class="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+				<p class="text-sm text-gray-500">No packs available yet. Check back soon.</p>
+			</div>
+		{:else}
+			<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+				{#each data.packs as pack}
+					<a
+						href="/play/puzzles?pack={pack.slug}"
+						class="relative block rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:border-gray-300 hover:shadow-md"
+					>
+						<h2 class="font-semibold text-gray-900">{pack.name}</h2>
+						{#if pack.description}
+							<p class="mt-1 text-sm text-gray-500">{pack.description}</p>
+						{/if}
 
-					<div class="mb-1 flex items-center gap-2">
-						<span
-							class="inline-block rounded-full px-2 py-0.5 text-xs font-medium"
-							class:bg-green-100={pack.access === 'free'}
-							class:text-green-700={pack.access === 'free'}
-							class:bg-indigo-100={pack.access === 'paid'}
-							class:text-indigo-700={pack.access === 'paid'}
-						>
-							{pack.access === 'free' ? 'Free' : 'Paid'}
-						</span>
-					</div>
-
-					<h2 class="font-semibold text-gray-900">{pack.name}</h2>
-					<p class="mt-1 text-sm text-gray-400">{pack.total} puzzles</p>
-
-					{#if pack.unlocked && pack.completed > 0}
 						<div class="mt-3">
 							<div class="h-1.5 overflow-hidden rounded-full bg-gray-100">
 								<div
@@ -54,14 +41,24 @@
 							</div>
 							<p class="mt-1 text-xs text-gray-400">{pack.completed} / {pack.total} completed</p>
 						</div>
-					{/if}
+					</a>
+				{/each}
+			</div>
+		{/if}
 
-					{#if !pack.unlocked}
-						<p class="mt-3 text-xs font-medium text-indigo-600">Unlock this pack →</p>
-					{/if}
+		{#if data.showStoreLink}
+			<section class="mt-12 rounded-2xl border border-dashed border-gray-300 bg-white p-8 text-center">
+				<h2 class="text-lg font-semibold text-gray-900">Want more puzzles?</h2>
+				<p class="mt-1 text-sm text-gray-500">
+					Unlock additional packs with new challenges and mechanics.
+				</p>
+				<a
+					href="/store"
+					class="mt-4 inline-flex items-center justify-center rounded-full bg-gray-900 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-700"
+				>
+					Get more levels
 				</a>
-			{/each}
-		</div>
+			</section>
+		{/if}
 	</main>
 </div>
-

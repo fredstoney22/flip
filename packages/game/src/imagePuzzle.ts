@@ -75,7 +75,6 @@ function pigmentsInGrid(grid: PuzzleGrid): Pigment[] {
 export interface ImagePuzzleOptions {
 	/** Split each color layer into N horizontal bands for more moves. Default 1. */
 	splitsPerColor?: number;
-	allowTemplateRotation?: boolean;
 }
 
 /**
@@ -83,7 +82,7 @@ export interface ImagePuzzleOptions {
  * (at top-left) to XOR color layers away until the grid is all white.
  */
 export function buildImagePuzzle(grid: PuzzleGrid, options: ImagePuzzleOptions = {}): PuzzleConfig {
-	const { splitsPerColor = 1, allowTemplateRotation = true } = options;
+	const { splitsPerColor = 1 } = options;
 	const templates: PuzzleTemplate[] = [];
 
 	for (const pigment of pigmentsInGrid(grid)) {
@@ -107,7 +106,6 @@ export function buildImagePuzzle(grid: PuzzleGrid, options: ImagePuzzleOptions =
 		startState,
 		templates,
 		solvedValue: PIGMENT_CLEAR_SOLVED_VALUE,
-		allowTemplateRotation,
 		minMovesToSolve: templates.length
 	};
 }
