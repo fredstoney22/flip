@@ -1,0 +1,153 @@
+# Flip — Claude Code guide
+
+Flip is a colour-mixing puzzle game. Players apply templates to a grid of pigment cells; XOR mixing of RYB primaries creates secondary colours. The goal is to clear every cell to white (pigment 0). It ships as a SvelteKit PWA with a Hono API backend, Stripe payments, and a rich puzzle-generation engine.
+
+---
+
+## Monorepo structure
+
+| Path | What it is |
+|------|-----------|
+| `apps/app` | SvelteKit frontend (TypeScript, Vite, Tailwind CSS, Playwright e2e) |
+| `apps/api` | Hono API backend (TypeScript, Node via `tsx`, Zod env validation) |
+| `packages/auth` | better-auth shared config (Google OAuth) |
+| `packages/db` | Drizzle ORM — schema, migrations, Supabase PostgreSQL connection |
+| `packages/game` | Pure-TS puzzle engine: generation, solving, difficulty scoring, pack management, pricing |
+
+`packages/game` is the core business logic. Before adding puzzle or pack features, check it for existing utilities — it has 50+ source files covering generation, solvability analysis, difficulty profiles, and pedagogy validation.
+
+---
+
+## Commands
+
+```bash
+# Dev
+npm run app:dev          # SvelteKit dev server (port 5173)
+npm run api:dev          # Hono API with hot-reload (port 3001)
+
+# Database
+npm run db:generate      # Generate Drizzle migrations from schema changes
+npm run db:migrate       # Apply pending migrations
+npm run db:push          # Push schema directly (bypasses migration tracking)
+npm run db:studio        # Open Drizzle Studio
+
+# Game / packs
+npm run game:validate              # Validate all pack definitions
+npm run game:generate-pack         # Generate a new pack
+npm run game:report-difficulty     # Report difficulty metrics
+npm run game:reorder-pack          # Re-order pack puzzles by difficulty
+
+# Tests
+npm test                 # Playwright e2e smoke suite (builds app first)
+npm run test:ui          # Playwright interactive UI
+npm run test:unit        # Vitest unit tests (once)
+npm run test:unit:watch  # Vitest in watch mode
+
+# Lint
+npm run lint             # Run oxlint
+npm run lint:fix         # Auto-fix lint issues
+
+# Stripe
+npm run stripe:listen    # Forward webhooks to localhost:5173/api/webhooks/stripe
+npm run stripe:status    # Check Stripe configuration status
+```
+
+---
+
+## Environment variables
+
+All env vars live in a single **root `.env` file**. Each package loads it differently:
+
+- **`apps/app`** (`vite.config.ts`): loads root `.env` via `loadEnv` and injects into `process.env` — required for `packages/auth` and `packages/db` which run server-side.
+- **`packages/db`** (`drizzle.config.ts`): loads root `.env` via `dotenv` with an explicit path (`resolve(process.cwd(), '../../.env')`) — needed because drizzle-kit runs from the `packages/db` directory.
+- **`apps/api`** (`env.ts`): loads root `.env` via `dotenv` in development only; in production (Lambda) env vars are injected at runtime.
+
+Key variables:
+
+| Variable | Where to get it |
+|----------|----------------|
+| `DATABASE_URL` | Supabase → Settings → Database → Connection string (port 5432, not 6543) |
+| `STRIPE_SECRET_KEY` | Stripe Dashboard → Developers → API keys |
+| `STRIPE_WEBHOOK_SECRET` | Stripe Dashboard → Developers → Webhooks |
+| `BETTER_AUTH_SECRET` | Any long random string |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google Cloud Console → OAuth credentials |
+
+Run `npm run verify:auth` to confirm production auth is configured correctly.
+
+---
+
+## Testing
+
+Two frameworks — use the right one for the job:
+
+| Scenario | Framework | Command |
+|----------|-----------|---------|
+| UI/routing smoke tests | Playwright | `npm test` |
+| Pure logic (game engine, utilities, services) | Vitest | `npm run test:unit` |
+
+Playwright builds the app and runs against the preview server (`localhost:4173`), not the dev server. Set `CI=true` in CI environments to force a fresh build.
+
+Unit tests live beside source files (`*.test.ts`). The `packages/game` package has extensive Vitest coverage — run it before and after changes to game logic.
+
+After any UI change, check `apps/app/tests/smoke.test.ts` for tests that may be affected and run the suite.
+
+---
+
+## Core domain concepts
+
+### Pigment system
+Cells hold a 3-bit RYB bitmask (`Pigment = 0–7`):
+- `0` = clear (white, solved state)
+- `1` = Red, `2` = Yellow, `4` = Blue (primaries)
+- `3` = Orange, `5` = Purple, `6` = Green (secondaries)
+- `7` = Prism (all three primaries)
+
+Applying a template XORs its pigment into matching cells. All types are in `packages/game/src/types.ts`.
+
+### Packs
+A `PackDefinition` has a `slug`, `name`, `access` (`free` | `paid`), and a map of puzzle configs. Pack slugs in production must be listed in `packages/game/src/productionPacks.ts`. Stripe product IDs live in API config — not in pack definitions.
+
+Seeding behaviour is controlled by `SEED_ACTIVE_MODE`:
+- `dev` — activates dev-only packs
+- `production` — activates only slugs in `PRODUCTION_PACK_SLUGS`
+- `all` — activates everything
+
+### Stripe integration
+Paid packs use Stripe Checkout. The API routes live in `apps/api/src/stripe/`. Pack pricing is computed in `packages/game/src/packPricing.ts`. Use `npm run stripe:listen` locally to forward webhooks.
+
+---
+
+## Code conventions
+
+- **TypeScript strict** — no `any`. Use typed errors.
+- **Naming**: `camelCase` for variables/functions, `PascalCase` for types/classes/components, `UPPER_SNAKE_CASE` for top-level constants, boolean prefixes `is`/`has`/`can`/`should`.
+- **File size**: target ≤300 lines; split when a file does more than one thing.
+- **Prefer editing existing files** over creating new ones — check for existing utilities before adding new ones.
+- **Explicit over clever**: readable code over one-liners.
+- **`.env.example` hygiene**: add/remove a key in `.env.example` every time you add/remove an env var in code.
+
+---
+
+## Workflow
+
+- **Plan before coding**: for non-trivial tasks, outline the approach and confirm before making changes.
+- **Autonomous execution after approval**: once a plan is approved, run every command needed to implement, build, lint, and test it without stopping to ask a human to run them manually. Only pause for genuinely irreversible/destructive actions (force-push, dropping data, etc.), not for routine dev/test/build commands.
+- **TDD**: write or update tests first, then implement. Run the relevant test command before finalising any change.
+- **Test new features end to end**: after implementing a feature, exercise it through the Playwright e2e suite (`npm test`), adding or updating tests as needed, and iterate on the implementation using those test results until they pass.
+- **Correctness over speed of delivery**: when choosing between implementation approaches, decide based on correctness, robustness, and fit — not on which is faster to build. Time/effort to implement is not a valid factor in the decision.
+- **Commit style**: imperative subject line ≤50 chars with type prefix (`feat`, `fix`, `chore`, `refactor`, `test`, `docs`). One logical change per commit.
+- **Security**: never commit secrets. Validate all user input. Use parameterised queries. Don't log PII.
+
+---
+
+## Key documentation
+
+| File | What it covers |
+|------|---------------|
+| `documentation/new-app-checklist.md` | Start here when reusing this template |
+| `documentation/database.md` | Drizzle + Supabase setup, env loading details |
+| `documentation/testing.md` | Playwright + Vitest guide |
+| `documentation/stripe.md` | Stripe integration overview |
+| `documentation/stripe-live-setup.md` | Going live with Stripe |
+| `documentation/vercel-deployment.md` | Production deployment |
+| `documentation/git-worktrees.md` | Worktree workflow used in this project |

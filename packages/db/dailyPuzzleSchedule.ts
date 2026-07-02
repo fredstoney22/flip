@@ -6,8 +6,8 @@ import { FIRST_STEPS_SLUG } from '../game/src/puzzles/firstSteps.js';
 /** Pack used for the public daily puzzle rotation. */
 export const DAILY_PACK_SLUG = FIRST_STEPS_SLUG;
 
-/** Number of First Steps puzzles to rotate through (puzzles 1–9). */
-export const DAILY_PUZZLE_ROTATION_COUNT = 9;
+/** Number of First Steps puzzles to rotate through (puzzles 1–8). */
+export const DAILY_PUZZLE_ROTATION_COUNT = 8;
 
 /** How many calendar days ahead to pre-schedule (today + future days). */
 export const DAILY_SCHEDULE_LOOKAHEAD_DAYS = 14;
