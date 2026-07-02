@@ -139,7 +139,7 @@ describe('/play/puzzles load — happy path', () => {
 });
 
 describe('/play/puzzles load — access guard', () => {
-  it('redirects to /play when the pack API returns 403', async () => {
+  it('redirects to /store when the pack API returns 403', async () => {
     const fetchFn = buildFetch([
       { match: '/packs/hard-in-3/puzzles', body: {}, status: 403 },
       { match: '/progress', body: EMPTY_PROGRESS }
@@ -147,7 +147,7 @@ describe('/play/puzzles load — access guard', () => {
 
     await expect(
       load(makeLoadArgs('hard-in-3', fetchFn))
-    ).rejects.toMatchObject({ status: 302, location: '/play' });
+    ).rejects.toMatchObject({ status: 302, location: '/store' });
   });
 
   it('throws 404 when the pack is not found', async () => {
