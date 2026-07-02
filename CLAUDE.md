@@ -131,7 +131,10 @@ Paid packs use Stripe Checkout. The API routes live in `apps/api/src/stripe/`. P
 ## Workflow
 
 - **Plan before coding**: for non-trivial tasks, outline the approach and confirm before making changes.
+- **Autonomous execution after approval**: once a plan is approved, run every command needed to implement, build, lint, and test it without stopping to ask a human to run them manually. Only pause for genuinely irreversible/destructive actions (force-push, dropping data, etc.), not for routine dev/test/build commands.
 - **TDD**: write or update tests first, then implement. Run the relevant test command before finalising any change.
+- **Test new features end to end**: after implementing a feature, exercise it through the Playwright e2e suite (`npm test`), adding or updating tests as needed, and iterate on the implementation using those test results until they pass.
+- **Correctness over speed of delivery**: when choosing between implementation approaches, decide based on correctness, robustness, and fit — not on which is faster to build. Time/effort to implement is not a valid factor in the decision.
 - **Commit style**: imperative subject line ≤50 chars with type prefix (`feat`, `fix`, `chore`, `refactor`, `test`, `docs`). One logical change per commit.
 - **Security**: never commit secrets. Validate all user input. Use parameterised queries. Don't log PII.
 
