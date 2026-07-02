@@ -7,7 +7,9 @@ describe('devPacks', () => {
 			'first-steps',
 			'chromatic-ascent',
 			'color-ladder',
-			'grid-4x4-dev'
+			'grid-4x4-dev',
+			'monochrome',
+			'multicolor'
 		]);
 	});
 
@@ -16,6 +18,8 @@ describe('devPacks', () => {
 		expect(isDevPack('chromatic-ascent')).toBe(true);
 		expect(isDevPack('color-ladder')).toBe(true);
 		expect(isDevPack('grid-4x4-dev')).toBe(true);
+		expect(isDevPack('monochrome')).toBe(true);
+		expect(isDevPack('multicolor')).toBe(true);
 	});
 
 	it('rejects non-dev pack slugs', () => {

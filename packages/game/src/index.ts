@@ -267,3 +267,10 @@ export {
 	getFirstStepsConcept
 } from './puzzles/firstSteps.js';
 export { archivedFirstStepsPuzzle5 } from './puzzles/firstStepsArchive.js';
+export {
+	DAILY_MONO_CONFIG,
+	DAILY_COLOR_CONFIG,
+	epochDaysForDate,
+	dailyGenerationKind,
+	generateDailyPuzzle
+} from './dailyGeneration.js';

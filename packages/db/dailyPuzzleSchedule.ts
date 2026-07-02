@@ -55,14 +55,49 @@ export async function getDailyPuzzleForDate(dateStr: string): Promise<DailyPuzzl
 }
 
 /**
+ * Stores a freshly-generated puzzle inline for the given date.
+ * Uses onConflictDoNothing so concurrent calls are safe — the winner's row is returned.
+ */
+export async function storeDailyGeneratedPuzzle(
+	dateStr: string,
+	configJson: string,
+	kind: string
+): Promise<DailyPuzzleRow> {
+	await db
+		.insert(dailyPuzzle)
+		.values({
+			id: randomUUID(),
+			date: dateStr,
+			packSlug: null,
+			puzzleId: null,
+			generatedConfig: configJson,
+			generationKind: kind,
+			createdAt: new Date()
+		})
+		.onConflictDoNothing();
+
+	const row = await getDailyPuzzleForDate(dateStr);
+	if (!row) {
+		throw new Error(`Failed to store daily generated puzzle for ${dateStr}`);
+	}
+	return row;
+}
+
+/**
  * Ensures a daily_puzzle row exists for the given UTC date and matches the
  * current rotation (pack + puzzle). Updates stale rows when the source pack changes.
+ * Generated rows (generatedConfig != null) are returned as-is without modification.
  */
 export async function ensureDailyPuzzleForDate(dateStr: string): Promise<DailyPuzzleRow> {
 	const { packSlug, puzzleId } = dailyPuzzleAssignment(dateStr);
 	const existing = await getDailyPuzzleForDate(dateStr);
 
 	if (existing) {
+		// Don't touch generated rows — they store inline config
+		if (existing.generatedConfig !== null) {
+			return existing;
+		}
+
 		if (existing.packSlug === packSlug && existing.puzzleId === puzzleId) {
 			return existing;
 		}
