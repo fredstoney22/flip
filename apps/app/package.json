@@ -23,6 +23,7 @@
 		"@flip/api": "*",
 		"@flip/auth": "*",
 		"@flip/game": "*",
+		"@inlang/paraglide-js": "^2.20.2",
 		"@sentry/sveltekit": "^10.58.0",
 		"better-auth": "^1.4.0",
 		"stripe": "^20.3.1",

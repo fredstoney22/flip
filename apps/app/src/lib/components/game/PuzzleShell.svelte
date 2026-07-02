@@ -9,6 +9,7 @@
 	import { PRISM_RADIANCE_ENABLED } from '$lib/constants/featureFlags';
 	import { WIN_ANIMATION_TIMING as WIN } from '$lib/constants/winAnimationTiming';
 	import type { PuzzleGrid } from '@flip/game';
+	import * as m from '$lib/paraglide/messages';
 
 	interface SolveMeta {
 		packSlug?: string;
@@ -304,9 +305,14 @@
 			  : window.location.href;
 
 	  const label =
-			packName && puzzleId != null ? `"${packName}" puzzle #${puzzleId}` : 'a Flip puzzle';
+			packName && puzzleId != null
+			  ? m.puzzle_shell_share_label_named({ packName, puzzleId })
+			  : m.puzzle_shell_share_label_fallback();
 
-	  const text = `I solved ${label} in ${moveCount} move${moveCount === 1 ? '' : 's'}! Can you beat it? 👉 ${url}`;
+	  const text =
+			moveCount === 1
+			  ? m.puzzle_shell_share_text_one({ label, moveCount, url })
+			  : m.puzzle_shell_share_text_other({ label, moveCount, url });
 
 	  if (navigator.share) {
 	    await navigator.share({ title: 'Flip', text }).catch(() => undefined);
@@ -332,7 +338,7 @@
 	<div class="puzzle-grid-section" class:win-overflow={showWinCard}>
 		<div class="win-stage" class:win-overflow={showWinCard}>
 			<div class="puzzle-header" class:header-hidden={headerHidden} aria-hidden={headerHidden}>
-				<span class="move-counter" data-testid="move-counter">Moves: {moveCount}</span>
+				<span class="move-counter" data-testid="move-counter">{m.puzzle_shell_move_counter({ moveCount })}</span>
 				{#if showColorGuide || showHowTo}
 					<div class="header-actions">
 						{#if showColorGuide}
@@ -387,7 +393,7 @@
 								class="win-content"
 								class:visible={contentVisible}
 							>
-								<h2 class="win-title">Prism cleared!</h2>
+								<h2 class="win-title">{m.puzzle_shell_win_title()}</h2>
 
 								{#if enableShareAndRating}
 									<div class="win-rating">
@@ -403,7 +409,7 @@
 												onclick={handleNextPuzzle}
 												disabled={!winInteractive}
 											>
-												Next Puzzle →
+												{m.puzzle_shell_next_puzzle()}
 											</button>
 										{/if}
 										<button
@@ -411,7 +417,7 @@
 											onclick={onReset}
 											disabled={!winInteractive}
 										>
-											Play Again
+											{m.puzzle_shell_play_again()}
 										</button>
 									</div>
 
@@ -420,12 +426,12 @@
 											class="share-btn"
 											onclick={share}
 											disabled={!winInteractive}
-											aria-label="Share this puzzle"
+											aria-label={m.puzzle_shell_share_aria()}
 										>
 											{#if copied}
-												✓ Copied!
+												{m.puzzle_shell_share_copied()}
 											{:else}
-												↗ Share
+												{m.puzzle_shell_share_default()}
 											{/if}
 										</button>
 									{/if}
@@ -447,8 +453,8 @@
 		<button
 			class="undo-btn"
 			disabled={!canUndo || isSolved}
-			aria-label="Undo last move"
-			title="Undo (Ctrl+Z)"
+			aria-label={m.puzzle_shell_undo_aria()}
+			title={m.puzzle_shell_undo_title()}
 			onclick={onUndo}
 			data-testid="undo-button"
 		>
@@ -471,10 +477,10 @@
 		</button>
 		{#if onHint}
 			<button class="hint-btn" onclick={onHint} disabled={isSolved}>
-				Hint
+				{m.common_hint()}
 			</button>
 		{/if}
-		<button class="reset-btn" onclick={onReset}>Reset</button>
+		<button class="reset-btn" onclick={onReset}>{m.common_reset()}</button>
 	</div>
 </div>
 

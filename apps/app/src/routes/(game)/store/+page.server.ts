@@ -1,5 +1,6 @@
 import { getPackPriceUsd } from '@flip/game';
 import { getPackDescription } from '$lib/constants/packDescriptions';
+import { getPackName } from '$lib/constants/packNames';
 import type { PageServerLoad } from './$types';
 
 import { apiUrl } from '$lib/api-url.server';
@@ -22,7 +23,7 @@ export const load: PageServerLoad = async ({ fetch, request, locals, url }) => {
   const paidPacks = apiPacks
     .filter((pack) => pack.access === 'paid')
     .map((pack) => ({
-      name: pack.name,
+      name: getPackName(pack.slug) ?? pack.name,
       slug: pack.slug,
       total: pack.total ?? 0,
       unlocked: pack.hasAccess,

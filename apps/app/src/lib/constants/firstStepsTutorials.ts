@@ -1,13 +1,8 @@
 import type { TutorialConfig, TutorialStep } from '$lib/constants/tutorialSteps';
 import { FIRST_STEPS_SLUG } from '@flip/game';
+import * as m from '$lib/paraglide/messages';
 
 const PACK_HREF = `/play/puzzles?pack=${FIRST_STEPS_SLUG}`;
-
-const GOAL = '';
-
-/** How applying a lens changes color — used from puzzle 5 onward. */
-const LENS_TOGGLE =
-	'Applying a lens toggles the colors in its pattern where its applied: if a square does not have that color, the lens adds the color. If it already has that color, the lens removes it.';
 
 function puzzleInfo(title: string, body: string): TutorialStep {
   return { title, body, action: 'info' };
@@ -16,26 +11,26 @@ function puzzleInfo(title: string, body: string): TutorialStep {
 function finishStep(puzzleId: number, body: string): TutorialStep {
   const isLast = puzzleId >= 9;
   return {
-    title: 'Nice work!',
+    title: m.first_steps_finish_title(),
     body,
     action: 'finish',
-    finishLabel: isLast ? 'Back to First Steps' : 'Next puzzle',
+    finishLabel: isLast ? m.first_steps_finish_label_last() : m.first_steps_finish_label_next(),
     finishHref: isLast
       ? PACK_HREF
       : `/play/game?pack=${FIRST_STEPS_SLUG}&id=${puzzleId + 1}`
   };
 }
 
-function config(puzzleId: number, steps: TutorialStep[]): TutorialConfig {
+function config(steps: TutorialStep[]): TutorialConfig {
   return {
     steps,
-    skippedLinks: [{ label: 'First Steps', href: PACK_HREF }]
+    skippedLinks: [{ label: m.first_steps_skipped_link_label(), href: PACK_HREF }]
   };
 }
 
 function selectLens(body: string, templateIndex?: number): TutorialStep {
   return {
-    title: 'Select a lens',
+    title: m.first_steps_select_lens_title(),
     body,
     action: 'wait',
     advanceOn: 'templateSelect',
@@ -45,7 +40,7 @@ function selectLens(body: string, templateIndex?: number): TutorialStep {
 
 function placeLens(body: string, moveCount: number): TutorialStep {
   return {
-    title: 'Place the lens',
+    title: m.first_steps_place_lens_title(),
     body,
     action: 'wait',
     advanceOn: 'move',
@@ -56,91 +51,56 @@ function placeLens(body: string, moveCount: number): TutorialStep {
 /** Shown before the final solve — points players to the Hint button. */
 function hintBeforeSolve(body?: string): TutorialStep {
   return {
-    title: 'Stuck? Try Hint',
-    body:
-      body ??
-      'Tap Hint below the grid to see where the selected lens fits next. Then place it to keep clearing squares.',
+    title: m.first_steps_hint_title(),
+    body: body ?? m.first_steps_hint_default_body(),
     action: 'next'
   };
 }
 
 function clearGrid(body?: string): TutorialStep {
   return {
-    title: 'Finish the puzzle',
-    body: body ?? 'Keep placing lenses until every square is white.',
+    title: m.first_steps_clear_grid_title(),
+    body: body ?? m.first_steps_clear_grid_default_body(),
     action: 'wait',
     advanceOn: 'solve'
   };
 }
 
-/** Per-puzzle walkthrough defaults for the First Steps pack. */
-export const FIRST_STEPS_TUTORIALS: Record<number, TutorialConfig> = {
-  1: config(1, [
-    puzzleInfo(
-      'Applying your first lens',
-      `${GOAL} The goal of Prism is to clear all the color from the Prism Square! Select the lens below and tap it to rotate it. Then tap the Prism Square to apply the lens.`
-    ),
-  ]),
-  2: config(2, [
-    puzzleInfo(
-      'Rotating a lens',
-      `${GOAL} Tap a lens to rotate it, you will need to use the lens multiple times.`
-    ),
-  ]),
-  3: config(3, [
-    puzzleInfo(
-      'Multiple lenses',
-      `${GOAL} Two lenses are available, you will need both!`
-    ),
-  ]),
-  4: config(4, [
-    puzzleInfo(
-      'Smaller lenses',
-      `${GOAL} Lenses can be all shapes and sizes! When a lens is smaller than the puzzle, you can choose where to place it.`
-    )
-  ]),
-  5: config(5, [
-    puzzleInfo(
-      'Multiple colors',
-      `${GOAL} ${LENS_TOGGLE} Red + Yellow = Orange!`
-    ),
-  ]),
-  6: config(6, [
-    puzzleInfo(
-      'Multi-color lenses',
-      `${GOAL} ${LENS_TOGGLE} Some lenses can apply multiple colors at once!`
-    )
-  ]),
-  7: config(7, [
-    puzzleInfo(
-      'Color mixing',
-      `${GOAL} ${LENS_TOGGLE} Red + Yellow + Blue = Prism!`
-    )
-  ]),
-  8: config(8, [
-    puzzleInfo(
-      'Multi-color stencils',
-      `${GOAL} ${LENS_TOGGLE} Some lenses use a stencil — different cells in the same shape carry different colors.`
-    ),
-    selectLens('Select a lens and read which color each cell in the shape carries.'),
-    placeLens('Place it where those colors line up with the grid.', 1),
-    hintBeforeSolve('Hint highlights where the selected lens fits next.'),
-    clearGrid('Use every lens — rotate and switch as needed — until the grid is white.'),
-    finishStep(8, 'Stencils let one shape toggle several colors in a single move.')
-  ]),
-  9: config(9, [
-    puzzleInfo(
-      'Putting it all together',
-      `${GOAL} Use everything you have learned: multiple lenses, rotation, color toggling, and stencils.`
-    ),
-    {
-      title: 'Plan your moves',
-      body: 'Look at the grid and all lenses before you place anything.',
-      action: 'next'
-    },
-    selectLens('Select a lens to begin.'),
-    hintBeforeSolve('Hint is always available if you want a nudge toward the next move.'),
-    clearGrid('Clear every colored square until the grid is all white.'),
-    finishStep(9, 'You finished First Steps. Try the daily puzzle next!')
-  ])
-};
+/**
+ * Per-puzzle walkthrough defaults for the First Steps pack.
+ *
+ * Built fresh on every call (not a module-level constant) so it always reflects
+ * the locale resolved for the current request/render rather than whatever locale
+ * was active when the module first loaded.
+ */
+export function getFirstStepsTutorials(): Record<number, TutorialConfig> {
+  return {
+    1: config([puzzleInfo(m.first_steps_puzzle_1_title(), m.first_steps_puzzle_1_body())]),
+    2: config([puzzleInfo(m.first_steps_puzzle_2_title(), m.first_steps_puzzle_2_body())]),
+    3: config([puzzleInfo(m.first_steps_puzzle_3_title(), m.first_steps_puzzle_3_body())]),
+    4: config([puzzleInfo(m.first_steps_puzzle_4_title(), m.first_steps_puzzle_4_body())]),
+    5: config([puzzleInfo(m.first_steps_puzzle_5_title(), m.first_steps_puzzle_5_body())]),
+    6: config([puzzleInfo(m.first_steps_puzzle_6_title(), m.first_steps_puzzle_6_body())]),
+    7: config([puzzleInfo(m.first_steps_puzzle_7_title(), m.first_steps_puzzle_7_body())]),
+    8: config([
+      puzzleInfo(m.first_steps_puzzle_8_title(), m.first_steps_puzzle_8_body()),
+      selectLens(m.first_steps_puzzle_8_select_body()),
+      placeLens(m.first_steps_puzzle_8_place_body(), 1),
+      hintBeforeSolve(m.first_steps_puzzle_8_hint_body()),
+      clearGrid(m.first_steps_puzzle_8_clear_body()),
+      finishStep(8, m.first_steps_puzzle_8_finish_body())
+    ]),
+    9: config([
+      puzzleInfo(m.first_steps_puzzle_9_title(), m.first_steps_puzzle_9_body()),
+      {
+        title: m.first_steps_puzzle_9_plan_title(),
+        body: m.first_steps_puzzle_9_plan_body(),
+        action: 'next'
+      },
+      selectLens(m.first_steps_puzzle_9_select_body()),
+      hintBeforeSolve(m.first_steps_puzzle_9_hint_body()),
+      clearGrid(m.first_steps_puzzle_9_clear_body()),
+      finishStep(9, m.first_steps_puzzle_9_finish_body())
+    ])
+  };
+}

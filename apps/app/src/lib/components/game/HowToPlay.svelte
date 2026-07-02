@@ -1,4 +1,6 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages';
+
 	interface Props {
 		/** Open the help modal on first render (e.g. First Steps puzzle 1). */
 		initialOpen?: boolean;
@@ -30,7 +32,7 @@
 <div class="how-to-play">
 	<button
 		class="help-btn"
-		aria-label="How to play"
+		aria-label={m.how_to_play_button_aria()}
 		aria-expanded={isOpen}
 		aria-haspopup="dialog"
 		onclick={() => (isOpen = !isOpen)}
@@ -49,35 +51,35 @@
 			class="help-modal"
 			role="dialog"
 			aria-modal="true"
-			aria-label="How to play"
+			aria-label={m.how_to_play_dialog_aria()}
 			tabindex="-1"
 			onclick={(e) => e.stopPropagation()}
 			onkeydown={(e) => e.stopPropagation()}
 		>
 			<button
 				class="close-btn"
-				aria-label="Close help"
+				aria-label={m.how_to_play_close_aria()}
 				onclick={close}
 			>
 				×
 			</button>
-			<h3>How to Play</h3>
+			<h3>{m.how_to_play_heading()}</h3>
 			<ol>
 				<li>
-					<strong>Goal</strong> — clear the colors from the Prism.
+					<strong>{m.how_to_play_goal_term()}</strong> — {m.how_to_play_goal_body()}
 				</li>
 				<li>
-					<strong>Select a lens</strong> — click one of the lenses (color patterns) below the Prism
+					<strong>{m.how_to_play_select_term()}</strong> — {m.how_to_play_select_body()}
 				</li>
 				<li>
-					<strong>Rotate</strong> — tap a lens to rotate it.
+					<strong>{m.how_to_play_rotate_term()}</strong> — {m.how_to_play_rotate_body()}
 				</li>
 				<li>
-					<strong>Apply the lens to the Prism square</strong> — drag and drop a lens onto the Prism to flip the patterns colors.
+					<strong>{m.how_to_play_apply_term()}</strong> — {m.how_to_play_apply_body()}
 				</li>
 				<li>
-					<strong>Undo</strong> — click
-					<span class="action-preview undo-preview" role="img" aria-label="Undo">
+					<strong>{m.how_to_play_undo_term()}</strong> — click
+					<span class="action-preview undo-preview" role="img" aria-label={m.how_to_play_undo_icon_aria()}>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							width="14"
@@ -94,17 +96,17 @@
 							<path d="M3 3v5h5" />
 						</svg>
 					</span>
-					to undo your last move.
+					{m.how_to_play_undo_body()}
 				</li>
 				<li>
-					<strong>Reset</strong> — click
-					<span class="action-preview reset-preview" role="img" aria-label="Reset">Reset</span>
-					to start over.
+					<strong>{m.how_to_play_reset_term()}</strong> — click
+					<span class="action-preview reset-preview" role="img" aria-label={m.common_reset()}>{m.common_reset()}</span>
+					{m.how_to_play_reset_body()}
 				</li>
 				<li>
-					<strong>Hint</strong> — click
-					<span class="action-preview hint-preview" role="img" aria-label="Hint">Hint</span>
-					to see a good next move.
+					<strong>{m.how_to_play_hint_term()}</strong> — click
+					<span class="action-preview hint-preview" role="img" aria-label={m.common_hint()}>{m.common_hint()}</span>
+					{m.how_to_play_hint_body()}
 				</li>
 			</ol>
 		</div>
