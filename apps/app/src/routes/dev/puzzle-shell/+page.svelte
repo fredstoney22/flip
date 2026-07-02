@@ -28,17 +28,17 @@
 			data-story={activeStory.id}
 		>
 			<PuzzleShell {...activeStory.props}>
-				<svelte:fragment slot="grid">
+				{#snippet grid()}
 					<ColorSquare grid={PUZZLE_SHELL_DEMO_GRID} {cellSize} />
-				</svelte:fragment>
+				{/snippet}
 
-				<svelte:fragment slot="templates">
+				{#snippet templates()}
 					<div class="story-templates" aria-hidden="true">
 						<div class="story-template-chip"></div>
 						<div class="story-template-chip"></div>
 						<div class="story-template-chip"></div>
 					</div>
-				</svelte:fragment>
+				{/snippet}
 			</PuzzleShell>
 		</div>
 	</main>
