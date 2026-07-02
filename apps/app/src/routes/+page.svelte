@@ -26,66 +26,29 @@
 			</p>
 
 			<div class="mt-4 mx-auto w-fit rounded-xl bg-gray-100 p-3">
-				<div
-					class="grid gap-0.5"
-					style={`grid-template-columns: repeat(${
-					  (data.daily ? data.daily.config.startState : defaultPreview)[0].length
-					}, minmax(0, 1fr));`}
-				>
-					{#each (data.daily ? data.daily.config.startState : defaultPreview) as row}
-						{#each row as cell}
-							<div
-								class="h-4 w-4 rounded-[4px] sm:h-5 sm:w-5"
-								class:bg-white={cell === 1}
-								class:bg-gray-900={cell === 0}
-							></div>
-						{/each}
-					{/each}
-				</div>
+				{#if data.daily}
+					<PuzzleGridPreview config={data.daily.config} />
+				{:else}
+					<PuzzleGridPreview grid={defaultPreview} />
+				{/if}
 			</div>
 
 			<Button href="/daily" variant="primary" class="mt-4 rounded-full px-6">
 				Play daily puzzle
 			</Button>
 		</Card>
-
-		<!-- How it works card -->
-		<Card class="text-center">
-			<h2 class="text-lg font-semibold tracking-tight text-gray-900 sm:text-xl">How it works</h2>
-			<p class="mt-1 text-sm text-gray-500">
-				Learn the basics in a short interactive tutorial, then come back here to play.
-			</p>
-			<Button href="/tutorial" variant="primary" class="mt-4 rounded-full px-6">
-				Open tutorial
-			</Button>
-		</Card>
 	</section>
 
-	<!-- Packs teaser -->
+	<!-- Free play -->
 	<section class="mx-auto max-w-3xl px-4 pb-16 space-y-6">
 		<Card class="text-center">
-			<h2 class="text-lg font-semibold tracking-tight text-gray-900 sm:text-xl">Puzzle packs</h2>
-			<p class="mt-1 text-sm text-gray-500">Start free, unlock more when you're ready. Click a pack to see its puzzles.</p>
-			<div class="mt-6 space-y-4 text-left">
-				<a
-					href="/play/puzzles?pack=first-steps"
-					class="block rounded-2xl border border-gray-200 bg-white p-6 shadow-sm text-left transition-shadow hover:shadow-md hover:border-gray-300"
-				>
-					<span class="inline-block rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 mb-3">Free</span>
-					<h3 class="font-semibold text-gray-900">First Steps</h3>
-					<p class="mt-1 text-sm text-gray-500">9 puzzles · Learn lenses, rotation, and color step by step</p>
-					<p class="mt-3 text-xs font-medium text-indigo-600">View puzzles →</p>
-				</a>
-				<a
-					href="/pricing"
-					class="block rounded-2xl border border-gray-200 bg-white p-6 shadow-sm text-left transition-shadow hover:shadow-md hover:border-gray-300"
-				>
-					<span class="inline-block rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700 mb-3">Paid · $0.99</span>
-					<h3 class="font-semibold text-gray-900">Chromatic Ascent</h3>
-					<p class="mt-1 text-sm text-gray-500">10 puzzles · Pigment mixing from easy to expert</p>
-					<p class="mt-3 text-xs font-medium text-indigo-600">Unlock pack →</p>
-				</a>
-			</div>
+			<h2 class="text-lg font-semibold tracking-tight text-gray-900 sm:text-xl">Free play</h2>
+			<p class="mt-1 text-sm text-gray-500">
+				Work through puzzle packs at your own pace. Start with the free intro pack and unlock more in the store when you're ready.
+			</p>
+			<Button href="/play" variant="primary" class="mt-4 rounded-full px-6">
+				Browse puzzle packs
+			</Button>
 		</Card>
 
 		{#if !data.user}
@@ -123,6 +86,7 @@
 	import Logo from '$lib/components/Logo.svelte';
 	import Card from '$lib/components/Card.svelte';
 	import Button from '$lib/components/Button.svelte';
+	import PuzzleGridPreview from '$lib/components/game/PuzzleGridPreview.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();

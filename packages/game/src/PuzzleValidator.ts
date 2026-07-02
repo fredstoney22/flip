@@ -4,7 +4,7 @@
 
 import { applyTemplate, rotateRight } from './PuzzleFunctions.js';
 import type { Pigment, PuzzleConfig, PuzzleGrid, PuzzleTemplate } from './types.js';
-import { MONO_FLIP_SOLVED_VALUE } from './types.js';
+import { PIGMENT_CLEAR_SOLVED_VALUE } from './types.js';
 
 type Location = [number, number];
 
@@ -13,7 +13,7 @@ export function getValidPuzzle(
 	templateSizes: number[] = [3, 3, 3],
 	movesToSolve: number = 3
 ): PuzzleConfig {
-	let puzzle: PuzzleGrid = oneSquare(puzzleSize);
+	let puzzle: PuzzleGrid = clearedGrid(puzzleSize);
 	const templates: PuzzleTemplate[] = randSquares(templateSizes).map((shape) => ({
 		shape: shape.map((row) => row.map((cell) => (cell ? 1 : 0) as Pigment))
 	}));
@@ -49,8 +49,7 @@ export function getValidPuzzle(
 	return {
 		startState: puzzle,
 		templates,
-		solvedValue: MONO_FLIP_SOLVED_VALUE,
-		allowTemplateRotation: true
+		solvedValue: PIGMENT_CLEAR_SOLVED_VALUE
 	};
 }
 
@@ -66,8 +65,8 @@ function randSquares(sizes: number[]): PuzzleGrid[] {
 	return sizes.map(randSquare);
 }
 
-function oneSquare(size: number): PuzzleGrid {
-	return Array.from({ length: size }, () => Array<Pigment>(size).fill(MONO_FLIP_SOLVED_VALUE));
+function clearedGrid(size: number): PuzzleGrid {
+	return Array.from({ length: size }, () => Array<Pigment>(size).fill(PIGMENT_CLEAR_SOLVED_VALUE));
 }
 
 function getRandomIndex<T>(arr: T[]): number {

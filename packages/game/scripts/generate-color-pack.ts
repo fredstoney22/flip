@@ -1,53 +1,43 @@
-import {
-	generateVerifiedPuzzle,
-	pigmentGeneratorConfig
-} from '../src/PuzzleGenerator.js';
-import type { GeneratedPuzzleConfig, GeneratorConfig } from '../src/PuzzleGenerator.js';
+/**
+ * @deprecated Use generate-pack.ts with a pack spec in PACK_GENERATION_SPECS.
+ * Kept for ad-hoc color-lab puzzle snippets.
+ */
+import { buildGeneratorConfig, stripGeneratedPuzzle } from '../src/packGeneration.js';
+import { resolveGenerationRuntime } from '../src/packGenerationRuntime.js';
+import { generateVerifiedPuzzle } from '../src/PuzzleGenerator.js';
 import type { PuzzleConfig } from '../src/types.js';
 
-type DifficultySpec = {
-	name: string;
-	targetMinMoves: number;
-};
-
-const DIFFICULTIES: DifficultySpec[] = [
+const SLOTS = [
 	{ name: 'Warmup', targetMinMoves: 3 },
 	{ name: 'Mixer', targetMinMoves: 3 },
 	{ name: 'Tertiary Twist', targetMinMoves: 3 },
 	{ name: 'Deep Shade', targetMinMoves: 4 },
 	{ name: 'Chromatic Knot', targetMinMoves: 4 }
-];
+] as const;
 
-const BASE_CONFIG: Omit<GeneratorConfig, 'targetMinMoves'> = (() => {
-	const { targetMinMoves: _ignored, ...rest } = pigmentGeneratorConfig({ targetMinMoves: 2 });
-	return rest;
-})();
-
-function stripGenerated(cfg: GeneratedPuzzleConfig): PuzzleConfig {
-	const { startState, templates, solvedValue, allowTemplateRotation, minMovesToSolve } = cfg;
-	return { startState, templates, solvedValue, allowTemplateRotation, minMovesToSolve };
-}
+const colorRuntime = resolveGenerationRuntime('color-lab', 'color');
+const baseColor = buildGeneratorConfig({ kind: 'color', targetMinMoves: 2 });
 
 function main() {
 	const configs: { title: string; description: string; config: PuzzleConfig }[] = [];
 
-	for (const spec of DIFFICULTIES) {
+	for (const slot of SLOTS) {
 		const generated = generateVerifiedPuzzle({
-			...BASE_CONFIG,
-			targetMinMoves: spec.targetMinMoves
+			...baseColor,
+			targetMinMoves: slot.targetMinMoves,
+			maxAttempts: colorRuntime.maxAttempts
 		});
 		configs.push({
-			title: spec.name,
-			description: `Clears in exactly ${spec.targetMinMoves} move${
-				spec.targetMinMoves === 1 ? '' : 's'
+			title: slot.name,
+			description: `Clears in exactly ${slot.targetMinMoves} move${
+				slot.targetMinMoves === 1 ? '' : 's'
 			}.`,
-			config: stripGenerated(generated)
+			config: stripGeneratedPuzzle(generated)
 		});
 	}
 
 	const header = `// ---- BEGIN AUTO-GENERATED COLOR LAB PUZZLES ----
 // Generated via: npx tsx packages/game/scripts/generate-color-pack.ts
-// Merge into color-lab pack in packs.ts
 `;
 
 	const body =

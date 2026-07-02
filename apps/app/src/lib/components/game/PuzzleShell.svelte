@@ -1,9 +1,13 @@
 <script lang="ts">
+	import { tick, untrack } from 'svelte';
 	import ColorVennDiagram from './ColorVennDiagram.svelte';
 	import HowToPlay from './HowToPlay.svelte';
 	import PrismFrame from './PrismFrame.svelte';
+	import PrismLightMap from './PrismLightMap.svelte';
 	import StarRating from './StarRating.svelte';
+	import { PRISM_RADIANCE_ENABLED } from '$lib/constants/featureFlags';
 	import { WIN_ANIMATION_TIMING as WIN } from '$lib/constants/winAnimationTiming';
+	import type { PuzzleGrid } from '@flip/game';
 
 	interface SolveMeta {
 		packSlug?: string;
@@ -14,27 +18,32 @@
 	interface Props extends SolveMeta {
 		moveCount: number;
 		isSolved: boolean;
-		bestMoveCount?: number | null;
+		par?: number | null;
 		canUndo: boolean;
 		onUndo: () => void;
 		onReset: () => void;
 		onNextPuzzle?: () => void;
-		/** Optional: show a \"Hint\" button that calls this handler. */
 		onHint?: () => void;
-		/** Whether to show the inline how-to helper next to the move counter. */
 		showHowTo?: boolean;
-		/** Open the how-to modal automatically when the puzzle loads. */
 		autoOpenHowTo?: boolean;
-		/** Whether to show the RYB color-mixing Venn diagram next to the help button. */
 		showColorGuide?: boolean;
-		/** Whether to render the share + star rating block when solved. */
 		enableShareAndRating?: boolean;
+		prismLightGrid?: PuzzleGrid | null;
+		prismLightCellSize?: number;
+		prismLightMonochrome?: boolean;
+		/** Dev/stories: skip win animation and show the final card immediately */
+		instantWin?: boolean;
+	}
+
+	interface WinSize {
+		width: number;
+		height: number;
 	}
 
 	let {
 	  moveCount,
 	  isSolved,
-	  bestMoveCount = null,
+	  par = null,
 	  canUndo,
 	  onUndo,
 	  onReset,
@@ -46,28 +55,47 @@
 	  showHowTo = true,
 	  autoOpenHowTo = false,
 	  showColorGuide = false,
-	  enableShareAndRating = true
+	  enableShareAndRating = true,
+	  prismLightGrid = null,
+	  prismLightCellSize = 48,
+	  prismLightMonochrome = false,
+	  instantWin = false
 	}: Props = $props();
 
+	const showPrismLight = $derived(
+	  PRISM_RADIANCE_ENABLED &&
+	    prismLightGrid !== null &&
+	    prismLightGrid.length > 0 &&
+	    !prismLightMonochrome
+	);
+
+	type WinPhase = 'idle' | 'strip' | 'hold' | 'fill' | 'resize' | 'complete';
+
 	let copied = $state(false);
-	type WinPhase = 'idle' | 'collapse' | 'center' | 'reveal';
 	let winPhase = $state<WinPhase>('idle');
 	let winTimeouts: ReturnType<typeof setTimeout>[] = [];
 	let suppressWinTransitions = $state(false);
 	let lastPuzzleInstanceKey = '';
+	let playAreaEl = $state<HTMLDivElement | null>(null);
+	let gridArenaEl = $state<HTMLDivElement | null>(null);
+	let winCardEl = $state<HTMLDivElement | null>(null);
+	let winContentEl = $state<HTMLDivElement | null>(null);
+	let winAnchor = $state<WinSize | null>(null);
+	let winTarget = $state<WinSize | null>(null);
 
 	const puzzleInstanceKey = $derived(`${packSlug ?? ''}:${puzzleId ?? ''}`);
-	const winVisualActive = $derived(isSolved && winPhase !== 'idle');
-	/** Keep playing layout stable while cells collapse into the white box. */
-	const layoutRebalanced = $derived(
-	  isSolved && (winPhase === 'center' || winPhase === 'reveal')
-	);
-	const showPlayingHeader = $derived(!isSolved || winPhase === 'collapse');
-	const headerHidden = $derived(isSolved && winPhase === 'collapse');
-	const chromeFading = $derived(isSolved && winPhase === 'collapse');
-	const chromeHidden = $derived(layoutRebalanced);
-	const showVictoryOnBox = $derived(winVisualActive);
-	const victoryVisible = $derived(isSolved && winPhase === 'reveal');
+	const showPlayArea = $derived(winPhase === 'idle');
+	const showWinCard = $derived(winPhase !== 'idle');
+	const winInteractive = $derived(winPhase === 'resize' || winPhase === 'complete');
+	const headerHidden = $derived(isSolved);
+	const chromeFading = $derived(isSolved);
+	const showWinContent = $derived(winPhase === 'fill' || winPhase === 'resize' || winPhase === 'complete');
+	const contentVisible = $derived(winPhase === 'resize' || winPhase === 'complete');
+	const cardSized = $derived(winPhase === 'resize' || winPhase === 'complete');
+
+	const cardSide = $derived(cardSized && winTarget ? winTarget.width : null);
+	const cardWidth = $derived(cardSide ?? winAnchor?.width ?? null);
+	const cardHeight = $derived(cardSide ?? winAnchor?.height ?? null);
 
 	function clearWinTimeouts() {
 	  for (const id of winTimeouts) clearTimeout(id);
@@ -77,7 +105,134 @@
 	function resetWinAnimation() {
 	  clearWinTimeouts();
 	  winPhase = 'idle';
+	  winAnchor = null;
+	  winTarget = null;
 	  suppressWinTransitions = true;
+	}
+
+	function captureWinAnchor() {
+	  if (!playAreaEl) return;
+	  const playRect = playAreaEl.getBoundingClientRect();
+	  if (playRect.width <= 0 || playRect.height <= 0) return;
+	  winAnchor = {
+	    width: Math.ceil(playRect.width),
+	    height: Math.ceil(playRect.height)
+	  };
+	}
+
+	function ensureWinAnchor() {
+	  captureWinAnchor();
+	  if (winAnchor || !gridArenaEl) return;
+	  const arenaWidth = gridArenaEl.clientWidth;
+	  const size = Math.min(240, Math.max(120, arenaWidth - 32));
+	  winAnchor = { width: size, height: size };
+	}
+
+	function arenaMaxWidth(): number {
+	  if (!gridArenaEl) return 320;
+	  const style = getComputedStyle(gridArenaEl);
+	  const padX =
+	    parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+	  return Math.max(120, gridArenaEl.clientWidth - padX);
+	}
+
+	function toContentSquare(measuredWidth: number, measuredHeight: number): WinSize {
+	  const side = Math.min(
+	    arenaMaxWidth(),
+	    Math.max(measuredWidth, measuredHeight)
+	  );
+	  return { width: side, height: side };
+	}
+
+	async function measureWinTarget(): Promise<WinSize | null> {
+	  if (!winCardEl || !winContentEl || !gridArenaEl) return null;
+
+	  const card = winCardEl;
+	  const saved = {
+	    width: card.style.width,
+	    height: card.style.height,
+	    maxWidth: card.style.maxWidth,
+	    overflow: card.style.overflow,
+	    visibility: card.style.visibility
+	  };
+
+	  card.style.width = 'max-content';
+	  card.style.height = 'auto';
+	  card.style.maxWidth = `${arenaMaxWidth()}px`;
+	  card.style.overflow = 'visible';
+	  card.style.visibility = 'hidden';
+
+	  await tick();
+
+	  const width = Math.ceil(card.offsetWidth);
+	  const height = Math.ceil(card.offsetHeight);
+
+	  card.style.width = saved.width;
+	  card.style.height = saved.height;
+	  card.style.maxWidth = saved.maxWidth;
+	  card.style.overflow = saved.overflow;
+	  card.style.visibility = saved.visibility;
+
+	  if (width <= 0 || height <= 0) return null;
+
+	  return toContentSquare(width, height);
+	}
+
+	function fallbackWinTarget(): WinSize | null {
+	  if (!gridArenaEl) return null;
+	  const side = Math.min(260, arenaMaxWidth());
+	  return { width: side, height: side };
+	}
+
+	async function beginResizePhase() {
+	  winPhase = 'fill';
+	  await tick();
+	  await tick();
+
+	  winTarget = (await measureWinTarget()) ?? fallbackWinTarget();
+	  if (!winTarget) {
+	    winPhase = 'complete';
+	    return;
+	  }
+
+	  winPhase = 'resize';
+
+	  winTimeouts.push(
+	    setTimeout(() => {
+	      winPhase = 'complete';
+	    }, WIN.resizeMs)
+	  );
+	}
+
+	async function finishWinInstantly() {
+	  ensureWinAnchor();
+	  if (!winAnchor) return;
+
+	  winPhase = 'fill';
+	  await tick();
+	  await tick();
+
+	  winTarget = (await measureWinTarget()) ?? fallbackWinTarget();
+	  suppressWinTransitions = true;
+	  winPhase = 'complete';
+	}
+
+	function startWinSequence() {
+	  ensureWinAnchor();
+	  if (!winAnchor) return;
+	  winPhase = 'strip';
+
+	  winTimeouts.push(
+	    setTimeout(() => {
+	      winPhase = 'hold';
+
+	      winTimeouts.push(
+	        setTimeout(() => {
+	          void beginResizePhase();
+	        }, WIN.holdMs)
+	      );
+	    }, WIN.stripMs)
+	  );
 	}
 
 	function handleNextPuzzle() {
@@ -110,34 +265,27 @@
 	  if (!isSolved) {
 	    clearWinTimeouts();
 	    if (winPhase !== 'idle') {
-	      winPhase = 'idle';
-	      suppressWinTransitions = true;
+	      resetWinAnimation();
 	    }
 	    return;
 	  }
 
+	  // winPhase must not be a reactive dependency here — reading it subscribes
+	  // this effect to phase changes, and the cleanup below would cancel timeouts
+	  // as soon as the sequence leaves idle (leaving a permanent empty white box).
+	  if (untrack(() => winPhase !== 'idle')) return;
+
 	  const reducedMotion =
 	    typeof window !== 'undefined' &&
 	    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-	  if (reducedMotion) {
-	    winPhase = 'reveal';
-	    return;
-	  }
 
-	  clearWinTimeouts();
-	  winPhase = 'collapse';
-	  winTimeouts.push(
-	    setTimeout(() => {
-	      winPhase = 'center';
-	    }, WIN.centerPhaseMs)
-	  );
-	  winTimeouts.push(
-	    setTimeout(() => {
-	      winPhase = 'reveal';
-	    }, WIN.revealPhaseMs)
-	  );
-
-	  return () => clearWinTimeouts();
+	  requestAnimationFrame(() => {
+	    if (instantWin || reducedMotion) {
+	      void finishWinInstantly();
+	      return;
+	    }
+	    startWinSequence();
+	  });
 	});
 
 	async function share() {
@@ -166,102 +314,129 @@
 <div
 	class="puzzle-shell"
 	data-testid="puzzle-container"
-	class:puzzle-solved={layoutRebalanced}
+	class:win-active={showWinCard}
 	class:suppress-win-transitions={suppressWinTransitions}
-	style:--win-collapse-duration="{WIN.collapseDurationS}s"
-	style:--win-center-duration="{WIN.centerSettleDurationS}s"
-	style:--win-reveal-duration="{WIN.revealFadeDurationS}s"
+	style:--win-strip-duration="{WIN.stripDurationS}s"
+	style:--win-resize-duration="{WIN.resizeDurationS}s"
+	style:--win-content-fade-duration="{WIN.contentFadeDurationS}s"
+	style:--win-content-fade-delay="{WIN.contentFadeDelayS}s"
 	style:--win-template-hide-duration="{WIN.templateHideDurationS}s"
-	style:--win-line-fade-duration="{WIN.lineFadeDurationS}s"
-	style:--win-cell-duration="{WIN.cellDurationS}s"
-	style:--win-expand-duration="{WIN.expandDurationS}s"
 >
-	<div class="puzzle-grid-section" class:win-active={layoutRebalanced}>
-		<div class="win-stage" class:solved={layoutRebalanced}>
-			{#if showPlayingHeader}
-				<div class="puzzle-header" class:header-hidden={headerHidden} aria-hidden={headerHidden}>
-					<span class="move-counter" data-testid="move-counter">Moves: {moveCount}</span>
-					{#if showColorGuide || showHowTo}
-						<div class="header-actions">
-							{#if showColorGuide}
-								<ColorVennDiagram />
-							{/if}
-							{#if showHowTo}
-								<HowToPlay initialOpen={autoOpenHowTo} />
-							{/if}
-						</div>
-					{/if}
-				</div>
-			{/if}
-
-			<div
-				class="grid-arena"
-				class:win-collapse={winVisualActive}
-				class:win-center={winVisualActive && (winPhase === 'center' || winPhase === 'reveal')}
-			>
-				<div class="prism-arena-glow" aria-hidden="true"></div>
-				<PrismFrame winCollapse={winVisualActive}>
-					<div
-						class="grid-slot"
-						class:win-white-box={winVisualActive}
-						class:win-victory-reveal={victoryVisible}
-					>
-						<div class="white-box-shell" class:expanded={victoryVisible}>
-							<div class="white-box-grid" class:dimmed={victoryVisible}>
-								<slot name="grid" />
-							</div>
-
-							{#if showVictoryOnBox}
-								<div
-									class="victory-overlay"
-									class:visible={victoryVisible}
-									role="status"
-									aria-live="polite"
-									data-testid="victory-overlay"
-								>
-									<div class="victory">
-										<h2 class="victory-title">🎉 Puzzle Solved!</h2>
-
-										{#if enableShareAndRating}
-											<StarRating {moveCount} {bestMoveCount} />
-
-											{#if packSlug && puzzleId != null}
-												<button class="share-btn" onclick={share} aria-label="Share this puzzle">
-													{#if copied}
-														✓ Copied!
-													{:else}
-														↗ Share
-													{/if}
-												</button>
-											{/if}
-										{/if}
-
-										<div class="victory-actions">
-											{#if onNextPuzzle && packSlug && puzzleId != null}
-												<button class="btn-primary" onclick={handleNextPuzzle}>Next Puzzle →</button>
-											{/if}
-											<button class="btn-secondary" onclick={onReset}>Play Again</button>
-										</div>
-									</div>
-								</div>
-							{/if}
-						</div>
+	<div class="puzzle-grid-section" class:win-overflow={showWinCard}>
+		<div class="win-stage" class:win-overflow={showWinCard}>
+			<div class="puzzle-header" class:header-hidden={headerHidden} aria-hidden={headerHidden}>
+				<span class="move-counter" data-testid="move-counter">Moves: {moveCount}</span>
+				{#if showColorGuide || showHowTo}
+					<div class="header-actions">
+						{#if showColorGuide}
+							<ColorVennDiagram />
+						{/if}
+						{#if showHowTo}
+							<HowToPlay initialOpen={autoOpenHowTo} />
+						{/if}
 					</div>
-				</PrismFrame>
+				{/if}
+			</div>
+
+			<div bind:this={gridArenaEl} class="grid-arena" class:win-mode={showWinCard}>
+				{#if showPlayArea}
+					<div
+						class="prism-arena-glow"
+						class:has-prism-light={showPrismLight}
+						aria-hidden="true"
+					>
+						{#if showPrismLight && prismLightGrid}
+							<div class="prism-light-anchor">
+								<PrismLightMap
+									grid={prismLightGrid}
+									cellSize={prismLightCellSize}
+									monochromeFlip={prismLightMonochrome}
+								/>
+							</div>
+						{/if}
+					</div>
+					<PrismFrame winCollapse={false}>
+						<div bind:this={playAreaEl} class="play-area">
+							<slot name="grid" />
+						</div>
+					</PrismFrame>
+				{:else if winAnchor}
+					<div
+						bind:this={winCardEl}
+						class="win-card"
+						class:resizing={winPhase === 'resize'}
+						class:complete={winInteractive}
+						class:square={cardSide !== null}
+						class:padded={showWinContent}
+						style:width={cardWidth ? `${cardWidth}px` : null}
+						style:height={cardHeight ? `${cardHeight}px` : null}
+						role="status"
+						aria-live="polite"
+						data-testid="victory-overlay"
+					>
+						{#if showWinContent}
+							<div
+								bind:this={winContentEl}
+								class="win-content"
+								class:visible={contentVisible}
+							>
+								<h2 class="win-title">Prism cleared!</h2>
+
+								{#if enableShareAndRating}
+									<div class="win-rating">
+										<StarRating {moveCount} {par} />
+									</div>
+								{/if}
+
+								<div class="win-actions">
+									<div class="win-actions-row">
+										{#if onNextPuzzle && packSlug && puzzleId != null}
+											<button
+												class="btn-primary"
+												onclick={handleNextPuzzle}
+												disabled={!winInteractive}
+											>
+												Next Puzzle →
+											</button>
+										{/if}
+										<button
+											class="btn-secondary"
+											onclick={onReset}
+											disabled={!winInteractive}
+										>
+											Play Again
+										</button>
+									</div>
+
+									{#if enableShareAndRating && packSlug && puzzleId != null}
+										<button
+											class="share-btn"
+											onclick={share}
+											disabled={!winInteractive}
+											aria-label="Share this puzzle"
+										>
+											{#if copied}
+												✓ Copied!
+											{:else}
+												↗ Share
+											{/if}
+										</button>
+									{/if}
+								</div>
+							</div>
+						{/if}
+					</div>
+				{/if}
 			</div>
 		</div>
 	</div>
 
-	<div
-		class="templates-section"
-		class:win-fade={chromeFading}
-		class:win-hide={chromeHidden}
-	>
+	<div class="templates-section" class:win-fade={chromeFading}>
 		<slot name="templates" />
 		<slot name="legend" />
 	</div>
 
-	<div class="puzzle-action-bar" class:win-fade={chromeFading} class:win-hide={chromeHidden}>
+	<div class="puzzle-action-bar" class:win-fade={chromeFading}>
 		<button
 			class="undo-btn"
 			disabled={!canUndo || isSolved}
@@ -302,36 +477,26 @@
 		flex-direction: column;
 		align-items: stretch;
 		justify-content: flex-start;
-		gap: 0.375rem;
+		gap: 0.5rem;
 		width: 100%;
 		height: 100%;
 		min-height: 0;
-		overflow: hidden;
+		overflow-x: visible;
+		overflow-y: hidden;
 	}
 
+	.puzzle-shell.suppress-win-transitions .win-card,
+	.puzzle-shell.suppress-win-transitions .win-content,
 	.puzzle-shell.suppress-win-transitions .templates-section,
 	.puzzle-shell.suppress-win-transitions .puzzle-action-bar,
-	.puzzle-shell.suppress-win-transitions .white-box-shell,
-	.puzzle-shell.suppress-win-transitions .white-box-grid,
-	.puzzle-shell.suppress-win-transitions .grid-arena,
-	.puzzle-shell.suppress-win-transitions .grid-slot,
-	.puzzle-shell.suppress-win-transitions .victory-overlay,
 	.puzzle-shell.suppress-win-transitions .prism-arena-glow,
-	.puzzle-shell.suppress-win-transitions :global(.prism-frame),
-	.puzzle-shell.suppress-win-transitions :global(.prism-connectors),
-	.puzzle-shell.suppress-win-transitions :global(.prism-connector-line),
-	.puzzle-shell.suppress-win-transitions :global(.outer-corner),
-	.puzzle-shell.suppress-win-transitions :global(.prism-square),
-	.puzzle-shell.suppress-win-transitions :global(.inner-corner),
-	.puzzle-shell.suppress-win-transitions :global(.puzzle-grid),
-	.puzzle-shell.suppress-win-transitions :global(.puzzle-cell),
-	.puzzle-shell.suppress-win-transitions :global(.grid-row) {
+	.puzzle-shell.suppress-win-transitions :global(.prism-frame) {
 		transition: none !important;
 		animation: none !important;
 	}
 
-	.puzzle-shell.puzzle-solved {
-		justify-content: center;
+	.puzzle-shell.win-active {
+		overflow-y: auto;
 	}
 
 	.puzzle-grid-section {
@@ -344,13 +509,12 @@
 		position: relative;
 		z-index: 1;
 		width: 100%;
-		overflow: visible;
+		overflow: hidden;
 	}
 
-	.puzzle-grid-section.win-active {
-		flex: 1 1 auto;
-		justify-content: center;
-		min-height: min(420px, 55vh);
+	.puzzle-grid-section.win-overflow,
+	.win-stage.win-overflow {
+		overflow: visible;
 	}
 
 	.win-stage {
@@ -362,11 +526,7 @@
 		flex: 1 1 0;
 		min-height: 0;
 		gap: 0.375rem;
-	}
-
-	.win-stage.solved {
-		justify-content: center;
-		min-height: min(380px, 50vh);
+		overflow: hidden;
 	}
 
 	.puzzle-header {
@@ -375,10 +535,13 @@
 		gap: 0.75rem;
 		width: 100%;
 		flex-shrink: 0;
+		position: relative;
+		z-index: 2;
 	}
 
 	.puzzle-header.header-hidden {
 		visibility: hidden;
+		opacity: 0;
 		pointer-events: none;
 	}
 
@@ -407,295 +570,218 @@
 		padding: 0.5rem;
 		border-radius: 14px;
 		background: transparent;
-		transition: transform var(--win-center-duration, 1.4s) cubic-bezier(0.34, 1.2, 0.64, 1);
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	.grid-arena.win-mode {
 		overflow: visible;
+	}
+
+	.grid-arena > :global(.prism-frame) {
+		position: relative;
+		z-index: 1;
+	}
+
+	.play-area {
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 
 	.prism-arena-glow {
 		position: absolute;
-		inset: 12% 8%;
+		inset: 4% 2%;
 		border-radius: 50%;
+		pointer-events: none;
+		z-index: 0;
 		background: radial-gradient(
 			ellipse at 50% 45%,
 			rgba(129, 140, 248, 0.08) 0%,
 			rgba(99, 102, 241, 0.04) 42%,
 			transparent 72%
 		);
-		pointer-events: none;
-		z-index: 0;
-		transition: opacity var(--win-collapse-duration, 1.6s) ease;
 	}
 
-	.grid-arena.win-collapse {
-		box-shadow: none;
-	}
-
-	.grid-arena.win-collapse .prism-arena-glow {
-		opacity: 0.5;
-	}
-
-	.grid-arena.win-collapse :global(.prism-frame) {
-		border-color: transparent;
-		background: transparent;
-		box-shadow: none;
-	}
-
-	.grid-arena.win-center {
-		animation: win-box-settle var(--win-center-duration, 1.4s) cubic-bezier(0.34, 1.25, 0.64, 1) forwards;
-	}
-
-	@keyframes win-box-settle {
-		0% {
-			transform: scale(1);
-		}
-		45% {
-			transform: scale(1.035);
-		}
-		100% {
-			transform: scale(1);
-		}
-	}
-
-	.grid-slot {
-		position: relative;
+	.prism-arena-glow.has-prism-light {
+		inset: 0;
 		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: inherit;
+		background: radial-gradient(
+			ellipse 88% 82% at 50% 50%,
+			rgba(248, 250, 252, 0.92) 0%,
+			rgba(241, 245, 249, 0.55) 55%,
+			rgba(226, 232, 240, 0.2) 100%
+		);
+		opacity: 1;
+		overflow: hidden;
+	}
+
+	.grid-arena:has(.prism-arena-glow.has-prism-light) :global(.prism-frame) {
+		background: rgba(255, 255, 255, 0.06);
+	}
+
+	.prism-light-anchor {
+		position: relative;
+		flex-shrink: 0;
+		pointer-events: none;
+	}
+
+	.win-card {
+		position: relative;
+		flex: 0 0 auto;
+		box-sizing: border-box;
+		background: #ffffff;
+		border-radius: 14px;
+		border: 1px solid rgba(99, 102, 241, 0.14);
+		box-shadow:
+			0 12px 40px rgba(99, 102, 241, 0.14),
+			0 4px 12px rgba(15, 23, 42, 0.06);
+		overflow: hidden;
+		padding: 0;
+		max-width: 100%;
+	}
+
+	.win-card.square {
+		aspect-ratio: 1;
+	}
+
+	.win-card.padded {
+		display: flex;
+		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		z-index: 1;
+		padding: 1.25rem 1rem;
 	}
 
-	.white-box-shell {
-		position: relative;
-		display: inline-flex;
+	.win-card.resizing {
+		transition:
+			width var(--win-resize-duration, 2s) cubic-bezier(0.22, 1, 0.36, 1),
+			height var(--win-resize-duration, 2s) cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.win-content {
+		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;
-		border-radius: 10px;
-		box-sizing: border-box;
-		transition:
-			padding var(--win-expand-duration, 0.55s) cubic-bezier(0.22, 1, 0.36, 1),
-			box-shadow var(--win-collapse-duration, 1.6s) ease;
-	}
-
-	.grid-slot.win-white-box .white-box-shell {
-		background: #ffffff;
-		box-shadow:
-			0 0 48px rgba(99, 102, 241, 0.35),
-			0 0 96px rgba(236, 72, 153, 0.16),
-			0 4px 24px rgba(0, 0, 0, 0.08),
-			0 0 0 1px rgba(0, 0, 0, 0.04);
-	}
-
-	.white-box-shell.expanded {
-		padding: 1.35rem 1.25rem;
-		width: fit-content;
-		max-width: min(24rem, 92vw);
-	}
-
-	.white-box-grid {
-		display: flex;
-		justify-content: center;
-		flex-shrink: 0;
-		transition:
-			opacity var(--win-reveal-duration, 1.2s) ease,
-			max-height var(--win-expand-duration, 0.55s) ease,
-			margin var(--win-expand-duration, 0.55s) ease;
-		max-height: 500px;
-	}
-
-	.white-box-grid.dimmed {
-		opacity: 0;
-		max-height: 0;
-		margin: 0;
-		overflow: hidden;
-		pointer-events: none;
-	}
-
-	.grid-slot.win-white-box {
-		pointer-events: none;
-	}
-
-	.grid-slot.win-victory-reveal {
-		pointer-events: auto;
-	}
-
-	.grid-slot.win-white-box .white-box-grid :global(.puzzle-grid) {
-		background: transparent;
-		border-radius: 4px;
-		backdrop-filter: none;
-		-webkit-backdrop-filter: none;
-		box-shadow: none;
-		transition:
-			background var(--win-collapse-duration, 1.6s) ease,
-			gap var(--win-collapse-duration, 1.6s) cubic-bezier(0.4, 0, 0.2, 1),
-			padding var(--win-collapse-duration, 1.6s) cubic-bezier(0.4, 0, 0.2, 1),
-			border-radius var(--win-collapse-duration, 1.6s) ease,
-			box-shadow var(--win-collapse-duration, 1.6s) ease;
-	}
-
-	.grid-slot.win-white-box :global(.puzzle-grid) {
-		background: transparent;
-		border-radius: 4px;
-		backdrop-filter: none;
-		-webkit-backdrop-filter: none;
-		box-shadow: none;
-		transition:
-			background var(--win-collapse-duration, 1.6s) ease,
-			gap var(--win-collapse-duration, 1.6s) cubic-bezier(0.4, 0, 0.2, 1),
-			padding var(--win-collapse-duration, 1.6s) cubic-bezier(0.4, 0, 0.2, 1),
-			border-radius var(--win-collapse-duration, 1.6s) ease,
-			box-shadow var(--win-collapse-duration, 1.6s) ease;
-	}
-
-	.grid-slot.win-white-box :global(.puzzle-grid::after) {
-		opacity: 0;
-		transition: opacity var(--win-collapse-duration, 1.6s) ease;
-	}
-
-	.grid-slot.win-white-box :global(.inner-corner) {
-		opacity: 0;
-		transition: opacity var(--win-collapse-duration, 1.6s) ease;
-	}
-
-	.grid-arena.win-collapse :global(.puzzle-grid) {
-		gap: 0;
-		padding: 0;
-	}
-
-	.grid-slot.win-white-box :global(.grid-row) {
-		transition: gap var(--win-collapse-duration, 1.6s) cubic-bezier(0.4, 0, 0.2, 1);
-	}
-
-	.grid-arena.win-collapse :global(.grid-row) {
-		gap: 0;
-	}
-
-	.grid-slot.win-white-box :global(.puzzle-cell) {
-		background-color: #ffffff !important;
-		border-radius: 0;
-		box-shadow: none;
-		outline: none;
-		cursor: default;
-		transition:
-			background-color var(--win-collapse-duration, 1.6s) ease,
-			border-radius var(--win-collapse-duration, 1.6s) ease,
-			opacity var(--win-collapse-duration, 1.6s) ease;
-	}
-
-	.grid-slot.win-white-box :global(.puzzle-cell .cell-lines),
-	.grid-slot.win-white-box :global(.puzzle-cell .line) {
-		opacity: 0;
-		transition: opacity var(--win-line-fade-duration, 0.6s) ease;
-	}
-
-	.victory-overlay {
-		display: grid;
-		grid-template-rows: 0fr;
-		width: 100%;
-		opacity: 0;
-		visibility: hidden;
-		transition:
-			grid-template-rows var(--win-expand-duration, 0.55s) cubic-bezier(0.22, 1, 0.36, 1),
-			opacity var(--win-reveal-duration, 1.2s) ease,
-			visibility 0s linear var(--win-reveal-duration, 1.2s);
-		pointer-events: none;
-		z-index: 3;
-	}
-
-	.victory-overlay.visible {
-		grid-template-rows: 1fr;
-		opacity: 1;
-		visibility: visible;
-		transition:
-			grid-template-rows var(--win-expand-duration, 0.55s) cubic-bezier(0.22, 1, 0.36, 1),
-			opacity var(--win-reveal-duration, 1.2s) ease,
-			visibility 0s linear 0s;
-		pointer-events: auto;
-	}
-
-	.victory {
+		gap: 0.75rem;
 		text-align: center;
-		padding: 0;
-		background: transparent;
-		border: none;
-		border-radius: 0;
-		width: 100%;
-		min-width: min(16rem, 80vw);
-		min-height: 0;
-		overflow: hidden;
-		box-shadow: none;
 	}
 
-	.victory-overlay.visible .victory {
-		overflow: visible;
+	.win-content:not(.visible) {
+		opacity: 0;
 	}
 
-	.victory-title {
-		margin: 0 0 0.5rem;
-		font-size: 1.15rem;
+	.win-content.visible {
+		opacity: 1;
+		transition: opacity var(--win-content-fade-duration, 0.6s) ease;
+	}
+
+	.win-title {
+		margin: 0;
+		font-size: 1.2rem;
 		font-weight: 700;
-		color: #15803d;
+		letter-spacing: -0.02em;
+		color: #4338ca;
+	}
+
+	.win-rating {
+		width: 100%;
+	}
+
+	.win-rating :global(.badge-icon) {
+		font-size: 1.75rem;
+	}
+
+	.win-rating :global(.badge-info) {
+		margin-top: 0.125rem;
 	}
 
 	.share-btn {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.25rem;
-		margin-top: 0.5rem;
-		padding: 0.4rem 1rem;
-		border: 1px solid #6366f1;
-		border-radius: 8px;
-		background: white;
+		gap: 0.2rem;
+		margin: 0;
+		padding: 0.2rem 0.35rem;
+		border: none;
+		border-radius: 6px;
+		background: transparent;
 		color: #6366f1;
-		font-size: 0.875rem;
+		font-size: 0.8125rem;
 		font-weight: 600;
 		cursor: pointer;
-		transition: background 0.15s, color 0.15s;
-		min-width: 7rem;
+		transition: color 0.15s, background 0.15s;
+		min-width: auto;
 		justify-content: center;
 	}
 
-	.share-btn:hover {
-		background: #6366f1;
-		color: white;
+	.share-btn:hover:not(:disabled) {
+		background: #eef2ff;
+		color: #4f46e5;
 	}
 
-	.victory-actions {
+	.share-btn:disabled {
+		cursor: default;
+		opacity: 0.55;
+	}
+
+	.win-actions {
 		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.375rem;
+		width: 100%;
+		margin: 0;
+	}
+
+	.win-actions-row {
+		display: inline-grid;
+		grid-auto-flow: column;
 		gap: 0.5rem;
-		justify-content: center;
-		margin-top: 0.625rem;
-		flex-wrap: wrap;
+		align-items: stretch;
 	}
 
 	.btn-primary {
-		padding: 0.5rem 1.25rem;
-		background: #111827;
+		padding: 0.5rem 0.875rem;
+		background: #4f46e5;
 		color: white;
 		border: none;
 		border-radius: 8px;
+		font-size: 0.8125rem;
 		font-weight: 600;
+		white-space: nowrap;
 		cursor: pointer;
 		transition: background 0.15s;
 	}
 
-	.btn-primary:hover {
-		background: #374151;
+	.btn-primary:hover:not(:disabled) {
+		background: #4338ca;
+	}
+
+	.btn-primary:disabled,
+	.btn-secondary:disabled {
+		opacity: 0.55;
+		cursor: default;
 	}
 
 	.btn-secondary {
-		padding: 0.5rem 1.25rem;
+		padding: 0.5rem 0.875rem;
 		background: white;
 		color: #374151;
 		border: 1px solid #d1d5db;
 		border-radius: 8px;
+		font-size: 0.8125rem;
 		font-weight: 600;
+		white-space: nowrap;
 		cursor: pointer;
-		transition: background 0.15s;
+		transition: background 0.15s, border-color 0.15s;
 	}
 
-	.btn-secondary:hover {
+	.btn-secondary:hover:not(:disabled) {
 		background: #f9fafb;
+		border-color: #9ca3af;
 	}
 
 	.templates-section {
@@ -708,26 +794,15 @@
 		min-height: 0;
 		max-width: 100%;
 		width: 100%;
-		overflow: hidden;
-		transition:
-			opacity var(--win-template-hide-duration, 0.9s) ease,
-			transform var(--win-template-hide-duration, 0.9s) ease,
-			max-height calc(var(--win-template-hide-duration, 0.9s) + 0.2s) ease,
-			margin var(--win-template-hide-duration, 0.9s) ease;
+		padding-bottom: 0.125rem;
+		overflow-x: visible;
+		overflow-y: visible;
+		transition: opacity var(--win-template-hide-duration, 0.9s) ease;
 	}
 
 	.templates-section.win-fade {
 		opacity: 0;
 		pointer-events: none;
-	}
-
-	.templates-section.win-hide {
-		opacity: 0;
-		transform: translateY(10px);
-		max-height: 0;
-		margin: 0;
-		pointer-events: none;
-		flex: 0 0 auto;
 	}
 
 	.puzzle-action-bar {
@@ -740,10 +815,7 @@
 		padding: 0.5rem 0;
 		padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
 		margin-top: auto;
-		transition:
-			opacity 0.32s ease,
-			transform 0.32s ease,
-			max-height 0.4s ease;
+		transition: opacity 0.32s ease;
 	}
 
 	.puzzle-action-bar.win-fade {
@@ -751,46 +823,16 @@
 		pointer-events: none;
 	}
 
-	.puzzle-action-bar.win-hide {
-		opacity: 0;
-		transform: translateY(10px);
-		max-height: 0;
-		padding: 0;
-		margin: 0;
-		pointer-events: none;
-		overflow: hidden;
-	}
-
 	@media (prefers-reduced-motion: reduce) {
-		.grid-arena,
-		.grid-slot,
-		.white-box-shell,
-		.white-box-grid,
-		.prism-arena-glow,
-		:global(.prism-frame),
-		:global(.prism-connector-line),
-		:global(.outer-corner),
-		.grid-slot.win-white-box :global(.puzzle-grid),
-		.grid-slot.win-white-box :global(.puzzle-grid::after),
-		.grid-slot.win-white-box :global(.puzzle-cell),
-		.grid-slot.win-white-box :global(.grid-row),
-		:global(.prism-square),
-		:global(.inner-corner),
-		.victory-overlay,
+		.win-card,
+		.win-content,
 		.templates-section,
 		.puzzle-action-bar {
 			transition: none !important;
-			animation: none !important;
 		}
 
-		.grid-arena.win-center {
-			transform: none;
-		}
-
-		.victory-overlay.visible {
+		.win-content.visible {
 			opacity: 1;
-			grid-template-rows: 1fr;
-			visibility: visible;
 		}
 	}
 
@@ -864,4 +906,3 @@
 		border-color: #fca5a5;
 	}
 </style>
-

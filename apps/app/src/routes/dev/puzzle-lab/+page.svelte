@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Puzzle from '$lib/components/game/Puzzle.svelte';
+	import DifficultyDebugPanel from '$lib/components/game/DifficultyDebugPanel.svelte';
 	import PuzzlePlayLayout from '$lib/components/game/PuzzlePlayLayout.svelte';
 	import GridEditor from '$lib/components/puzzle-lab/GridEditor.svelte';
 	import TemplateEditor from '$lib/components/puzzle-lab/TemplateEditor.svelte';
@@ -191,6 +192,7 @@
 			</div>
 		{/snippet}
 		{#key configKey}
+			<DifficultyDebugPanel config={config} />
 			<Puzzle puzzleConfig={config} packName="Puzzle Lab" puzzleId={1} />
 		{/key}
 	</PuzzlePlayLayout>
@@ -219,17 +221,6 @@
 							Clear grid (white)
 						</button>
 					</div>
-
-					<label class="lab-checkbox">
-						<input
-							type="checkbox"
-							checked={lab.allowTemplateRotation}
-							onchange={(e) => {
-							  lab = { ...lab, allowTemplateRotation: e.currentTarget.checked };
-							}}
-						/>
-						Allow template rotation
-					</label>
 
 					<label class="lab-field">
 						<span>Par (minMovesToSolve)</span>
@@ -508,14 +499,6 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.5rem;
-	}
-
-	.lab-checkbox {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		font-size: 0.8125rem;
-		color: #374151;
 	}
 
 	.lab-btn {

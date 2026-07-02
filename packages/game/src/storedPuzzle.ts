@@ -5,7 +5,6 @@ interface StoredPuzzlePayloadV2 {
 	v: 2;
 	templates: PuzzleConfig['templates'];
 	solvedValue: PuzzleConfig['solvedValue'];
-	allowTemplateRotation?: boolean;
 	minMovesToSolve?: number;
 }
 
@@ -19,7 +18,6 @@ export function serializePuzzleForStorage(config: PuzzleConfig): {
 			v: 2,
 			templates: config.templates,
 			solvedValue: config.solvedValue,
-			allowTemplateRotation: config.allowTemplateRotation ?? true,
 			...(config.minMovesToSolve !== undefined
 				? { minMovesToSolve: config.minMovesToSolve }
 				: {})
@@ -42,7 +40,6 @@ export function parseStoredPuzzle(startStateJson: string, templatesJson: string)
 			startState,
 			templates: payload.templates,
 			solvedValue: payload.solvedValue,
-			allowTemplateRotation: payload.allowTemplateRotation,
 			minMovesToSolve: payload.minMovesToSolve
 		});
 	} else {
@@ -52,5 +49,5 @@ export function parseStoredPuzzle(startStateJson: string, templatesJson: string)
 		});
 	}
 
-	return { ...config, allowTemplateRotation: true };
+	return config;
 }

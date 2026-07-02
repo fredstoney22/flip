@@ -3,15 +3,14 @@
  * Framework-agnostic — safe to import from any app or package.
  *
  * Every puzzle uses masked XOR: applying a template XORs pigment into cells
- * where the template grid is non-zero (0 = inactive). Monochrome flip puzzles
- * use pigment 1 with solvedValue 1; multi-pigment puzzles use solvedValue 0
- * (clear/white).
+ * where the template grid is non-zero (0 = inactive). Puzzles are solved when
+ * every cell equals the clear pigment (0 / white).
  */
 
 /**
  * Cell value — 3-bit RYB pigment bitmask:
  *   0 = clear   1 = Red   2 = Yellow   3 = Orange (R+Y)
- *   4 = Blue    5 = Purple   6 = Green   7 = Brown (R+Y+B)
+ *   4 = Blue    5 = Purple   6 = Green   7 = Prism (R+Y+B)
  */
 export type Pigment = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
@@ -31,9 +30,7 @@ export interface PuzzleConfig {
 	templates: PuzzleTemplate[];
 	/** Cell value when the puzzle is solved. */
 	solvedValue: Pigment;
-	/** When true, players may rotate templates at no move cost (and solvers enumerate rotations). */
-	allowTemplateRotation?: boolean;
-	/** Optional par for 3-star rating; need not match the solver minimum. */
+	/** Optional par for optimal-solve badge; need not match the solver minimum. */
 	minMovesToSolve?: number;
 }
 
@@ -52,45 +49,25 @@ export interface PackDefinition {
 }
 
 const PRIMARY_HEX = {
-	red: '#ef4444',
-	yellow: '#facc15',
-	blue: '#3b82f6'
+	/** Saturated scarlet — cool red hue, distinct from orange. */
+	red: '#DC2626',
+	/** Golden yellow — clearly chromatic, not cream or white. */
+	yellow: '#FACC15',
+	blue: '#3b82f6',
+	/** Mid orange — between original #FF8C42 and #E68845. */
+	orange: '#F38A44'
 } as const;
-
-function hexToRgb(hex: string): [number, number, number] {
-	const value = parseInt(hex.slice(1), 16);
-	return [(value >> 16) & 255, (value >> 8) & 255, value & 255];
-}
-
-function rgbToHex([r, g, b]: [number, number, number]): string {
-	return (
-		'#' +
-		[r, g, b]
-			.map((channel) => Math.round(channel).toString(16).padStart(2, '0'))
-			.join('')
-	);
-}
-
-/** Average RGB of primary hex colours — visual RYB mix for combined pigments. */
-function mixPrimaryHex(...hexes: string[]): string {
-	const channels = hexes.map(hexToRgb);
-	const summed = channels.reduce<[number, number, number]>(
-		(acc, [r, g, b]) => [acc[0] + r, acc[1] + g, acc[2] + b],
-		[0, 0, 0]
-	);
-	return rgbToHex([summed[0] / channels.length, summed[1] / channels.length, summed[2] / channels.length]);
-}
 
 /** Display hex colours for each pigment value. */
 export const PIGMENT_HEX: Record<Pigment, string> = {
 	0: '#f9fafb',
 	1: PRIMARY_HEX.red,
 	2: PRIMARY_HEX.yellow,
-	3: '#f97316',
+	3: PRIMARY_HEX.orange,
 	4: PRIMARY_HEX.blue,
 	5: '#a855f7',
 	6: '#22c55e',
-	7: mixPrimaryHex(PRIMARY_HEX.red, PRIMARY_HEX.yellow, PRIMARY_HEX.blue)
+	7: '#7c3aed'
 };
 
 /** Human-readable pigment names for the UI. */
@@ -102,10 +79,10 @@ export const PIGMENT_NAME: Record<Pigment, string> = {
 	4: 'Blue',
 	5: 'Purple',
 	6: 'Green',
-	7: 'Brown'
+	7: 'Prism'
 };
 
-/** Monochrome flip puzzles: cells are only 0/1 and solved when all are 1. */
+/** @deprecated Legacy mono target; all puzzles now clear to white (0). */
 export const MONO_FLIP_SOLVED_VALUE: Pigment = 1;
 
 /** Multi-pigment puzzles clear to white. */

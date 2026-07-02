@@ -124,9 +124,15 @@ test.describe('Unauthenticated access — redirects', () => {
     await expect(page).toHaveURL(/\/play\/game/);
   });
 
-  test('GET /pricing redirects unauthenticated users to /auth/login', async ({ page }) => {
+  test('GET /pricing redirects to /store', async ({ page }) => {
     await page.goto('/pricing');
-    await expect(page).toHaveURL(/\/auth\/login/);
+    await expect(page).toHaveURL(/\/store/);
+  });
+
+  test('GET /store is accessible without authentication', async ({ page }) => {
+    const response = await page.goto('/store');
+    expect(response?.status()).toBeLessThan(500);
+    await expect(page).toHaveURL(/\/store/);
   });
 
   test('GET /dashboard redirects unauthenticated users to /auth/login', async ({ page }) => {
@@ -135,7 +141,7 @@ test.describe('Unauthenticated access — redirects', () => {
   });
 
   test('/auth/login?returnTo is preserved through the redirect', async ({ page }) => {
-    await page.goto('/pricing');
+    await page.goto('/dashboard');
     await expect(page).toHaveURL(/returnTo=/);
   });
 });
@@ -199,17 +205,17 @@ test.describe('Pack puzzle list — access guards (requires CI_E2E + auth)', () 
     await stubAuthClient(page);
 
     await page.goto('/play/puzzles?pack=intro-pack');
-    // Should NOT redirect to pricing for a free pack
-    await expect(page).not.toHaveURL(/\/pricing/);
+    // Should NOT redirect away from puzzles for a free pack
+    await expect(page).toHaveURL(/\/play\/puzzles/);
     await expect(page.getByText('Puzzle 1')).toBeVisible();
   });
 
-  test('redirects to /pricing when user has no access to hard-in-3', async ({ page }) => {
+  test('redirects to /store when user has no access to hard-in-3', async ({ page }) => {
     await stubHonoProgress(page, []); // no packAccess
     await stubAuthClient(page);
 
     await page.goto('/play/puzzles?pack=hard-in-3');
-    await expect(page).toHaveURL(/\/pricing/);
+    await expect(page).toHaveURL(/\/store$/);
   });
 });
 
@@ -238,12 +244,12 @@ test.describe('Game page — puzzle renders (requires CI_E2E + auth)', () => {
     await expect(undoButton).toBeDisabled();
   });
 
-  test('redirects to /pricing when user has no access to hard-in-3', async ({ page }) => {
+  test('redirects to /store when user has no access to hard-in-3', async ({ page }) => {
     await stubHonoProgress(page, []); // no packAccess
     await stubAuthClient(page);
 
     await page.goto('/play/game?pack=hard-in-3&id=1');
-    await expect(page).toHaveURL(/\/pricing/);
+    await expect(page).toHaveURL(/\/store$/);
   });
 });
 

@@ -26,11 +26,8 @@ function legacyGridToTemplate(grid: number[][]): PuzzleTemplate {
 	});
 }
 
-function inferSolvedValue(startState: PuzzleGrid, templates: PuzzleTemplate[]): Pigment {
-	const usesMultiPigment =
-		templates.some((t) => distinctPigmentsInTemplate(t).some((p) => p !== 0 && p !== 1)) ||
-		startState.some((row) => row.some((cell) => cell > 1));
-	return usesMultiPigment ? PIGMENT_CLEAR_SOLVED_VALUE : MONO_FLIP_SOLVED_VALUE;
+function inferSolvedValue(_startState: PuzzleGrid, _templates: PuzzleTemplate[]): Pigment {
+	return PIGMENT_CLEAR_SOLVED_VALUE;
 }
 
 function usesOnlyMonochromeCells(config: PuzzleConfig): boolean {
@@ -88,9 +85,6 @@ export function normalizePuzzleConfig(raw: unknown): PuzzleConfig {
 			? input.solvedValue
 			: inferSolvedValue(grid, templates);
 
-	const allowTemplateRotation =
-		typeof input.allowTemplateRotation === 'boolean' ? input.allowTemplateRotation : true;
-
 	const minMovesToSolve =
 		typeof input.minMovesToSolve === 'number' ? input.minMovesToSolve : undefined;
 
@@ -98,7 +92,6 @@ export function normalizePuzzleConfig(raw: unknown): PuzzleConfig {
 		startState: grid,
 		templates,
 		solvedValue,
-		allowTemplateRotation,
 		...(minMovesToSolve !== undefined ? { minMovesToSolve } : {})
 	};
 }

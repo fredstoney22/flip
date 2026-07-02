@@ -6,6 +6,189 @@
 		y1: number;
 		x2: number;
 		y2: number;
+		kind: 'connector' | 'tick-outer' | 'tick-inner';
+	}
+
+	interface PrismChrome {
+		width: number;
+		height: number;
+		lines: LineSegment[];
+	}
+
+	const OUTER_TICK = 14;
+	const INNER_TICK = 10;
+	const INNER_SELECTOR = '[data-prism-inner]';
+
+	function buildChrome(frameRect: DOMRect, innerRect: DOMRect): PrismChrome {
+	  const rel = (x: number, y: number) => ({
+	    x: x - frameRect.left,
+	    y: y - frameRect.top
+	  });
+
+	  const outer = {
+	    tl: rel(frameRect.left, frameRect.top),
+	    tr: rel(frameRect.right, frameRect.top),
+	    bl: rel(frameRect.left, frameRect.bottom),
+	    br: rel(frameRect.right, frameRect.bottom)
+	  };
+
+	  const inner = {
+	    tl: rel(innerRect.left, innerRect.top),
+	    tr: rel(innerRect.right, innerRect.top),
+	    bl: rel(innerRect.left, innerRect.bottom),
+	    br: rel(innerRect.right, innerRect.bottom)
+	  };
+
+	  const lines: LineSegment[] = [
+	    {
+	      x1: outer.tl.x,
+	      y1: outer.tl.y,
+	      x2: inner.tl.x,
+	      y2: inner.tl.y,
+	      kind: 'connector'
+	    },
+	    {
+	      x1: outer.tr.x,
+	      y1: outer.tr.y,
+	      x2: inner.tr.x,
+	      y2: inner.tr.y,
+	      kind: 'connector'
+	    },
+	    {
+	      x1: outer.bl.x,
+	      y1: outer.bl.y,
+	      x2: inner.bl.x,
+	      y2: inner.bl.y,
+	      kind: 'connector'
+	    },
+	    {
+	      x1: outer.br.x,
+	      y1: outer.br.y,
+	      x2: inner.br.x,
+	      y2: inner.br.y,
+	      kind: 'connector'
+	    },
+	    // Outer corner ticks — axis-aligned L brackets
+	    {
+	      x1: outer.tl.x,
+	      y1: outer.tl.y,
+	      x2: outer.tl.x + OUTER_TICK,
+	      y2: outer.tl.y,
+	      kind: 'tick-outer'
+	    },
+	    {
+	      x1: outer.tl.x,
+	      y1: outer.tl.y,
+	      x2: outer.tl.x,
+	      y2: outer.tl.y + OUTER_TICK,
+	      kind: 'tick-outer'
+	    },
+	    {
+	      x1: outer.tr.x - OUTER_TICK,
+	      y1: outer.tr.y,
+	      x2: outer.tr.x,
+	      y2: outer.tr.y,
+	      kind: 'tick-outer'
+	    },
+	    {
+	      x1: outer.tr.x,
+	      y1: outer.tr.y,
+	      x2: outer.tr.x,
+	      y2: outer.tr.y + OUTER_TICK,
+	      kind: 'tick-outer'
+	    },
+	    {
+	      x1: outer.bl.x,
+	      y1: outer.bl.y,
+	      x2: outer.bl.x + OUTER_TICK,
+	      y2: outer.bl.y,
+	      kind: 'tick-outer'
+	    },
+	    {
+	      x1: outer.bl.x,
+	      y1: outer.bl.y - OUTER_TICK,
+	      x2: outer.bl.x,
+	      y2: outer.bl.y,
+	      kind: 'tick-outer'
+	    },
+	    {
+	      x1: outer.br.x - OUTER_TICK,
+	      y1: outer.br.y,
+	      x2: outer.br.x,
+	      y2: outer.br.y,
+	      kind: 'tick-outer'
+	    },
+	    {
+	      x1: outer.br.x,
+	      y1: outer.br.y - OUTER_TICK,
+	      x2: outer.br.x,
+	      y2: outer.br.y,
+	      kind: 'tick-outer'
+	    },
+	    // Inner corner ticks
+	    {
+	      x1: inner.tl.x,
+	      y1: inner.tl.y,
+	      x2: inner.tl.x + INNER_TICK,
+	      y2: inner.tl.y,
+	      kind: 'tick-inner'
+	    },
+	    {
+	      x1: inner.tl.x,
+	      y1: inner.tl.y,
+	      x2: inner.tl.x,
+	      y2: inner.tl.y + INNER_TICK,
+	      kind: 'tick-inner'
+	    },
+	    {
+	      x1: inner.tr.x - INNER_TICK,
+	      y1: inner.tr.y,
+	      x2: inner.tr.x,
+	      y2: inner.tr.y,
+	      kind: 'tick-inner'
+	    },
+	    {
+	      x1: inner.tr.x,
+	      y1: inner.tr.y,
+	      x2: inner.tr.x,
+	      y2: inner.tr.y + INNER_TICK,
+	      kind: 'tick-inner'
+	    },
+	    {
+	      x1: inner.bl.x,
+	      y1: inner.bl.y,
+	      x2: inner.bl.x + INNER_TICK,
+	      y2: inner.bl.y,
+	      kind: 'tick-inner'
+	    },
+	    {
+	      x1: inner.bl.x,
+	      y1: inner.bl.y - INNER_TICK,
+	      x2: inner.bl.x,
+	      y2: inner.bl.y,
+	      kind: 'tick-inner'
+	    },
+	    {
+	      x1: inner.br.x - INNER_TICK,
+	      y1: inner.br.y,
+	      x2: inner.br.x,
+	      y2: inner.br.y,
+	      kind: 'tick-inner'
+	    },
+	    {
+	      x1: inner.br.x,
+	      y1: inner.br.y - INNER_TICK,
+	      x2: inner.br.x,
+	      y2: inner.br.y,
+	      kind: 'tick-inner'
+	    }
+	  ];
+
+	  return {
+	    width: frameRect.width,
+	    height: frameRect.height,
+	    lines
+	  };
 	}
 
 	interface Props {
@@ -16,43 +199,21 @@
 	let { children, winCollapse = false }: Props = $props();
 
 	let frameEl = $state<HTMLDivElement | null>(null);
-	let lines = $state<LineSegment[]>([]);
-	let svgSize = $state({ width: 0, height: 0 });
+	let chrome = $state<PrismChrome>({ width: 0, height: 0, lines: [] });
 
-	function updateConnectorLines() {
+	function updateChrome() {
 	  const frame = frameEl;
 	  if (!frame) return;
 
-	  const inner = frame.querySelector<HTMLElement>('.puzzle-grid');
+	  const inner = frame.querySelector<HTMLElement>(INNER_SELECTOR);
 	  const frameRect = frame.getBoundingClientRect();
-	  svgSize = { width: frameRect.width, height: frameRect.height };
 
 	  if (!inner || frameRect.width === 0 || frameRect.height === 0) {
-	    lines = [];
+	    chrome = { width: frameRect.width, height: frameRect.height, lines: [] };
 	    return;
 	  }
 
-	  const innerRect = inner.getBoundingClientRect();
-	  const rel = (x: number, y: number) => ({
-	    x: x - frameRect.left,
-	    y: y - frameRect.top
-	  });
-
-	  const outerTl = rel(frameRect.left, frameRect.top);
-	  const outerTr = rel(frameRect.right, frameRect.top);
-	  const outerBl = rel(frameRect.left, frameRect.bottom);
-	  const outerBr = rel(frameRect.right, frameRect.bottom);
-	  const innerTl = rel(innerRect.left, innerRect.top);
-	  const innerTr = rel(innerRect.right, innerRect.top);
-	  const innerBl = rel(innerRect.left, innerRect.bottom);
-	  const innerBr = rel(innerRect.right, innerRect.bottom);
-
-	  lines = [
-	    { x1: outerTl.x, y1: outerTl.y, x2: innerTl.x, y2: innerTl.y },
-	    { x1: outerTr.x, y1: outerTr.y, x2: innerTr.x, y2: innerTr.y },
-	    { x1: outerBl.x, y1: outerBl.y, x2: innerBl.x, y2: innerBl.y },
-	    { x1: outerBr.x, y1: outerBr.y, x2: innerBr.x, y2: innerBr.y }
-	  ];
+	  chrome = buildChrome(frameRect, inner.getBoundingClientRect());
 	}
 
 	$effect(() => {
@@ -60,15 +221,15 @@
 	  if (!frame) return;
 
 	  void winCollapse;
-	  updateConnectorLines();
+	  updateChrome();
 
-	  const ro = new ResizeObserver(() => updateConnectorLines());
+	  const ro = new ResizeObserver(() => updateChrome());
 	  ro.observe(frame);
 
-	  const inner = frame.querySelector('.puzzle-grid');
+	  const inner = frame.querySelector(INNER_SELECTOR);
 	  if (inner) ro.observe(inner);
 
-	  const onResize = () => updateConnectorLines();
+	  const onResize = () => updateChrome();
 	  window.addEventListener('resize', onResize);
 
 	  return () => {
@@ -76,37 +237,48 @@
 	    window.removeEventListener('resize', onResize);
 	  };
 	});
+
+	function strokeForKind(kind: LineSegment['kind']): string {
+	  switch (kind) {
+	    case 'connector':
+	      return 'rgba(99, 102, 241, 0.38)';
+	    case 'tick-outer':
+	      return 'rgba(99, 102, 241, 0.55)';
+	    case 'tick-inner':
+	      return 'rgba(99, 102, 241, 0.7)';
+	  }
+	}
+
+	function strokeWidthForKind(kind: LineSegment['kind']): number {
+	  return kind === 'connector' ? 1 : 1.5;
+	}
 </script>
 
 <div class="prism-frame" class:win-collapse={winCollapse} bind:this={frameEl}>
-	{#if svgSize.width > 0 && svgSize.height > 0}
+	{#if !winCollapse && chrome.width > 0 && chrome.height > 0 && chrome.lines.length > 0}
 		<svg
 			class="prism-connectors"
 			aria-hidden="true"
-			width={svgSize.width}
-			height={svgSize.height}
-			viewBox="0 0 {svgSize.width} {svgSize.height}"
+			width={chrome.width}
+			height={chrome.height}
+			viewBox="0 0 {chrome.width} {chrome.height}"
 		>
-			{#each lines as line, index}
-				<line
-					x1={line.x1}
-					y1={line.y1}
-					x2={line.x2}
-					y2={line.y2}
-					stroke="rgba(99, 102, 241, 0.38)"
-					stroke-width="1"
-					stroke-linecap="round"
-					class="prism-connector-line"
-					style:--connector-index={index}
-				/>
-			{/each}
+			<g class="prism-chrome">
+				{#each chrome.lines as line, index (index)}
+					<line
+						x1={line.x1}
+						y1={line.y1}
+						x2={line.x2}
+						y2={line.y2}
+						stroke={strokeForKind(line.kind)}
+						stroke-width={strokeWidthForKind(line.kind)}
+						stroke-linecap="square"
+						class="prism-chrome-line prism-chrome-{line.kind}"
+					/>
+				{/each}
+			</g>
 		</svg>
 	{/if}
-
-	<span class="outer-corner outer-corner-tl" aria-hidden="true"></span>
-	<span class="outer-corner outer-corner-tr" aria-hidden="true"></span>
-	<span class="outer-corner outer-corner-bl" aria-hidden="true"></span>
-	<span class="outer-corner outer-corner-br" aria-hidden="true"></span>
 
 	<div class="prism-frame-content">
 		{@render children()}
@@ -119,14 +291,13 @@
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		padding: 2rem;
-		border: 1px solid #d1d5db;
-		border-radius: 12px;
-		background:
-			linear-gradient(160deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.88) 100%);
-		box-shadow:
-			inset 0 1px 0 rgba(255, 255, 255, 0.9),
-			0 4px 18px rgba(15, 23, 42, 0.05);
+		padding: 1.75rem;
+		border: 1px solid var(--glass-border);
+		border-radius: 0;
+		background: rgba(255, 255, 255, 0.3);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		box-shadow: var(--shadow-medium);
 		isolation: isolate;
 	}
 
@@ -134,93 +305,8 @@
 		position: absolute;
 		inset: 0;
 		pointer-events: none;
-		z-index: 0;
-		overflow: visible;
-	}
-
-	.prism-connector-line {
-		transition: opacity var(--win-collapse-duration, 1.6s) ease;
-	}
-
-	.prism-frame.win-collapse .prism-connector-line {
-		opacity: 0;
-	}
-
-	.outer-corner {
-		position: absolute;
-		width: 14px;
-		height: 14px;
-		pointer-events: none;
 		z-index: 2;
-		transition: opacity var(--win-collapse-duration, 1.6s) ease;
-	}
-
-	.outer-corner::before,
-	.outer-corner::after {
-		content: '';
-		position: absolute;
-		background: rgba(99, 102, 241, 0.55);
-		box-shadow: 0 0 5px rgba(99, 102, 241, 0.18);
-	}
-
-	.outer-corner::before {
-		width: 14px;
-		height: 1.5px;
-	}
-
-	.outer-corner::after {
-		width: 1.5px;
-		height: 14px;
-	}
-
-	.outer-corner-tl {
-		top: 0;
-		left: 0;
-	}
-
-	.outer-corner-tr {
-		top: 0;
-		right: 0;
-	}
-
-	.outer-corner-tr::before {
-		right: 0;
-	}
-
-	.outer-corner-tr::after {
-		right: 0;
-	}
-
-	.outer-corner-bl {
-		bottom: 0;
-		left: 0;
-	}
-
-	.outer-corner-bl::before {
-		bottom: 0;
-	}
-
-	.outer-corner-bl::after {
-		bottom: 0;
-	}
-
-	.outer-corner-br {
-		bottom: 0;
-		right: 0;
-	}
-
-	.outer-corner-br::before {
-		right: 0;
-		bottom: 0;
-	}
-
-	.outer-corner-br::after {
-		right: 0;
-		bottom: 0;
-	}
-
-	.prism-frame.win-collapse .outer-corner {
-		opacity: 0;
+		overflow: visible;
 	}
 
 	.prism-frame-content {

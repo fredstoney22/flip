@@ -60,10 +60,10 @@
 					<div class="mt-4 flex flex-wrap items-center gap-3">
 						{#if !data.subscription}
 							<a
-								href="/pricing"
+								href="/play"
 								class="inline-flex flex-1 items-center justify-center rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-gray-800 sm:flex-none"
 							>
-								View packs & pricing
+								View puzzle packs
 							</a>
 						{:else if !data.subscription.cancelAtPeriodEnd}
 							{#if isConfirmingCancel}

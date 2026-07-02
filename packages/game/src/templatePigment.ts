@@ -68,25 +68,34 @@ export function pigmentLayerKey(template: PuzzleTemplate): string {
 /** Build a multi-color template with at least two distinct pigments on active cells. */
 export function buildMultiColoredTemplate(
 	mask: number[][],
-	pigments: Pigment[]
+	pigments: Pigment[],
+	maxPigmentsPerTemplate: number = pigments.length
 ): PuzzleTemplate | null {
+	if (maxPigmentsPerTemplate < 2) return null;
+
+	const paletteSize = Math.min(maxPigmentsPerTemplate, pigments.length);
+	const palette =
+		pigments.length <= paletteSize
+			? pigments
+			: [...pigments].sort(() => Math.random() - 0.5).slice(0, paletteSize);
+
 	const active: [number, number][] = [];
 	for (let r = 0; r < mask.length; r++) {
 		for (let c = 0; c < mask[r].length; c++) {
 			if (mask[r][c] === 1) active.push([r, c]);
 		}
 	}
-	if (active.length < 2 || pigments.length < 2) return null;
+	if (active.length < 2 || palette.length < 2) return null;
 
 	const shape: Pigment[][] = mask.map((row) => row.map(() => 0 as Pigment));
 	const shuffled = [...active].sort(() => Math.random() - 0.5);
-	const first = pigments[0];
-	const second = pigments[1];
+	const first = palette[0];
+	const second = palette[1];
 	shape[shuffled[0][0]][shuffled[0][1]] = first;
 	shape[shuffled[1][0]][shuffled[1][1]] = second;
 	for (let i = 2; i < shuffled.length; i++) {
 		const [r, c] = shuffled[i];
-		shape[r][c] = pigments[Math.floor(Math.random() * pigments.length)];
+		shape[r][c] = palette[Math.floor(Math.random() * palette.length)];
 	}
 
 	return { shape };

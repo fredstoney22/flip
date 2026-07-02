@@ -5,11 +5,17 @@ import {
   distributeToRows,
   getTemplateRowGroups,
   gridPixelSize,
+  templateBaseBound,
   templatePixelSize,
   templateRowPixelWidth
 } from './puzzleLayout.js';
 
 describe('puzzleLayout', () => {
+  it('templatePixelSize matches CSS scale transform sizing', () => {
+    expect(templateBaseBound(3)).toBe(34);
+    expect(templatePixelSize(3, 30)).toBe(102);
+  });
+
   it('cellSizeForDimension accounts for gaps and padding', () => {
     // 14 cells in 390px: (390 - 13*2 - 8) / 14 = 25
     expect(cellSizeForDimension(14, 390)).toBe(25);

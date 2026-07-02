@@ -15,7 +15,7 @@ export const POST: RequestHandler = async ({ locals, url }) => {
     mode: 'subscription',
     line_items: [{ price: STRIPE_PRO_PRICE_ID, quantity: 1 }],
     success_url: `${origin}/billing/success`,
-    cancel_url: `${origin}/pricing`,
+    cancel_url: `${origin}/play`,
     customer_email: user.email,
     metadata: { userId: user.id }
   });

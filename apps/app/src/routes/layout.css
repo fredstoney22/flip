@@ -1,3 +1,15 @@
 @import 'tailwindcss';
+@import '$lib/styles/iridescent-pigment.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+	--glass-bg: rgba(255, 255, 255, 0.4);
+	--glass-bg-strong: rgba(255, 255, 255, 0.72);
+	--glass-border: rgba(255, 255, 255, 0.6);
+	--shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+	--shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.08);
+	--shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.1);
+	--prism-glow-hover: 0 0 24px rgba(99, 102, 241, 0.15), 0 4px 16px rgba(0, 0, 0, 0.06);
+	--prism-glow-solved: 0 0 40px rgba(99, 102, 241, 0.3), 0 8px 32px rgba(0, 0, 0, 0.08);
+}

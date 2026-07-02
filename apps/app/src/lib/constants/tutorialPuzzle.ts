@@ -1,12 +1,12 @@
 import type { PuzzleConfig } from '@flip/game';
-import { MONO_FLIP_SOLVED_VALUE } from '@flip/game';
+import { PIGMENT_CLEAR_SOLVED_VALUE } from '@flip/game';
 
 /** Tutorial: two moves, second requires rotating the template 90°. */
 export const TUTORIAL_PUZZLE_CONFIG: PuzzleConfig = {
   startState: [
-    [1, 0, 1],
-    [0, 0, 0],
-    [1, 0, 1]
+    [0, 1, 0],
+    [1, 1, 1],
+    [0, 1, 0]
   ],
   templates: [
     {
@@ -17,7 +17,6 @@ export const TUTORIAL_PUZZLE_CONFIG: PuzzleConfig = {
       ]
     }
   ],
-  solvedValue: MONO_FLIP_SOLVED_VALUE,
-  allowTemplateRotation: true,
+  solvedValue: PIGMENT_CLEAR_SOLVED_VALUE,
   minMovesToSolve: 2
 };

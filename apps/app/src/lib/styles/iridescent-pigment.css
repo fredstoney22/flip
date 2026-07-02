@@ -1,0 +1,122 @@
+/* Procedural holographic foil — one continuous sheet, prism cells reveal it underneath. */
+.pigment-iridescent,
+.pigment-iridescent-sheet {
+	--iri-base: #c4b5fd;
+	position: relative;
+	overflow: hidden;
+	background-color: var(--iri-base);
+}
+
+.pigment-iridescent::before,
+.pigment-iridescent::after,
+.pigment-iridescent-sheet::before,
+.pigment-iridescent-sheet::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	background-position: center;
+}
+
+/*
+ * Holographic foil palette — cyan, magenta, lavender, mint, gold, white highlights.
+ * Light blooms from the right; ~3 spectral cycles per cell for prism legibility.
+ */
+.pigment-iridescent::before,
+.pigment-iridescent-sheet::before {
+	background-image:
+		linear-gradient(
+			118deg,
+			rgba(255, 255, 255, 0.55) 0%,
+			transparent 18%,
+			rgba(255, 255, 255, 0.28) 36%,
+			transparent 54%,
+			rgba(255, 255, 255, 0.42) 72%,
+			transparent 88%,
+			rgba(253, 244, 255, 0.2) 100%
+		),
+		linear-gradient(
+			128deg,
+			#f0abfc 0%,
+			#67e8f9 7%,
+			#a7f3d0 14%,
+			#fde68a 21%,
+			#f472b6 28%,
+			#7dd3fc 35%,
+			#e879f9 42%,
+			#a7f3d0 49%,
+			#f0abfc 56%,
+			#67e8f9 63%,
+			#fde68a 70%,
+			#c4b5fd 77%,
+			#f472b6 84%,
+			#7dd3fc 91%,
+			#f0abfc 100%
+		),
+		conic-gradient(
+			from 248deg at 74% 40%,
+			#ffffff 0deg,
+			#fde68a 18deg,
+			#f0abfc 36deg,
+			#f472b6 54deg,
+			#c4b5fd 72deg,
+			#67e8f9 90deg,
+			#7dd3fc 108deg,
+			#a7f3d0 126deg,
+			#67e8f9 144deg,
+			#e879f9 162deg,
+			#fdf2f8 180deg,
+			#ffffff 198deg,
+			#fde68a 216deg,
+			#f0abfc 234deg,
+			#f472b6 252deg,
+			#c4b5fd 270deg,
+			#67e8f9 288deg,
+			#7dd3fc 306deg,
+			#a7f3d0 324deg,
+			#f0abfc 342deg,
+			#ffffff 360deg
+		);
+}
+
+.pigment-iridescent::after,
+.pigment-iridescent-sheet::after {
+	background-image: linear-gradient(
+		48deg,
+		transparent 0%,
+		rgba(255, 255, 255, 0.62) 10%,
+		transparent 22%,
+		rgba(125, 211, 252, 0.42) 36%,
+		transparent 50%,
+		rgba(255, 255, 255, 0.48) 64%,
+		transparent 78%,
+		rgba(244, 114, 182, 0.32) 90%,
+		transparent 100%
+	);
+	mix-blend-mode: soft-light;
+	opacity: 0.9;
+}
+
+.pigment-iridescent-sheet {
+	position: absolute;
+	z-index: 0;
+	pointer-events: none;
+	mask-size: 100% 100%;
+	mask-repeat: no-repeat;
+	-webkit-mask-size: 100% 100%;
+	-webkit-mask-repeat: no-repeat;
+}
+
+.puzzle-cell.prism-reveal {
+	background-color: transparent !important;
+}
+
+.template-lens-shape-cell.prism-reveal {
+	background: transparent !important;
+}
+
+.puzzle-grid-preview-cell.prism-reveal {
+	background-color: transparent !important;
+}

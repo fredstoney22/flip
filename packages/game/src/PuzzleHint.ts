@@ -20,27 +20,21 @@ interface InternalMove extends HintMove {
 
 function enumerateHintMoves(
 	puzzleSize: number,
-	templates: PuzzleTemplate[],
-	allowTemplateRotation: boolean
+	templates: PuzzleTemplate[]
 ): InternalMove[] {
 	const moves: InternalMove[] = [];
 
 	for (let tIdx = 0; tIdx < templates.length; tIdx++) {
 		const base = templates[tIdx];
 		const orientations: { template: PuzzleTemplate; rotation: number }[] = [];
-
-		if (allowTemplateRotation) {
-			const seen = new Set<string>();
-			for (let rotation = 0; rotation < 4; rotation++) {
-				const oriented = orientTemplate(base, rotation);
-				const key = oriented.shape.map((r) => r.join('')).join('|');
-				if (!seen.has(key)) {
-					seen.add(key);
-					orientations.push({ template: oriented, rotation });
-				}
+		const seen = new Set<string>();
+		for (let rotation = 0; rotation < 4; rotation++) {
+			const oriented = orientTemplate(base, rotation);
+			const key = oriented.shape.map((r) => r.join('')).join('|');
+			if (!seen.has(key)) {
+				seen.add(key);
+				orientations.push({ template: oriented, rotation });
 			}
-		} else {
-			orientations.push({ template: base, rotation: 0 });
 		}
 
 		for (const { template: oriented, rotation } of orientations) {
@@ -79,7 +73,7 @@ export function findHintMove(
 	/** @deprecated No longer affects hint search; kept for call-site compatibility. */
 	_usedTemplateMask: number = 0
 ): HintMove | null {
-	const { templates, solvedValue, allowTemplateRotation = true } = config;
+	const { templates, solvedValue } = config;
 	const startState = currentGrid ?? config.startState;
 	if (isSolved(startState, solvedValue)) {
 		return null;
@@ -87,10 +81,10 @@ export function findHintMove(
 	if (!startState.length || !startState[0]?.length) return null;
 
 	const size = startState.length;
-	const moves = enumerateHintMoves(size, templates, allowTemplateRotation);
+	const moves = enumerateHintMoves(size, templates);
 	if (moves.length === 0) return null;
 
-	const useCanonical = allowTemplateRotation && solvedValue === MONO_FLIP_SOLVED_VALUE;
+	const useCanonical = solvedValue === MONO_FLIP_SOLVED_VALUE;
 	const stateKey = (grid: PuzzleGrid) =>
 		useCanonical ? canonicalizeGrid(grid) : gridToKey(grid);
 

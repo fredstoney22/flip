@@ -31,6 +31,7 @@
 			{#each data.puzzles as puzzle}
 				<a
 					href="/play/game?pack={data.pack.slug}&id={puzzle.id}"
+					data-sveltekit-preload-data="off"
 					class="flex items-center justify-between rounded-xl border bg-white px-4 py-3 shadow-sm transition-shadow hover:shadow-md"
 					class:border-green-200={puzzle.completed}
 					class:bg-green-50={puzzle.completed}
@@ -46,7 +47,11 @@
 						{/if}
 					</div>
 					{#if puzzle.completed}
-						<span class="text-green-500" aria-label="Completed">✓</span>
+						{#if puzzle.optimal}
+							<span class="text-amber-500" aria-label="Optimal solve">★</span>
+						{:else}
+							<span class="text-green-500" aria-label="Completed">✓</span>
+						{/if}
 					{/if}
 				</a>
 			{/each}

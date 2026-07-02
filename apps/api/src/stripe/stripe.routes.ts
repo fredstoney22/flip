@@ -96,8 +96,8 @@ app.post('/pack-checkout', zValidator('json', packCheckoutBody), async (c) => {
 	const checkoutSession = await stripe.checkout.sessions.create({
 		mode: 'payment',
 		line_items: [{ price: price.id, quantity: 1 }],
-		success_url: `${origin}/play/puzzles?purchase=success`,
-		cancel_url: `${origin}/pricing`,
+		success_url: `${origin}/play/puzzles?pack=${packSlug}&purchase=success`,
+		cancel_url: `${origin}/store`,
 		metadata: {
 			type: 'pack_purchase',
 			userId: session.user.id,

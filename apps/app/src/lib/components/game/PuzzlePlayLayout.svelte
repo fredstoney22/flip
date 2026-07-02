@@ -8,12 +8,22 @@
 		backLabel?: string;
 		title?: string;
 		trailingLabel?: string;
+		/** Hide side panel visually without collapsing layout (e.g. on puzzle win). */
+		sidePanelHidden?: boolean;
 		/** Narrow column beside the puzzle (e.g. tutorial steps). Does not overlap the board. */
 		sidePanel?: Snippet;
 		children: Snippet;
 	}
 
-	let { backHref, backLabel, title, trailingLabel, sidePanel, children }: Props = $props();
+	let {
+	  backHref,
+	  backLabel,
+	  title,
+	  trailingLabel,
+	  sidePanelHidden = false,
+	  sidePanel,
+	  children
+	}: Props = $props();
 </script>
 
 <div class="flex h-dvh flex-col overflow-hidden bg-gray-50">
@@ -22,7 +32,12 @@
 
 	<main class="puzzle-play-main" class:with-side-panel={!!sidePanel}>
 		{#if sidePanel}
-			<aside class="puzzle-play-side" aria-live="polite">
+			<aside
+				class="puzzle-play-side"
+				class:side-panel-hidden={sidePanelHidden}
+				aria-live="polite"
+				aria-hidden={sidePanelHidden}
+			>
 				{@render sidePanel()}
 			</aside>
 		{/if}
@@ -69,6 +84,13 @@
 
 	.puzzle-play-side {
 		overflow-y: auto;
+		transition: opacity 0.9s ease;
+	}
+
+	.puzzle-play-side.side-panel-hidden {
+		visibility: hidden;
+		opacity: 0;
+		pointer-events: none;
 	}
 
 	.puzzle-play-content {

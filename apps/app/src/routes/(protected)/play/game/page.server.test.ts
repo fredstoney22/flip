@@ -6,20 +6,14 @@ import { load } from '../../../(game)/play/game/+page.server';
 // ---------------------------------------------------------------------------
 interface ApiPuzzleResponse {
 	packSlug: string;
+	packName: string;
 	puzzleNumber: number;
+	nextPuzzleNumber: number | null;
 	config: {
 		startState: number[][];
 		templates: Array<{ shape: number[][] }>;
 		solvedValue: number;
-		allowTemplateRotation?: boolean;
 	};
-}
-
-interface ApiPuzzleListResponse {
-	packId: string;
-	packName: string;
-	packSlug: string;
-	puzzles: Array<{ puzzleNumber: number }>;
 }
 
 interface ProgressResponse {
@@ -37,7 +31,9 @@ interface ProgressResponse {
 // ---------------------------------------------------------------------------
 const INTRO_PUZZLE: ApiPuzzleResponse = {
   packSlug: 'intro-pack',
+  packName: 'Intro Pack',
   puzzleNumber: 1,
+  nextPuzzleNumber: 2,
   config: {
     startState: [
       [1, 1, 1],
@@ -45,16 +41,8 @@ const INTRO_PUZZLE: ApiPuzzleResponse = {
       [1, 1, 1]
     ],
     templates: [{ shape: [[0, 0, 0], [0, 1, 0], [0, 0, 0]] }],
-    solvedValue: 1,
-    allowTemplateRotation: true
+    solvedValue: 1
   }
-};
-
-const INTRO_LIST: ApiPuzzleListResponse = {
-  packId: 'intro-pack-id',
-  packName: 'Intro Pack',
-  packSlug: 'intro-pack',
-  puzzles: [{ puzzleNumber: 1 }, { puzzleNumber: 2 }, { puzzleNumber: 3 }]
 };
 
 const EMPTY_PROGRESS: ProgressResponse = { packAccess: [], progress: [] };
@@ -113,7 +101,6 @@ describe('/play/game load — happy path (free pack)', () => {
   it('returns puzzle config, pack info, and puzzleId', async () => {
     const fetchFn = buildFetch([
       { match: '/puzzles/1', body: INTRO_PUZZLE },
-      { match: '/puzzles', body: INTRO_LIST },
       { match: '/progress', body: EMPTY_PROGRESS }
     ]);
 
@@ -126,10 +113,9 @@ describe('/play/game load — happy path (free pack)', () => {
     expect(result.puzzleId).toBe(1);
   });
 
-  it('derives nextPuzzleId as 2 when puzzle 1 is loaded', async () => {
+  it('derives nextPuzzleId from the puzzle API response', async () => {
     const fetchFn = buildFetch([
       { match: '/puzzles/1', body: INTRO_PUZZLE },
-      { match: '/puzzles', body: INTRO_LIST },
       { match: '/progress', body: EMPTY_PROGRESS }
     ]);
 
@@ -137,11 +123,14 @@ describe('/play/game load — happy path (free pack)', () => {
     expect(result.nextPuzzleId).toBe(2);
   });
 
-  it('returns nextPuzzleId null for the last puzzle in the list', async () => {
-    const lastPuzzle: ApiPuzzleResponse = { ...INTRO_PUZZLE, puzzleNumber: 3 };
+  it('returns nextPuzzleId null for the last puzzle in the pack', async () => {
+    const lastPuzzle: ApiPuzzleResponse = {
+      ...INTRO_PUZZLE,
+      puzzleNumber: 3,
+      nextPuzzleNumber: null
+    };
     const fetchFn = buildFetch([
       { match: '/puzzles/3', body: lastPuzzle },
-      { match: '/puzzles', body: INTRO_LIST },
       { match: '/progress', body: EMPTY_PROGRESS }
     ]);
 
@@ -159,7 +148,6 @@ describe('/play/game load — happy path (free pack)', () => {
 
     const fetchFn = buildFetch([
       { match: '/puzzles/1', body: INTRO_PUZZLE },
-      { match: '/puzzles', body: INTRO_LIST },
       { match: '/progress', body: progressWithRecord }
     ]);
 
@@ -170,7 +158,6 @@ describe('/play/game load — happy path (free pack)', () => {
   it('sets bestMoveCount to null when puzzle has never been completed', async () => {
     const fetchFn = buildFetch([
       { match: '/puzzles/1', body: INTRO_PUZZLE },
-      { match: '/puzzles', body: INTRO_LIST },
       { match: '/progress', body: EMPTY_PROGRESS }
     ]);
 
@@ -180,22 +167,20 @@ describe('/play/game load — happy path (free pack)', () => {
 });
 
 describe('/play/game load — access guard', () => {
-  it('redirects to /pricing when the puzzle API returns 403', async () => {
+  it('redirects to /store when the puzzle API returns 403', async () => {
     const fetchFn = buildFetch([
       { match: '/puzzles/1', body: {}, status: 403 },
-      { match: '/puzzles', body: {}, status: 403 },
       { match: '/progress', body: EMPTY_PROGRESS }
     ]);
 
     await expect(
       load(makeLoadArgs('hard-in-3', '1', fetchFn))
-    ).rejects.toMatchObject({ status: 302, location: '/pricing' });
+    ).rejects.toMatchObject({ status: 302, location: '/store' });
   });
 
   it('throws 404 when puzzle is not found', async () => {
     const fetchFn = buildFetch([
       { match: '/puzzles/99', body: {}, status: 404 },
-      { match: '/puzzles', body: INTRO_LIST },
       { match: '/progress', body: EMPTY_PROGRESS }
     ]);
 
@@ -207,7 +192,6 @@ describe('/play/game load — access guard', () => {
   it('throws 500 when the API returns an unexpected error', async () => {
     const fetchFn = buildFetch([
       { match: '/puzzles/1', body: {}, status: 500 },
-      { match: '/puzzles', body: INTRO_LIST },
       { match: '/progress', body: EMPTY_PROGRESS }
     ]);
 

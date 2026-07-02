@@ -1,67 +1,62 @@
 <script lang="ts">
+	import { isOptimalSolve } from '$lib/utils/starRating';
+
 	interface Props {
 		moveCount: number;
-		bestMoveCount: number | null;
+		par: number | null;
 	}
 
-	let { moveCount, bestMoveCount }: Props = $props();
+	let { moveCount, par }: Props = $props();
 
-	const stars = $derived(calculateStars(moveCount, bestMoveCount));
-
-	function calculateStars(moves: number, best: number | null): number {
-	  if (best === null) return 3;
-	  if (moves === best) return 3;
-	  if (moves <= best + 2) return 2;
-	  return 1;
-	}
+	const optimal = $derived(isOptimalSolve(moveCount, par));
 </script>
 
-<div class="star-rating">
-	<div class="stars" aria-label="{stars} out of 3 stars">
-		{#each [1, 2, 3] as star}
-			<span class="star" class:filled={star <= stars} aria-hidden="true">★</span>
-		{/each}
+<div class="solve-badge">
+	<div
+		class="badge-icon"
+		class:optimal
+		aria-label={optimal ? 'Optimal solve' : 'Puzzle completed'}
+	>
+		{#if optimal}
+			<span aria-hidden="true">★</span>
+		{:else}
+			<span aria-hidden="true">✓</span>
+		{/if}
 	</div>
-	<p class="star-info">
-		{#if stars === 3}
-			<span class="label perfect">Perfect! {moveCount} moves</span>
-		{:else if stars === 2}
-			<span class="label silver">
-				Great! {moveCount} moves{bestMoveCount !== null ? ` (Best: ${bestMoveCount})` : ''}
-			</span>
+	<p class="badge-info">
+		{#if optimal}
+			<span class="label optimal">Perfect! {moveCount} moves</span>
 		{:else}
 			<span class="label completed">
-				Completed! {moveCount} moves{bestMoveCount !== null ? ` (Best: ${bestMoveCount})` : ''}
+				Completed! {moveCount} moves
 			</span>
 		{/if}
 	</p>
 </div>
 
 <style>
-	.star-rating {
+	.solve-badge {
 		text-align: center;
 	}
 
-	.stars {
+	.badge-icon {
 		font-size: 2rem;
-		letter-spacing: 0.25rem;
+		line-height: 1;
 	}
 
-	.star {
-		color: #d1d5db;
-		transition: color 0.2s ease;
-	}
-
-	.star.filled {
+	.badge-icon.optimal {
 		color: #f59e0b;
 	}
 
-	.star-info {
+	.badge-icon:not(.optimal) {
+		color: #10b981;
+	}
+
+	.badge-info {
 		margin-top: 0.25rem;
 		font-size: 0.875rem;
 	}
 
-	.perfect { color: #10b981; font-weight: 600; }
-	.silver  { color: #6b7280; }
+	.optimal { color: #10b981; font-weight: 600; }
 	.completed { color: #6b7280; }
 </style>

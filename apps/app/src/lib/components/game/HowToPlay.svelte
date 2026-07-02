@@ -64,16 +64,16 @@
 			<h3>How to Play</h3>
 			<ol>
 				<li>
-					<strong>Goal</strong> — clear the colors from the Prism square.
+					<strong>Goal</strong> — clear the colors from the Prism.
 				</li>
 				<li>
-					<strong>Select a lens</strong> — click one of the lenses below the Prism square.
+					<strong>Select a lens</strong> — click one of the lenses (color patterns) below the Prism
 				</li>
 				<li>
-					<strong>Rotate</strong> — tap the selected lens again to rotate it.
+					<strong>Rotate</strong> — tap a lens to rotate it.
 				</li>
 				<li>
-					<strong>Apply the lens to the Prism square</strong> — hover over the grid to see the preview, then click to apply it.
+					<strong>Apply the lens to the Prism square</strong> — drag and drop a lens onto the Prism to flip the patterns colors.
 				</li>
 				<li>
 					<strong>Undo</strong> — click

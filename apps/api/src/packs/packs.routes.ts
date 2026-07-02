@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
-import { count } from 'drizzle-orm';
+import { count, gt } from 'drizzle-orm';
 import { db, pack, puzzle, packAccess, eq, and, asc } from '@flip/db';
 import { auth } from '@flip/auth';
 import { parseStoredPuzzle } from '@flip/game';
@@ -145,9 +145,18 @@ app.get('/:slug/puzzles/:number', async (c) => {
 	const p = puzzleRows[0];
 	const config = parseStoredPuzzle(p.startState, p.templates);
 
+	const [nextPuzzleRow] = await db
+		.select({ puzzleNumber: puzzle.puzzleNumber })
+		.from(puzzle)
+		.where(and(eq(puzzle.packId, packRow.id), gt(puzzle.sortOrder, p.sortOrder)))
+		.orderBy(asc(puzzle.sortOrder))
+		.limit(1);
+
 	return c.json({
 		packSlug: slug,
+		packName: packRow.name,
 		puzzleNumber: p.puzzleNumber,
+		nextPuzzleNumber: nextPuzzleRow?.puzzleNumber ?? null,
 		config
 	});
 });

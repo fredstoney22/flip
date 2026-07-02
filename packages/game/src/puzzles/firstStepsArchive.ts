@@ -28,6 +28,5 @@ export const archivedFirstStepsPuzzle5: PuzzleConfig = {
 		}
 	],
 	solvedValue: 0,
-	allowTemplateRotation: true,
 	minMovesToSolve: 2
 };

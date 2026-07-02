@@ -6,6 +6,7 @@
 import type { PackDefinition, PuzzleConfig } from './types.js';
 import { animalPack } from './puzzles/monkey.js';
 import { firstStepsPack } from './puzzles/firstSteps.js';
+import { simpleMonoDevPack } from './puzzles/simpleMonoDev.js';
 
 export const packs: PackDefinition[] = [
   {
@@ -16,19 +17,19 @@ export const packs: PackDefinition[] = [
       "1": {
         "startState": [
           [
-            1,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
             0,
             1
           ],
           [
             1,
-            0,
-            1
-          ],
-          [
             1,
-            0,
-            1
+            0
           ]
         ],
         "templates": [
@@ -36,11 +37,11 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 1,
-                0
+                1
               ],
               [
                 1,
-                0
+                1
               ]
             ]
           },
@@ -48,42 +49,41 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 0,
-                1,
+                0,
                 0
               ],
               [
                 1,
-                0,
+                1,
                 1
               ],
               [
                 0,
                 0,
-                0
+                1
               ]
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 2
       },
       "2": {
         "startState": [
           [
-            0,
-            1,
-            0
-          ],
-          [
             1,
             0,
             0
           ],
           [
+            0,
             1,
+            1
+          ],
+          [
+            0,
             1,
-            0
+            1
           ]
         ],
         "templates": [
@@ -94,7 +94,7 @@ export const packs: PackDefinition[] = [
                 1
               ],
               [
-                0,
+                1,
                 1
               ]
             ]
@@ -102,42 +102,41 @@ export const packs: PackDefinition[] = [
           {
             "shape": [
               [
-                0,
-                0,
-                1
+                1,
+                1,
+                0
               ],
               [
                 0,
                 0,
-                1
+                0
               ],
               [
                 1,
-                0,
+                1,
                 1
               ]
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 2
       },
       "3": {
         "startState": [
           [
+            0,
+            0,
+            1
+          ],
+          [
             1,
             1,
-            0
+            1
           ],
           [
             0,
-            1,
-            0
-          ],
-          [
-            1,
-            1,
+            0,
             0
           ]
         ],
@@ -149,8 +148,8 @@ export const packs: PackDefinition[] = [
                 1
               ],
               [
-                0,
-                0
+                1,
+                1
               ]
             ]
           },
@@ -162,20 +161,19 @@ export const packs: PackDefinition[] = [
                 0
               ],
               [
-                0,
+                1,
                 0,
                 0
               ],
               [
                 0,
                 1,
-                0
+                1
               ]
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 2
       },
       "4": {
@@ -186,25 +184,25 @@ export const packs: PackDefinition[] = [
             1
           ],
           [
-            0,
-            0,
-            1
+            1,
+            1,
+            0
           ],
           [
-            1,
             0,
-            1
+            0,
+            0
           ]
         ],
         "templates": [
           {
             "shape": [
               [
-                0,
+                1,
                 1
               ],
               [
-                0,
+                1,
                 1
               ]
             ]
@@ -213,7 +211,7 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 0,
-                1,
+                0,
                 0
               ],
               [
@@ -224,31 +222,30 @@ export const packs: PackDefinition[] = [
               [
                 0,
                 0,
-                0
+                1
               ]
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 2
       },
       "5": {
         "startState": [
           [
-            0,
             1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
             0
           ],
           [
             1,
             0,
             1
-          ],
-          [
-            0,
-            1,
-            1
           ]
         ],
         "templates": [
@@ -259,7 +256,7 @@ export const packs: PackDefinition[] = [
                 1
               ],
               [
-                0,
+                1,
                 1
               ]
             ]
@@ -268,24 +265,23 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 0,
+                1,
+                0
+              ],
+              [
                 0,
+                1,
                 1
               ],
               [
-                0,
-                0,
-                0
-              ],
-              [
                 1,
-                1,
-                0
+                0,
+                1
               ]
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 2
       }
     }
@@ -298,18 +294,18 @@ export const packs: PackDefinition[] = [
       "1": {
         "startState": [
           [
-            0,
             1,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
             0
           ],
           [
             0,
-            1,
-            1
-          ],
-          [
             0,
-            1,
             1
           ]
         ],
@@ -321,19 +317,7 @@ export const packs: PackDefinition[] = [
                 1
               ],
               [
-                0,
-                0
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
                 1,
-                0
-              ],
-              [
-                0,
                 1
               ]
             ]
@@ -347,35 +331,53 @@ export const packs: PackDefinition[] = [
               ],
               [
                 0,
-                0,
+                1,
                 0
               ],
               [
+                1,
+                1,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
                 0,
+                1
+              ],
+              [
+                1,
                 0,
+                1
+              ],
+              [
+                1,
+                1,
                 1
               ]
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 3
       },
       "2": {
         "startState": [
           [
             1,
+            0,
+            1
+          ],
+          [
             1,
+            0,
             1
           ],
           [
             0,
-            0,
-            0
-          ],
-          [
-            1,
             0,
             1
           ]
@@ -385,19 +387,7 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 1,
-                0
-              ],
-              [
-                0,
                 1
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
-                0
               ],
               [
                 1,
@@ -410,12 +400,31 @@ export const packs: PackDefinition[] = [
               [
                 0,
                 0,
+                1
+              ],
+              [
+                0,
+                0,
                 0
               ],
               [
                 1,
                 0,
                 1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                1
+              ],
+              [
+                1,
+                1,
+                0
               ],
               [
                 0,
@@ -425,34 +434,33 @@ export const packs: PackDefinition[] = [
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 3
       },
       "3": {
         "startState": [
           [
-            0,
-            1,
-            0
-          ],
-          [
             1,
             1,
-            0
+            1
           ],
           [
             0,
-            1,
+            0,
             0
+          ],
+          [
+            0,
+            1,
+            1
           ]
         ],
         "templates": [
           {
             "shape": [
               [
-                0,
-                0
+                1,
+                1
               ],
               [
                 1,
@@ -464,53 +472,59 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 0,
+                1,
                 1
               ],
               [
+                0,
                 1,
                 0
+              ],
+              [
+                1,
+                1,
+                1
               ]
             ]
           },
           {
             "shape": [
               [
-                0,
-                0,
+                1,
+                1,
                 1
               ],
               [
-                0,
+                1,
                 0,
                 0
               ],
               [
-                1,
+                0,
                 0,
                 1
               ]
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 3
       },
       "4": {
         "startState": [
           [
-            1,
-            1,
-            1
-          ],
-          [
-            1,
-            1,
+            0,
+            0,
             0
           ],
           [
             0,
             1,
+            0
+          ],
+          [
+            1,
+            0,
             0
           ]
         ],
@@ -518,8 +532,8 @@ export const packs: PackDefinition[] = [
           {
             "shape": [
               [
-                0,
-                0
+                1,
+                1
               ],
               [
                 1,
@@ -530,11 +544,18 @@ export const packs: PackDefinition[] = [
           {
             "shape": [
               [
+                0,
                 1,
                 0
               ],
               [
                 0,
+                1,
+                0
+              ],
+              [
+                0,
+                1,
                 1
               ]
             ]
@@ -544,79 +565,85 @@ export const packs: PackDefinition[] = [
               [
                 1,
                 0,
-                0
-              ],
-              [
-                0,
-                0,
-                0
-              ],
-              [
-                1,
-                0,
                 1
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                0
               ]
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 3
       },
       "5": {
         "startState": [
           [
-            0,
-            0,
-            1
-          ],
-          [
-            0,
-            0,
-            1
-          ],
-          [
-            0,
             1,
-            1
+            1,
+            0
+          ],
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            1,
+            0,
+            0
           ]
         ],
         "templates": [
           {
             "shape": [
               [
-                0,
+                1,
                 1
               ],
               [
                 1,
-                0
+                1
               ]
             ]
           },
           {
             "shape": [
               [
+                0,
                 1,
-                0
+                1
+              ],
+              [
+                0,
+                0,
+                1
               ],
               [
                 1,
-                0
+                0,
+                1
               ]
             ]
           },
           {
             "shape": [
               [
+                0,
+                1,
+                1
+              ],
+              [
                 1,
                 0,
                 0
-              ],
-              [
-                0,
-                0,
-                1
               ],
               [
                 1,
@@ -626,8 +653,7 @@ export const packs: PackDefinition[] = [
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 3
       }
     }
@@ -642,16 +668,16 @@ export const packs: PackDefinition[] = [
           [
             1,
             1,
+            0
+          ],
+          [
+            0,
+            0,
             1
           ],
           [
             0,
             0,
-            0
-          ],
-          [
-            0,
-            1,
             1
           ]
         ],
@@ -659,31 +685,12 @@ export const packs: PackDefinition[] = [
           {
             "shape": [
               [
-                0,
-                1
-              ],
-              [
-                0,
-                1
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
                 1,
-                0
+                1
               ],
               [
                 1,
-                0,
                 1
-              ],
-              [
-                0,
-                0,
-                0
               ]
             ]
           },
@@ -692,6 +699,25 @@ export const packs: PackDefinition[] = [
               [
                 1,
                 0,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                1,
                 0
               ],
               [
@@ -707,26 +733,25 @@ export const packs: PackDefinition[] = [
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 3
       },
       "2": {
         "startState": [
           [
             0,
-            0,
+            1,
+            1
+          ],
+          [
+            1,
+            1,
             1
           ],
           [
             0,
             0,
-            0
-          ],
-          [
-            1,
-            1,
-            0
+            1
           ]
         ],
         "templates": [
@@ -734,10 +759,29 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 1,
-                0
+                1
               ],
               [
                 1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                0,
+                1
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
                 0
               ]
             ]
@@ -752,26 +796,7 @@ export const packs: PackDefinition[] = [
               [
                 0,
                 1,
-                0
-              ],
-              [
-                0,
-                0,
                 1
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
-                1,
-                0
-              ],
-              [
-                1,
-                0,
-                0
               ],
               [
                 0,
@@ -781,26 +806,25 @@ export const packs: PackDefinition[] = [
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 3
       },
       "3": {
         "startState": [
           [
-            0,
-            0,
-            1
-          ],
-          [
-            0,
             1,
+            0,
             0
           ],
           [
             1,
-            0,
+            1,
             1
+          ],
+          [
+            0,
+            0,
+            0
           ]
         ],
         "templates": [
@@ -808,25 +832,25 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 1,
-                0
+                1
               ],
               [
                 1,
-                0
+                1
               ]
             ]
           },
           {
             "shape": [
               [
+                1,
                 0,
-                0,
-                0
+                1
               ],
               [
-                0,
                 1,
-                0
+                0,
+                1
               ],
               [
                 0,
@@ -838,7 +862,12 @@ export const packs: PackDefinition[] = [
           {
             "shape": [
               [
-                0,
+                1,
+                1,
+                0
+              ],
+              [
+                1,
                 0,
                 0
               ],
@@ -846,35 +875,29 @@ export const packs: PackDefinition[] = [
                 1,
                 0,
                 1
-              ],
-              [
-                0,
-                1,
-                0
               ]
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 3
       },
       "4": {
         "startState": [
           [
-            1,
             0,
-            0
-          ],
-          [
-            1,
             1,
             0
           ],
           [
+            1,
+            1,
+            0
+          ],
+          [
+            1,
             0,
-            0,
-            1
+            0
           ]
         ],
         "templates": [
@@ -885,35 +908,16 @@ export const packs: PackDefinition[] = [
                 1
               ],
               [
-                0,
-                0
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
                 1,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
                 1
-              ],
-              [
-                0,
-                1,
-                0
               ]
             ]
           },
           {
             "shape": [
               [
-                1,
                 0,
+                1,
                 0
               ],
               [
@@ -925,42 +929,79 @@ export const packs: PackDefinition[] = [
                 0,
                 0,
                 1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
               ]
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 3
       },
       "5": {
         "startState": [
           [
-            0,
-            0,
-            1
-          ],
-          [
             1,
             0,
             0
           ],
           [
+            0,
             1,
+            0
+          ],
+          [
+            0,
             1,
-            1
+            0
           ]
         ],
         "templates": [
           {
             "shape": [
               [
-                0,
+                1,
                 1
               ],
               [
-                0,
+                1,
                 1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                1,
+                1,
+                0
               ]
             ]
           },
@@ -973,38 +1014,18 @@ export const packs: PackDefinition[] = [
               ],
               [
                 0,
-                0,
-                1
-              ],
-              [
-                0,
-                1,
-                0
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
                 1,
                 0
               ],
               [
                 1,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
+                1,
                 1
               ]
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 3
       }
     }
@@ -1019,17 +1040,17 @@ export const packs: PackDefinition[] = [
           [
             0,
             0,
-            1
-          ],
-          [
-            1,
-            1,
-            1
-          ],
-          [
-            0,
-            0,
             0
+          ],
+          [
+            1,
+            0,
+            1
+          ],
+          [
+            1,
+            0,
+            1
           ]
         ],
         "templates": [
@@ -1038,15 +1059,15 @@ export const packs: PackDefinition[] = [
               [
                 0,
                 0,
-                1
-              ],
-              [
-                1,
-                1,
-                1
+                0
               ],
               [
                 0,
+                0,
+                1
+              ],
+              [
+                1,
                 1,
                 0
               ]
@@ -1056,59 +1077,58 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 1,
-                0,
-                1
-              ],
-              [
-                0,
                 1,
                 0
               ],
               [
                 1,
+                0,
+                0
+              ],
+              [
                 1,
-                1
+                0,
+                0
               ]
             ]
           },
           {
             "shape": [
               [
+                1,
                 0,
-                0,
+                0
+              ],
+              [
+                1,
+                1,
                 1
               ],
               [
                 1,
                 0,
-                1
-              ],
-              [
-                1,
-                1,
                 1
               ]
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 4
       },
       "2": {
         "startState": [
           [
             0,
-            0,
+            1,
             0
           ],
           [
             1,
-            0,
+            1,
             1
           ],
           [
-            1,
+            0,
             1,
             0
           ]
@@ -1117,38 +1137,19 @@ export const packs: PackDefinition[] = [
           {
             "shape": [
               [
-                0,
-                0,
-                1
-              ],
-              [
                 1,
                 1,
                 1
               ],
               [
                 1,
-                0,
-                0
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
-                0,
+                1,
                 0
               ],
               [
                 1,
-                0,
+                1,
                 0
-              ],
-              [
-                0,
-                0,
-                1
               ]
             ]
           },
@@ -1157,23 +1158,41 @@ export const packs: PackDefinition[] = [
               [
                 1,
                 1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ],
+              [
+                0,
+                1,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                0,
+                1
+              ],
+              [
+                1,
+                1,
                 1
               ],
               [
                 1,
                 0,
-                0
-              ],
-              [
-                0,
-                0,
-                0
+                1
               ]
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 4
       },
       "3": {
@@ -1181,50 +1200,31 @@ export const packs: PackDefinition[] = [
           [
             1,
             0,
-            1
+            0
           ],
           [
             0,
-            0,
-            1
+            1,
+            0
           ],
           [
             1,
             0,
-            1
+            0
           ]
         ],
         "templates": [
           {
             "shape": [
               [
-                0,
-                0,
-                0
-              ],
-              [
                 1,
-                0,
+                1,
                 0
               ],
               [
                 1,
                 1,
                 1
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
-                1,
-                1
-              ],
-              [
-                0,
-                0,
-                0
               ],
               [
                 0,
@@ -1238,23 +1238,41 @@ export const packs: PackDefinition[] = [
               [
                 1,
                 0,
-                0
-              ],
-              [
-                0,
-                1,
-                0
+                1
               ],
               [
                 0,
                 1,
                 1
+              ],
+              [
+                0,
+                1,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                0,
+                1
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
               ]
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 4
       },
       "4": {
@@ -1265,14 +1283,14 @@ export const packs: PackDefinition[] = [
             1
           ],
           [
-            1,
-            1,
-            1
+            0,
+            0,
+            0
           ],
           [
             0,
-            1,
-            1
+            0,
+            0
           ]
         ],
         "templates": [
@@ -1281,36 +1299,17 @@ export const packs: PackDefinition[] = [
               [
                 1,
                 0,
-                0
-              ],
-              [
-                1,
-                1,
                 1
               ],
               [
                 0,
-                1,
-                1
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                1,
                 0,
                 0
               ],
               [
                 1,
-                0,
-                1
-              ],
-              [
                 1,
-                1,
-                1
+                0
               ]
             ]
           },
@@ -1318,42 +1317,60 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 0,
-                0,
-                1
-              ],
-              [
-                1,
                 1,
                 1
               ],
               [
                 0,
-                0,
+                1,
                 0
+              ],
+              [
+                0,
+                1,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ],
+              [
+                1,
+                0,
+                1
               ]
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 4
       },
       "5": {
         "startState": [
           [
             1,
+            1,
+            0
+          ],
+          [
+            0,
             0,
             0
           ],
           [
             1,
             1,
-            1
-          ],
-          [
-            1,
-            1,
-            1
+            0
           ]
         ],
         "templates": [
@@ -1361,13 +1378,32 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 1,
-                1,
+                0,
+                1
+              ],
+              [
+                0,
+                0,
                 0
               ],
               [
                 1,
-                1,
+                0,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
                 0
+              ],
+              [
+                1,
+                0,
+                1
               ],
               [
                 1,
@@ -1381,42 +1417,22 @@ export const packs: PackDefinition[] = [
               [
                 1,
                 1,
-                1
-              ],
-              [
-                1,
-                1,
-                0
-              ],
-              [
-                0,
-                1,
-                1
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
-                1,
                 0
               ],
               [
                 1,
-                1,
-                1
+                0,
+                0
               ],
               [
-                0,
                 1,
+                0,
                 1
               ]
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 4
       }
     }
@@ -1429,37 +1445,37 @@ export const packs: PackDefinition[] = [
       "1": {
         "startState": [
           [
-            0,
-            0,
+            1,
+            1,
             0
           ],
           [
             1,
-            0,
+            1,
             0
           ],
           [
-            0,
             1,
-            1
+            1,
+            0
           ]
         ],
         "templates": [
           {
             "shape": [
               [
+                0,
                 1,
-                0,
                 1
               ],
               [
-                0,
-                0,
-                1
+                1,
+                1,
+                0
               ],
               [
                 0,
-                0,
+                1,
                 1
               ]
             ]
@@ -1468,17 +1484,17 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 0,
+                1,
+                1
+              ],
+              [
+                1,
                 0,
                 0
               ],
               [
                 1,
-                1,
-                0
-              ],
-              [
-                1,
-                1,
+                0,
                 1
               ]
             ]
@@ -1487,8 +1503,8 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 1,
-                0,
-                0
+                1,
+                1
               ],
               [
                 0,
@@ -1496,15 +1512,14 @@ export const packs: PackDefinition[] = [
                 1
               ],
               [
-                1,
                 0,
-                0
+                0,
+                1
               ]
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 5
       },
       "2": {
@@ -1512,12 +1527,12 @@ export const packs: PackDefinition[] = [
           [
             1,
             0,
-            1
+            0
           ],
           [
+            1,
             0,
-            0,
-            1
+            0
           ],
           [
             0,
@@ -1531,7 +1546,7 @@ export const packs: PackDefinition[] = [
               [
                 1,
                 1,
-                0
+                1
               ],
               [
                 1,
@@ -1539,8 +1554,8 @@ export const packs: PackDefinition[] = [
                 1
               ],
               [
-                0,
-                0,
+                1,
+                1,
                 0
               ]
             ]
@@ -1549,7 +1564,7 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 1,
-                0,
+                1,
                 1
               ],
               [
@@ -1558,9 +1573,9 @@ export const packs: PackDefinition[] = [
                 1
               ],
               [
-                0,
-                0,
-                1
+                1,
+                1,
+                0
               ]
             ]
           },
@@ -1573,19 +1588,18 @@ export const packs: PackDefinition[] = [
               ],
               [
                 0,
-                0,
-                1
+                1,
+                0
               ],
               [
-                0,
+                1,
                 1,
                 1
               ]
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 5
       },
       "3": {
@@ -1596,6 +1610,309 @@ export const packs: PackDefinition[] = [
             1
           ],
           [
+            1,
+            1,
+            1
+          ],
+          [
+            1,
+            0,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                1,
+                1,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                1,
+                0,
+                1
+              ],
+              [
+                1,
+                0,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                1,
+                1
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                1,
+                1,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 5
+      },
+      "4": {
+        "startState": [
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            1
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                0,
+                0,
+                1
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                1,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                1,
+                1
+              ],
+              [
+                0,
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                0,
+                1
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 5
+      },
+      "5": {
+        "startState": [
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            1,
+            0,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                1,
+                0,
+                1
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                0,
+                1
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                1,
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                1
+              ],
+              [
+                1,
+                1,
+                1
+              ],
+              [
+                1,
+                0,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 5
+      }
+    }
+  },
+  {
+    "name": "Color Spectrum",
+    "slug": "color-spectrum",
+    "access": "free",
+    "puzzles": {
+      "1": {
+        "startState": [
+          [
+            0,
+            0,
+            2
+          ],
+          [
+            2,
+            0,
+            2
+          ],
+          [
+            2,
+            0,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                0,
+                2,
+                2
+              ],
+              [
+                0,
+                2,
+                0
+              ],
+              [
+                0,
+                0,
+                2
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                2,
+                0,
+                2
+              ],
+              [
+                0,
+                2,
+                0
+              ],
+              [
+                0,
+                2,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 2
+      },
+      "2": {
+        "startState": [
+          [
             0,
             1,
             0
@@ -1603,7 +1920,2862 @@ export const packs: PackDefinition[] = [
           [
             0,
             0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0
+              ],
+              [
+                0,
+                0
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 2
+      },
+      "3": {
+        "startState": [
+          [
+            0,
+            0,
+            4
+          ],
+          [
+            0,
+            4,
+            4
+          ],
+          [
+            0,
+            4,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                4,
+                0
+              ],
+              [
+                4,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                4,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                4
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 2
+      },
+      "4": {
+        "startState": [
+          [
+            0,
+            3,
+            3
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            3
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                3,
+                3,
+                0
+              ],
+              [
+                0,
+                0,
+                3
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                3,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                3,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                3
+              ],
+              [
+                3,
+                3
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 3
+      },
+      "5": {
+        "startState": [
+          [
+            6,
+            0,
+            6
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            6,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                6,
+                6,
+                6
+              ],
+              [
+                6,
+                6,
+                0
+              ],
+              [
+                6,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                6,
+                6,
+                0
+              ],
+              [
+                6,
+                0,
+                6
+              ],
+              [
+                6,
+                6,
+                6
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                6,
+                6,
+                0
+              ],
+              [
+                6,
+                6,
+                6
+              ],
+              [
+                0,
+                0,
+                6
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 3
+      },
+      "6": {
+        "startState": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            5,
+            0,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                5,
+                0
+              ],
+              [
+                5,
+                5
+              ],
+              [
+                5,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                5,
+                5,
+                5
+              ],
+              [
+                0,
+                0,
+                5
+              ],
+              [
+                5,
+                5,
+                5
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0
+              ],
+              [
+                5,
+                5
+              ],
+              [
+                5,
+                5
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 3
+      },
+      "7": {
+        "startState": [
+          [
+            3,
+            0,
             1
+          ],
+          [
+            3,
+            3,
+            0
+          ],
+          [
+            1,
+            3,
+            1
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                1,
+                1,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                1,
+                1
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                2,
+                0,
+                2
+              ],
+              [
+                0,
+                2,
+                0
+              ],
+              [
+                2,
+                0,
+                2
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                2,
+                1
+              ],
+              [
+                0,
+                2
+              ],
+              [
+                0,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 4
+      },
+      "8": {
+        "startState": [
+          [
+            1,
+            6,
+            1
+          ],
+          [
+            4,
+            1,
+            2
+          ],
+          [
+            1,
+            1,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                0,
+                1
+              ],
+              [
+                1,
+                0,
+                1
+              ],
+              [
+                1,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                2,
+                0
+              ],
+              [
+                2,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                2
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0
+              ],
+              [
+                4,
+                4
+              ],
+              [
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                4,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                2
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 6
+      },
+      "9": {
+        "startState": [
+          [
+            0,
+            6,
+            0
+          ],
+          [
+            0,
+            0,
+            3
+          ],
+          [
+            3,
+            3,
+            5
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                0
+              ],
+              [
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                3,
+                3
+              ],
+              [
+                0,
+                0
+              ],
+              [
+                3,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                5,
+                5,
+                5
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                5,
+                5
+              ],
+              [
+                5,
+                5
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                6
+              ],
+              [
+                0,
+                5,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                6,
+                5
+              ],
+              [
+                5,
+                5,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 6
+      },
+      "10": {
+        "startState": [
+          [
+            4,
+            0,
+            6
+          ],
+          [
+            5,
+            1,
+            5
+          ],
+          [
+            6,
+            3,
+            7
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                0
+              ],
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                3,
+                3
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                3
+              ],
+              [
+                3,
+                0,
+                3
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                6,
+                0
+              ],
+              [
+                3,
+                0
+              ],
+              [
+                6,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                3,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                6,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 6
+      }
+    }
+  },
+  {
+    "name": "Chromatic Ascent",
+    "slug": "chromatic-ascent",
+    "access": "paid",
+    "puzzles": {
+      "1": {
+        "startState": [
+          [
+            0,
+            2,
+            0
+          ],
+          [
+            0,
+            0,
+            2
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                0,
+                0
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                0,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 2
+      },
+      "2": {
+        "startState": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 2
+      },
+      "3": {
+        "startState": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            4,
+            0,
+            0
+          ],
+          [
+            4,
+            4,
+            4
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                4,
+                4,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 2
+      },
+      "4": {
+        "startState": [
+          [
+            3,
+            3,
+            0
+          ],
+          [
+            3,
+            3,
+            3
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                3,
+                0
+              ],
+              [
+                3,
+                3
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 3
+      },
+      "5": {
+        "startState": [
+          [
+            0,
+            6,
+            0
+          ],
+          [
+            6,
+            6,
+            0
+          ],
+          [
+            0,
+            6,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                0,
+                6,
+                0
+              ],
+              [
+                0,
+                6,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 3
+      },
+      "6": {
+        "startState": [
+          [
+            0,
+            0,
+            5
+          ],
+          [
+            0,
+            5,
+            0
+          ],
+          [
+            5,
+            0,
+            5
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                5,
+                0
+              ],
+              [
+                0,
+                5
+              ],
+              [
+                0,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 3
+      },
+      "7": {
+        "startState": [
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            1,
+            3,
+            2
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                2
+              ],
+              [
+                0,
+                2,
+                2
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                0,
+                2
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 4
+      },
+      "8": {
+        "startState": [
+          [
+            7,
+            7,
+            5
+          ],
+          [
+            6,
+            5,
+            7
+          ],
+          [
+            0,
+            7,
+            2
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                1,
+                1
+              ],
+              [
+                0,
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                1,
+                1
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                1,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                2,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                2
+              ],
+              [
+                2,
+                0,
+                2
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                0
+              ],
+              [
+                2,
+                2
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                4,
+                4,
+                0
+              ],
+              [
+                4,
+                4,
+                4
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                4
+              ],
+              [
+                0,
+                4,
+                0
+              ],
+              [
+                1,
+                0,
+                4
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 6
+      },
+      "9": {
+        "startState": [
+          [
+            3,
+            6,
+            5
+          ],
+          [
+            0,
+            3,
+            5
+          ],
+          [
+            6,
+            0,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                3,
+                0,
+                0
+              ],
+              [
+                3,
+                0,
+                3
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                3,
+                3,
+                0
+              ],
+              [
+                0,
+                0,
+                3
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                5,
+                0,
+                5
+              ],
+              [
+                0,
+                5,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                5,
+                0,
+                5
+              ],
+              [
+                5,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                6,
+                5
+              ],
+              [
+                5,
+                6
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                6,
+                3,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 6
+      },
+      "10": {
+        "startState": [
+          [
+            3,
+            5,
+            4
+          ],
+          [
+            6,
+            0,
+            1
+          ],
+          [
+            3,
+            6,
+            1
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                1,
+                1
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                4
+              ],
+              [
+                0,
+                0
+              ],
+              [
+                4,
+                4
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                4,
+                4
+              ],
+              [
+                4,
+                4
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                6,
+                1,
+                0
+              ],
+              [
+                6,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                6
+              ],
+              [
+                4,
+                0,
+                6
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 6
+      }
+    }
+  },
+  {
+    "name": "4×4 Grid (Dev)",
+    "slug": "grid-4x4-dev",
+    "access": "free",
+    "puzzles": {
+      "1": {
+        "startState": [
+          [
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            1,
+            0,
+            1,
+            0
+          ],
+          [
+            1,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                1,
+                1
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                1,
+                1
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 1
+      },
+      "2": {
+        "startState": [
+          [
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            1
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                1
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                1,
+                1
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 3
+      },
+      "3": {
+        "startState": [
+          [
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            0
+          ],
+          [
+            1,
+            1,
+            1,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                1,
+                0,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                1,
+                1
+              ],
+              [
+                1,
+                1,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 3
+      },
+      "4": {
+        "startState": [
+          [
+            0,
+            1,
+            1,
+            1
+          ],
+          [
+            1,
+            0,
+            1,
+            1
+          ],
+          [
+            1,
+            1,
+            0,
+            1
+          ],
+          [
+            1,
+            1,
+            1,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                0,
+                1
+              ],
+              [
+                0,
+                0,
+                1
+              ],
+              [
+                1,
+                1,
+                1
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 2
+      },
+      "5": {
+        "startState": [
+          [
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            1,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ],
+              [
+                1,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                0,
+                1
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 3
+      },
+      "6": {
+        "startState": [
+          [
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            1,
+            1,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            1,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                0,
+                1
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                0,
+                1
+              ],
+              [
+                1,
+                1,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 3
+      },
+      "7": {
+        "startState": [
+          [
+            1,
+            0,
+            1,
+            0
+          ],
+          [
+            1,
+            0,
+            1,
+            0
+          ],
+          [
+            1,
+            1,
+            1,
+            0
+          ],
+          [
+            1,
+            1,
+            0,
+            1
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                0,
+                1
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                1,
+                1,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 3
+      },
+      "8": {
+        "startState": [
+          [
+            1,
+            1,
+            1,
+            0
+          ],
+          [
+            1,
+            0,
+            1,
+            1
+          ],
+          [
+            1,
+            1,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ],
+              [
+                1,
+                1,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                1
+              ],
+              [
+                1,
+                1,
+                1
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 3
+      },
+      "9": {
+        "startState": [
+          [
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0
+          ],
+          [
+            1,
+            0,
+            1,
+            0
+          ],
+          [
+            1,
+            0,
+            1,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                0,
+                0,
+                1
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 3
+      },
+      "10": {
+        "startState": [
+          [
+            1,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            1
+          ],
+          [
+            1,
+            1,
+            0,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                1
+              ],
+              [
+                0,
+                1,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 3
+      },
+      "11": {
+        "startState": [
+          [
+            0,
+            0,
+            1,
+            0
+          ],
+          [
+            1,
+            1,
+            1,
+            1
+          ],
+          [
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            1,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 4
+      },
+      "12": {
+        "startState": [
+          [
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            1,
+            1
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 4
+      },
+      "13": {
+        "startState": [
+          [
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            1,
+            1
+          ],
+          [
+            0,
+            1,
+            0,
+            1
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                0,
+                1
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 3
+      },
+      "14": {
+        "startState": [
+          [
+            1,
+            1,
+            0,
+            1
+          ],
+          [
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            1,
+            1
+          ],
+          [
+            1,
+            1,
+            0,
+            1
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                1,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                0,
+                1
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 4
+      },
+      "15": {
+        "startState": [
+          [
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            1,
+            1
+          ],
+          [
+            0,
+            1,
+            1,
+            1
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 4
+      },
+      "16": {
+        "startState": [
+          [
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            1,
+            1
+          ],
+          [
+            1,
+            1,
+            0,
+            1
+          ],
+          [
+            1,
+            1,
+            1,
+            1
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                0,
+                1
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                1,
+                1
+              ],
+              [
+                0,
+                0,
+                1
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                1,
+                1
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                1,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 3
+      },
+      "17": {
+        "startState": [
+          [
+            1,
+            1,
+            1,
+            0
+          ],
+          [
+            1,
+            1,
+            1,
+            0
+          ],
+          [
+            1,
+            1,
+            1,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            1
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 4
+      },
+      "18": {
+        "startState": [
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            1,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            1
+          ],
+          [
+            1,
+            1,
+            1,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                1,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                1,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 4
+      },
+      "19": {
+        "startState": [
+          [
+            1,
+            0,
+            1,
+            0
+          ],
+          [
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            1,
+            1,
+            0
           ]
         ],
         "templates": [
@@ -1616,13 +4788,165 @@ export const packs: PackDefinition[] = [
               ],
               [
                 1,
+                0,
+                0
+              ],
+              [
+                0,
                 1,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                0,
                 1
               ],
               [
                 1,
                 0,
                 0
+              ],
+              [
+                1,
+                0,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                1,
+                0,
+                1
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 3
+      },
+      "20": {
+        "startState": [
+          [
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            1,
+            0,
+            0,
+            1
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                0,
+                0,
+                1
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                1,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 4
+      },
+      "21": {
+        "startState": [
+          [
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            1,
+            1
+          ],
+          [
+            0,
+            1,
+            1,
+            1
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                1
               ]
             ]
           },
@@ -1634,40 +4958,786 @@ export const packs: PackDefinition[] = [
                 1
               ],
               [
-                0,
-                1,
-                1
-              ],
-              [
-                1,
-                1,
-                1
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
                 1,
                 0,
                 0
               ],
               [
                 1,
-                0,
-                1
-              ],
-              [
-                0,
                 1,
                 1
               ]
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
-        "minMovesToSolve": 5
+        "solvedValue": 0,
+        "minMovesToSolve": 4
+      },
+      "22": {
+        "startState": [
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            1,
+            1
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 4
+      },
+      "23": {
+        "startState": [
+          [
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            1,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            1
+          ],
+          [
+            1,
+            0,
+            1,
+            1
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                0,
+                1
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                1,
+                1
+              ],
+              [
+                0,
+                1,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 4
+      },
+      "24": {
+        "startState": [
+          [
+            0,
+            0,
+            1,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            1
+          ],
+          [
+            0,
+            1,
+            0,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                1,
+                1
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 3
+      },
+      "25": {
+        "startState": [
+          [
+            1,
+            0,
+            1,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            1,
+            1
+          ],
+          [
+            0,
+            1,
+            1,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                1,
+                1,
+                1
+              ],
+              [
+                1,
+                0,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                1,
+                1
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 3
+      },
+      "26": {
+        "startState": [
+          [
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            1,
+            1
+          ],
+          [
+            1,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                0,
+                1
+              ],
+              [
+                1,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                1,
+                0,
+                1
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 4
+      },
+      "27": {
+        "startState": [
+          [
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            1
+          ],
+          [
+            1,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            1,
+            1,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                0,
+                1
+              ],
+              [
+                0,
+                1,
+                1
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 4
+      },
+      "28": {
+        "startState": [
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            1,
+            1
+          ],
+          [
+            1,
+            0,
+            1,
+            1
+          ],
+          [
+            0,
+            1,
+            1,
+            1
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                1,
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                1
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                0,
+                1
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 4
+      },
+      "29": {
+        "startState": [
+          [
+            1,
+            0,
+            1,
+            1
+          ],
+          [
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            1,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                1,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                1,
+                0,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 4
+      },
+      "30": {
+        "startState": [
+          [
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            1,
+            1
+          ],
+          [
+            1,
+            1,
+            0,
+            1
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ],
+              [
+                1,
+                1,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 4
+      }
+    }
+  },
+  {
+    "name": "First Steps",
+    "slug": "first-steps",
+    "access": "free",
+    "puzzles": {
+      "1": {
+        "startState": [
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            1,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 1
+      },
+      "2": {
+        "startState": [
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            1,
+            0,
+            1
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 3
+      },
+      "3": {
+        "startState": [
+          [
+            1,
+            1,
+            1
+          ],
+          [
+            1,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                1,
+                0,
+                1
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 2
       },
       "4": {
         "startState": [
@@ -1677,13 +5747,13 @@ export const packs: PackDefinition[] = [
             0
           ],
           [
-            0,
             1,
-            1
+            1,
+            0
           ],
           [
-            1,
-            1,
+            0,
+            0,
             1
           ]
         ],
@@ -1692,79 +5762,150 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 1,
-                1,
-                0
-              ],
-              [
-                1,
-                1,
-                0
-              ],
-              [
-                1,
-                1,
                 1
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                1,
-                0,
-                0
-              ],
-              [
-                0,
-                1,
-                1
-              ],
-              [
-                1,
-                1,
-                0
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
-                1,
-                1
-              ],
-              [
-                1,
-                0,
-                1
-              ],
-              [
-                0,
-                1,
-                0
               ]
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
-        "minMovesToSolve": 5
+        "solvedValue": 0,
+        "minMovesToSolve": 3
       },
       "5": {
         "startState": [
           [
-            1,
-            1,
-            1
+            2,
+            2,
+            0
           ],
           [
-            1,
-            1,
-            0
+            2,
+            3,
+            1
           ],
           [
             0,
             1,
+            1
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1
+              ],
+              [
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                2,
+                2
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 2
+      },
+      "6": {
+        "startState": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            4,
+            5,
+            1
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                4,
+                0,
+                0
+              ],
+              [
+                0,
+                5,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                4,
+                0,
+                0
+              ],
+              [
+                4,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 3
+      },
+      "7": {
+        "startState": [
+          [
+            0,
+            7,
+            0
+          ],
+          [
+            7,
+            0,
+            7
+          ],
+          [
+            0,
+            7,
             0
           ]
         ],
@@ -1773,37 +5914,58 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 1,
-                1,
-                1
-              ],
-              [
-                0,
-                1,
                 0
               ],
               [
                 0,
-                1,
-                1
+                2
               ]
             ]
           },
           {
             "shape": [
               [
-                1,
-                1,
+                4,
                 0
               ],
               [
-                1,
-                1,
+                0,
+                4
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 6
+      },
+      "8": {
+        "startState": [
+          [
+            0,
+            1,
+            1
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            2,
+            1
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                0,
                 1
               ],
               [
-                0,
-                0,
-                1
+                1,
+                0
               ]
             ]
           },
@@ -1811,29 +5973,36 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 0,
-                1,
-                1
-              ],
-              [
-                0,
                 0,
                 0
               ],
               [
-                1,
-                1,
+                2,
+                2,
+                2
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                2
+              ],
+              [
+                2,
+                0,
                 1
               ]
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
-        "minMovesToSolve": 5
+        "solvedValue": 0,
+        "minMovesToSolve": 4
       }
     }
   },
-  firstStepsPack,
   {
     "name": "Intro Pack",
     "slug": "intro-pack",
@@ -1842,19 +6011,19 @@ export const packs: PackDefinition[] = [
       "1": {
         "startState": [
           [
-            1,
-            1,
-            1
-          ],
-          [
-            1,
+            0,
             0,
             0
           ],
           [
-            1,
             0,
+            1,
             1
+          ],
+          [
+            0,
+            1,
+            0
           ]
         ],
         "templates": [
@@ -1871,8 +6040,7 @@ export const packs: PackDefinition[] = [
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 1
       },
       "2": {
@@ -1914,8 +6082,7 @@ export const packs: PackDefinition[] = [
             ]
           }
         ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true
+        "solvedValue": 0
       },
       "3": {
         "startState": [
@@ -1975,8 +6142,7 @@ export const packs: PackDefinition[] = [
             ]
           }
         ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true
+        "solvedValue": 0
       },
       "4": {
         "startState": [
@@ -2036,8 +6202,7 @@ export const packs: PackDefinition[] = [
             ]
           }
         ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true
+        "solvedValue": 0
       },
       "5": {
         "startState": [
@@ -2097,25 +6262,24 @@ export const packs: PackDefinition[] = [
             ]
           }
         ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true
+        "solvedValue": 0
       },
       "6": {
         "startState": [
           [
+            0,
             1,
+            1
+          ],
+          [
+            0,
             0,
             0
           ],
           [
-            1,
-            1,
-            1
-          ],
-          [
-            1,
-            1,
-            1
+            0,
+            0,
+            0
           ]
         ],
         "templates": [
@@ -2151,26 +6315,25 @@ export const packs: PackDefinition[] = [
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 2
       },
       "7": {
         "startState": [
           [
+            0,
             1,
-            0,
-            1
-          ],
-          [
-            0,
-            0,
             0
           ],
           [
             1,
             1,
             1
+          ],
+          [
+            0,
+            0,
+            0
           ]
         ],
         "templates": [
@@ -2225,26 +6388,25 @@ export const packs: PackDefinition[] = [
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 3
       },
       "8": {
         "startState": [
           [
-            0,
-            1,
-            1
-          ],
-          [
             1,
             0,
             0
           ],
           [
-            1,
             0,
+            1,
             1
+          ],
+          [
+            0,
+            1,
+            0
           ]
         ],
         "templates": [
@@ -2299,26 +6461,25 @@ export const packs: PackDefinition[] = [
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 3
       },
       "9": {
         "startState": [
           [
-            0,
-            0,
-            0
-          ],
-          [
             1,
-            0,
+            1,
             1
           ],
           [
             0,
             1,
             0
+          ],
+          [
+            1,
+            0,
+            1
           ]
         ],
         "templates": [
@@ -2373,8 +6534,7 @@ export const packs: PackDefinition[] = [
             ]
           }
         ],
-        "solvedValue": 1,
-        "allowTemplateRotation": true,
+        "solvedValue": 0,
         "minMovesToSolve": 3
       },
       "10": {
@@ -2454,8 +6614,7 @@ export const packs: PackDefinition[] = [
             ]
           }
         ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true
+        "solvedValue": 0
       }
     }
   },
@@ -2541,8 +6700,7 @@ export const packs: PackDefinition[] = [
             ]
           }
         ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true
+        "solvedValue": 0
       },
       "15": {
         "startState": [
@@ -2621,8 +6779,7 @@ export const packs: PackDefinition[] = [
             ]
           }
         ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true
+        "solvedValue": 0
       }
     }
   },
@@ -2689,8 +6846,7 @@ export const packs: PackDefinition[] = [
             ]
           }
         ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true
+        "solvedValue": 0
       }
     }
   },
@@ -2760,7 +6916,6 @@ export const packs: PackDefinition[] = [
           }
         ],
         "solvedValue": 0,
-        "allowTemplateRotation": true,
         "minMovesToSolve": 3
       },
       "2": {
@@ -2854,7 +7009,6 @@ export const packs: PackDefinition[] = [
           }
         ],
         "solvedValue": 0,
-        "allowTemplateRotation": true,
         "minMovesToSolve": 4
       },
       "3": {
@@ -2972,7 +7126,6 @@ export const packs: PackDefinition[] = [
           }
         ],
         "solvedValue": 0,
-        "allowTemplateRotation": true,
         "minMovesToSolve": 6
       },
       "4": {
@@ -3089,7 +7242,6 @@ export const packs: PackDefinition[] = [
           }
         ],
         "solvedValue": 0,
-        "allowTemplateRotation": true,
         "minMovesToSolve": 6
       },
       "5": {
@@ -3208,1548 +7360,6 @@ export const packs: PackDefinition[] = [
           }
         ],
         "solvedValue": 0,
-        "allowTemplateRotation": true,
-        "minMovesToSolve": 6
-      }
-    }
-  },
-  {
-    "name": "Color Spectrum",
-    "slug": "color-spectrum",
-    "access": "free",
-    "puzzles": {
-      "1": {
-        "startState": [
-          [
-            0,
-            0,
-            2
-          ],
-          [
-            2,
-            2,
-            0
-          ],
-          [
-            2,
-            0,
-            0
-          ]
-        ],
-        "templates": [
-          {
-            "shape": [
-              [
-                2,
-                0
-              ],
-              [
-                0,
-                2
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                2,
-                0
-              ],
-              [
-                2,
-                0
-              ]
-            ]
-          }
-        ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true,
-        "minMovesToSolve": 2
-      },
-      "2": {
-        "startState": [
-          [
-            1,
-            0,
-            0
-          ],
-          [
-            0,
-            1,
-            1
-          ],
-          [
-            0,
-            1,
-            0
-          ]
-        ],
-        "templates": [
-          {
-            "shape": [
-              [
-                0,
-                0,
-                0
-              ],
-              [
-                1,
-                1,
-                1
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                1,
-                0
-              ],
-              [
-                0,
-                1
-              ],
-              [
-                0,
-                1
-              ]
-            ]
-          }
-        ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true,
-        "minMovesToSolve": 2
-      },
-      "3": {
-        "startState": [
-          [
-            0,
-            0,
-            4
-          ],
-          [
-            4,
-            0,
-            0
-          ],
-          [
-            4,
-            0,
-            0
-          ]
-        ],
-        "templates": [
-          {
-            "shape": [
-              [
-                4,
-                0
-              ],
-              [
-                4,
-                0
-              ],
-              [
-                0,
-                0
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                4,
-                0,
-                0
-              ],
-              [
-                0,
-                4,
-                0
-              ],
-              [
-                0,
-                0,
-                4
-              ]
-            ]
-          }
-        ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true,
-        "minMovesToSolve": 2
-      },
-      "4": {
-        "startState": [
-          [
-            3,
-            0,
-            3
-          ],
-          [
-            3,
-            3,
-            0
-          ],
-          [
-            0,
-            0,
-            0
-          ]
-        ],
-        "templates": [
-          {
-            "shape": [
-              [
-                3,
-                3
-              ],
-              [
-                3,
-                3
-              ],
-              [
-                0,
-                3
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
-                3,
-                0
-              ],
-              [
-                3,
-                0,
-                3
-              ],
-              [
-                3,
-                3,
-                3
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                3,
-                0,
-                3
-              ],
-              [
-                0,
-                0,
-                3
-              ],
-              [
-                0,
-                3,
-                3
-              ]
-            ]
-          }
-        ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true,
-        "minMovesToSolve": 3
-      },
-      "5": {
-        "startState": [
-          [
-            0,
-            0,
-            0
-          ],
-          [
-            0,
-            0,
-            6
-          ],
-          [
-            6,
-            6,
-            0
-          ]
-        ],
-        "templates": [
-          {
-            "shape": [
-              [
-                6,
-                0,
-                0
-              ],
-              [
-                6,
-                6,
-                0
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                6,
-                0
-              ],
-              [
-                6,
-                0
-              ],
-              [
-                0,
-                6
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                6,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                6
-              ],
-              [
-                0,
-                6,
-                0
-              ]
-            ]
-          }
-        ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true,
-        "minMovesToSolve": 3
-      },
-      "6": {
-        "startState": [
-          [
-            0,
-            0,
-            0
-          ],
-          [
-            5,
-            5,
-            0
-          ],
-          [
-            0,
-            5,
-            0
-          ]
-        ],
-        "templates": [
-          {
-            "shape": [
-              [
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                5,
-                5
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                5,
-                0
-              ],
-              [
-                5,
-                5
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
-                5
-              ],
-              [
-                0,
-                0
-              ],
-              [
-                5,
-                0
-              ]
-            ]
-          }
-        ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true,
-        "minMovesToSolve": 3
-      },
-      "7": {
-        "startState": [
-          [
-            1,
-            2,
-            2
-          ],
-          [
-            0,
-            1,
-            1
-          ],
-          [
-            1,
-            1,
-            0
-          ]
-        ],
-        "templates": [
-          {
-            "shape": [
-              [
-                1,
-                1,
-                0
-              ],
-              [
-                0,
-                1,
-                0
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
-                1
-              ],
-              [
-                0,
-                1
-              ],
-              [
-                1,
-                0
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
-                2,
-                2
-              ],
-              [
-                2,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                1,
-                2
-              ],
-              [
-                0,
-                1
-              ],
-              [
-                0,
-                1
-              ]
-            ]
-          }
-        ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true,
-        "minMovesToSolve": 4
-      },
-      "8": {
-        "startState": [
-          [
-            2,
-            2,
-            2
-          ],
-          [
-            5,
-            1,
-            7
-          ],
-          [
-            0,
-            6,
-            7
-          ]
-        ],
-        "templates": [
-          {
-            "shape": [
-              [
-                0,
-                1,
-                0
-              ],
-              [
-                0,
-                1,
-                1
-              ],
-              [
-                1,
-                0,
-                1
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
-                1,
-                0
-              ],
-              [
-                1,
-                0,
-                0
-              ],
-              [
-                1,
-                1,
-                1
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
-                0,
-                2
-              ],
-              [
-                2,
-                2,
-                2
-              ],
-              [
-                2,
-                0,
-                0
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                2,
-                0
-              ],
-              [
-                2,
-                2
-              ],
-              [
-                2,
-                2
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                4,
-                4
-              ],
-              [
-                0,
-                4
-              ],
-              [
-                4,
-                4
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                4,
-                0,
-                1
-              ],
-              [
-                1,
-                0,
-                2
-              ],
-              [
-                2,
-                0,
-                0
-              ]
-            ]
-          }
-        ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true,
-        "minMovesToSolve": 6
-      },
-      "9": {
-        "startState": [
-          [
-            6,
-            3,
-            0
-          ],
-          [
-            5,
-            5,
-            6
-          ],
-          [
-            6,
-            5,
-            0
-          ]
-        ],
-        "templates": [
-          {
-            "shape": [
-              [
-                0,
-                0
-              ],
-              [
-                0,
-                3
-              ],
-              [
-                3,
-                0
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
-                3,
-                3
-              ],
-              [
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                5,
-                5,
-                5
-              ],
-              [
-                5,
-                0,
-                0
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                5,
-                0,
-                5
-              ],
-              [
-                0,
-                0,
-                5
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
-                5,
-                6
-              ],
-              [
-                0,
-                3,
-                0
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                5,
-                3
-              ],
-              [
-                5,
-                6
-              ]
-            ]
-          }
-        ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true,
-        "minMovesToSolve": 6
-      },
-      "10": {
-        "startState": [
-          [
-            3,
-            1,
-            0
-          ],
-          [
-            0,
-            0,
-            4
-          ],
-          [
-            0,
-            5,
-            3
-          ]
-        ],
-        "templates": [
-          {
-            "shape": [
-              [
-                1,
-                0,
-                1
-              ],
-              [
-                0,
-                1,
-                0
-              ],
-              [
-                1,
-                1,
-                0
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
-                1,
-                0
-              ],
-              [
-                0,
-                1,
-                1
-              ],
-              [
-                1,
-                0,
-                1
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                3,
-                0,
-                0
-              ],
-              [
-                3,
-                0,
-                0
-              ],
-              [
-                3,
-                3,
-                3
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                3,
-                0,
-                3
-              ],
-              [
-                0,
-                3,
-                0
-              ],
-              [
-                3,
-                0,
-                3
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
-                6
-              ],
-              [
-                1,
-                3
-              ],
-              [
-                0,
-                1
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                6,
-                3
-              ],
-              [
-                0,
-                0
-              ],
-              [
-                1,
-                1
-              ]
-            ]
-          }
-        ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true,
-        "minMovesToSolve": 6
-      }
-    }
-  },
-  {
-    "name": "Chromatic Ascent",
-    "slug": "chromatic-ascent",
-    "access": "paid",
-    "puzzles": {
-      "1": {
-        "startState": [
-          [
-            0,
-            0,
-            2
-          ],
-          [
-            2,
-            2,
-            0
-          ],
-          [
-            0,
-            2,
-            0
-          ]
-        ],
-        "templates": [
-          {
-            "shape": [
-              [
-                2,
-                0
-              ],
-              [
-                0,
-                2
-              ]
-            ]
-          }
-        ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true,
-        "minMovesToSolve": 2
-      },
-      "2": {
-        "startState": [
-          [
-            1,
-            1,
-            0
-          ],
-          [
-            1,
-            1,
-            0
-          ],
-          [
-            1,
-            1,
-            0
-          ]
-        ],
-        "templates": [
-          {
-            "shape": [
-              [
-                0,
-                0,
-                1
-              ],
-              [
-                0,
-                1,
-                1
-              ]
-            ]
-          }
-        ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true,
-        "minMovesToSolve": 2
-      },
-      "3": {
-        "startState": [
-          [
-            0,
-            0,
-            0
-          ],
-          [
-            4,
-            4,
-            0
-          ],
-          [
-            4,
-            4,
-            0
-          ]
-        ],
-        "templates": [
-          {
-            "shape": [
-              [
-                4,
-                0,
-                0
-              ],
-              [
-                0,
-                4,
-                0
-              ]
-            ]
-          }
-        ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true,
-        "minMovesToSolve": 2
-      },
-      "4": {
-        "startState": [
-          [
-            0,
-            0,
-            0
-          ],
-          [
-            0,
-            3,
-            3
-          ],
-          [
-            3,
-            0,
-            3
-          ]
-        ],
-        "templates": [
-          {
-            "shape": [
-              [
-                0,
-                3,
-                0
-              ],
-              [
-                3,
-                3,
-                3
-              ]
-            ]
-          }
-        ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true,
-        "minMovesToSolve": 3
-      },
-      "5": {
-        "startState": [
-          [
-            0,
-            6,
-            6
-          ],
-          [
-            6,
-            0,
-            6
-          ],
-          [
-            0,
-            0,
-            0
-          ]
-        ],
-        "templates": [
-          {
-            "shape": [
-              [
-                6,
-                0
-              ],
-              [
-                6,
-                0
-              ]
-            ]
-          }
-        ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true,
-        "minMovesToSolve": 3
-      },
-      "6": {
-        "startState": [
-          [
-            5,
-            0,
-            0
-          ],
-          [
-            0,
-            5,
-            0
-          ],
-          [
-            0,
-            5,
-            0
-          ]
-        ],
-        "templates": [
-          {
-            "shape": [
-              [
-                0,
-                5
-              ],
-              [
-                5,
-                5
-              ],
-              [
-                0,
-                0
-              ]
-            ]
-          }
-        ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true,
-        "minMovesToSolve": 3
-      },
-      "7": {
-        "startState": [
-          [
-            0,
-            1,
-            1
-          ],
-          [
-            2,
-            1,
-            0
-          ],
-          [
-            2,
-            2,
-            1
-          ]
-        ],
-        "templates": [
-          {
-            "shape": [
-              [
-                1,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0
-              ],
-              [
-                1,
-                0,
-                1
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
-                1
-              ],
-              [
-                1,
-                0
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
-                0,
-                0
-              ],
-              [
-                2,
-                2,
-                2
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
-                0,
-                2
-              ],
-              [
-                2,
-                0,
-                1
-              ]
-            ]
-          }
-        ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true,
-        "minMovesToSolve": 4
-      },
-      "8": {
-        "startState": [
-          [
-            5,
-            6,
-            1
-          ],
-          [
-            6,
-            2,
-            1
-          ],
-          [
-            4,
-            1,
-            1
-          ]
-        ],
-        "templates": [
-          {
-            "shape": [
-              [
-                1,
-                0
-              ],
-              [
-                0,
-                0
-              ],
-              [
-                1,
-                1
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                1,
-                1
-              ],
-              [
-                0,
-                1
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                2,
-                0,
-                0
-              ],
-              [
-                2,
-                0,
-                0
-              ],
-              [
-                2,
-                0,
-                0
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                2,
-                0
-              ],
-              [
-                0,
-                2
-              ],
-              [
-                0,
-                2
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                4,
-                0,
-                4
-              ],
-              [
-                0,
-                0,
-                4
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
-                0,
-                1
-              ],
-              [
-                0,
-                0,
-                0
-              ],
-              [
-                2,
-                4,
-                0
-              ]
-            ]
-          }
-        ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true,
-        "minMovesToSolve": 6
-      },
-      "9": {
-        "startState": [
-          [
-            0,
-            3,
-            6
-          ],
-          [
-            3,
-            3,
-            3
-          ],
-          [
-            5,
-            6,
-            6
-          ]
-        ],
-        "templates": [
-          {
-            "shape": [
-              [
-                3,
-                0
-              ],
-              [
-                3,
-                3
-              ],
-              [
-                3,
-                3
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                3,
-                3,
-                0
-              ],
-              [
-                3,
-                0,
-                3
-              ],
-              [
-                3,
-                0,
-                3
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                5,
-                5,
-                0
-              ],
-              [
-                0,
-                5,
-                5
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                5,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                5
-              ],
-              [
-                5,
-                5,
-                5
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                5,
-                6
-              ],
-              [
-                3,
-                0
-              ],
-              [
-                5,
-                3
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                6,
-                0,
-                5
-              ],
-              [
-                0,
-                5,
-                0
-              ],
-              [
-                3,
-                0,
-                6
-              ]
-            ]
-          }
-        ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true,
-        "minMovesToSolve": 6
-      },
-      "10": {
-        "startState": [
-          [
-            5,
-            1,
-            3
-          ],
-          [
-            0,
-            4,
-            4
-          ],
-          [
-            7,
-            1,
-            0
-          ]
-        ],
-        "templates": [
-          {
-            "shape": [
-              [
-                1,
-                0,
-                0
-              ],
-              [
-                0,
-                1,
-                0
-              ],
-              [
-                1,
-                0,
-                0
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
-                0,
-                1
-              ],
-              [
-                1,
-                0,
-                1
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
-                4,
-                0
-              ],
-              [
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                4
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
-                0,
-                4
-              ],
-              [
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                4,
-                0
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                1,
-                0
-              ],
-              [
-                4,
-                1
-              ],
-              [
-                6,
-                0
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                1,
-                6
-              ],
-              [
-                4,
-                0
-              ],
-              [
-                0,
-                0
-              ]
-            ]
-          }
-        ],
-        "solvedValue": 0,
-        "allowTemplateRotation": true,
         "minMovesToSolve": 6
       }
     }
@@ -5673,11 +8283,650 @@ export const packs: PackDefinition[] = [
           }
         ],
         "solvedValue": 0,
-        "allowTemplateRotation": true,
         "minMovesToSolve": 3
       }
     }
-  }
+  },
+  {
+    "name": "Color Ladder",
+    "slug": "color-ladder",
+    "access": "free",
+    "puzzles": {
+      "1": {
+        "startState": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            2,
+            2
+          ],
+          [
+            0,
+            2,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                2,
+                2
+              ],
+              [
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                2,
+                0,
+                2
+              ],
+              [
+                0,
+                2,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 2
+      },
+      "2": {
+        "startState": [
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                1
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0
+              ],
+              [
+                1,
+                0
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 2
+      },
+      "3": {
+        "startState": [
+          [
+            0,
+            4,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            4,
+            0,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                4,
+                4,
+                4
+              ],
+              [
+                0,
+                4,
+                0
+              ],
+              [
+                0,
+                4,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                4,
+                4
+              ],
+              [
+                0,
+                4,
+                4
+              ],
+              [
+                0,
+                4,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 2
+      },
+      "4": {
+        "startState": [
+          [
+            3,
+            3,
+            3
+          ],
+          [
+            3,
+            0,
+            3
+          ],
+          [
+            3,
+            3,
+            0
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                0,
+                3,
+                0
+              ],
+              [
+                3,
+                3,
+                0
+              ],
+              [
+                3,
+                3,
+                3
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                3,
+                3,
+                3
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                3,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                3
+              ],
+              [
+                3,
+                3,
+                3
+              ],
+              [
+                3,
+                0,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 3
+      },
+      "5": {
+        "startState": [
+          [
+            0,
+            0,
+            6
+          ],
+          [
+            0,
+            0,
+            6
+          ],
+          [
+            0,
+            6,
+            6
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                6,
+                0
+              ],
+              [
+                0,
+                6
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0
+              ],
+              [
+                6,
+                6
+              ],
+              [
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                6,
+                0,
+                6
+              ],
+              [
+                0,
+                0,
+                6
+              ],
+              [
+                0,
+                0,
+                6
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 3
+      },
+      "6": {
+        "startState": [
+          [
+            5,
+            0,
+            0
+          ],
+          [
+            5,
+            5,
+            0
+          ],
+          [
+            5,
+            0,
+            5
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                0,
+                5,
+                5
+              ],
+              [
+                0,
+                0,
+                5
+              ],
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                5
+              ],
+              [
+                5,
+                0
+              ],
+              [
+                5,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 3
+      },
+      "7": {
+        "startState": [
+          [
+            0,
+            3,
+            0
+          ],
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            2,
+            1
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                2,
+                0
+              ],
+              [
+                0,
+                2,
+                1
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 4
+      },
+      "8": {
+        "startState": [
+          [
+            0,
+            2,
+            0
+          ],
+          [
+            4,
+            5,
+            6
+          ],
+          [
+            2,
+            5,
+            3
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                2
+              ],
+              [
+                0,
+                0,
+                2
+              ],
+              [
+                0,
+                0,
+                2
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                4,
+                0
+              ],
+              [
+                2,
+                4,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 5
+      },
+      "9": {
+        "startState": [
+          [
+            0,
+            0,
+            2
+          ],
+          [
+            7,
+            1,
+            0
+          ],
+          [
+            0,
+            6,
+            4
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                0,
+                1
+              ],
+              [
+                0,
+                1
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                2
+              ],
+              [
+                4,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                2
+              ],
+              [
+                4,
+                0,
+                0
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 6
+      },
+      "10": {
+        "startState": [
+          [
+            7,
+            5,
+            1
+          ],
+          [
+            0,
+            6,
+            7
+          ],
+          [
+            1,
+            5,
+            4
+          ]
+        ],
+        "templates": [
+          {
+            "shape": [
+              [
+                1,
+                1
+              ],
+              [
+                0,
+                0
+              ],
+              [
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                6,
+                0
+              ],
+              [
+                0,
+                0,
+                4
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                4,
+                6
+              ]
+            ]
+          }
+        ],
+        "solvedValue": 0,
+        "minMovesToSolve": 6
+      }
+    }
+  },
+  simpleMonoDevPack
 ];
 export function getPackBySlug(slug: string): PackDefinition | undefined {
 	return packs.find((p) => p.slug === slug);
