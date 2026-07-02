@@ -1,5 +1,7 @@
 # Flip — Claude Code guide
 
+> Agent orchestration protocol (worktree isolation, task classification, verification gates, hard prohibitions) lives in [`AGENTS.md`](./AGENTS.md).
+
 Flip is a colour-mixing puzzle game. Players apply templates to a grid of pigment cells; XOR mixing of RYB primaries creates secondary colours. The goal is to clear every cell to white (pigment 0). It ships as a SvelteKit PWA with a Hono API backend, Stripe payments, and a rich puzzle-generation engine.
 
 ---
@@ -44,7 +46,7 @@ npm run test:unit        # Vitest unit tests (once)
 npm run test:unit:watch  # Vitest in watch mode
 
 # Lint
-npm run lint             # Run oxlint
+npm run lint             # Run eslint on apps/app (also runs as pre-commit hook via husky)
 npm run lint:fix         # Auto-fix lint issues
 
 # Stripe
@@ -148,3 +150,4 @@ Paid packs use Stripe Checkout. The API routes live in `apps/api/src/stripe/`. P
 | `documentation/stripe-live-setup.md` | Going live with Stripe |
 | `documentation/vercel-deployment.md` | Production deployment |
 | `documentation/git-worktrees.md` | Worktree workflow used in this project |
+| `AGENTS.md` | Agent orchestration protocol (First Mate pattern) |
