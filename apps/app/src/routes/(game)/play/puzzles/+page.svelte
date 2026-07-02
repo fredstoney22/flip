@@ -1,4 +1,5 @@
 <script lang="ts">
+	import PuzzleGridPreview from '$lib/components/game/PuzzleGridPreview.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -27,31 +28,41 @@
 			</p>
 		{/if}
 
-		<div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+		<div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
 			{#each data.puzzles as puzzle}
 				<a
 					href="/play/game?pack={data.pack.slug}&id={puzzle.id}"
 					data-sveltekit-preload-data="off"
-					class="flex items-center justify-between rounded-xl border bg-white px-4 py-3 shadow-sm transition-shadow hover:shadow-md"
+					class="relative flex flex-col items-center gap-2 rounded-xl border bg-white px-3 py-3 shadow-sm transition-shadow hover:shadow-md"
 					class:border-green-200={puzzle.completed}
 					class:bg-green-50={puzzle.completed}
 					class:border-gray-100={!puzzle.completed}
 				>
-					<div>
-						<span class="text-sm font-semibold text-gray-800">Puzzle {puzzle.id}</span>
-						{#if puzzle.concept}
-							<p class="mt-0.5 text-xs text-indigo-600">{puzzle.concept}</p>
-						{/if}
-						{#if puzzle.completed && puzzle.bestMoveCount !== null}
-							<p class="mt-0.5 text-xs text-gray-400">Best: {puzzle.bestMoveCount} moves</p>
-						{/if}
-					</div>
 					{#if puzzle.completed}
-						{#if puzzle.optimal}
-							<span class="text-amber-500" aria-label="Optimal solve">★</span>
-						{:else}
-							<span class="text-green-500" aria-label="Completed">✓</span>
-						{/if}
+						<span
+							class="absolute right-2 top-2"
+							class:text-amber-500={puzzle.optimal}
+							class:text-green-500={!puzzle.optimal}
+						>
+							{#if puzzle.optimal}
+								<span aria-label="Optimal solve">★</span>
+							{:else}
+								<span aria-label="Completed">✓</span>
+							{/if}
+						</span>
+					{/if}
+					<span class="text-sm font-semibold text-gray-800">Puzzle {puzzle.id}</span>
+					{#if puzzle.config}
+						<PuzzleGridPreview
+							config={puzzle.config}
+							cellClass="h-2.5 w-2.5 rounded-[2px] sm:h-3 sm:w-3"
+						/>
+					{/if}
+					{#if puzzle.concept}
+						<p class="text-center text-xs text-indigo-600">{puzzle.concept}</p>
+					{/if}
+					{#if puzzle.completed && puzzle.bestMoveCount !== null}
+						<p class="text-xs text-gray-400">Best: {puzzle.bestMoveCount} moves</p>
 					{/if}
 				</a>
 			{/each}
