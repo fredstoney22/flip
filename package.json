@@ -48,7 +48,8 @@
 		"stripe:status": "npx tsx apps/api/scripts/stripe-status.ts",
 		"stripe:replay-purchases": "npx tsx apps/api/scripts/replay-pack-purchases.ts",
 		"stripe:go-live": "npx tsx apps/api/scripts/go-live-stripe.ts",
-		"verify:auth": "npx tsx scripts/verify-production-auth.ts"
+		"verify:auth": "npx tsx scripts/verify-production-auth.ts",
+		"vercel:setup-preview": "bash scripts/setup-vercel-preview-env.sh"
 	},
 	"devDependencies": {
 		"@types/node": "^25.3.0",
