@@ -12,6 +12,7 @@ import { progressRoutes } from './progress/progress.routes';
 import { dailyRoutes } from './daily/daily.routes';
 import { packsRoutes } from './packs/packs.routes';
 import { cronRoutes } from './cron/cron.routes';
+import { feedbackRoutes } from './feedback/feedback.routes';
 
 /** Hono routes mounted under `/api` (same origin as SvelteKit on Vercel). */
 const api = new OpenAPIHono({
@@ -57,6 +58,7 @@ api.get('/reference', Scalar({ url: '/api/openapi.json', showDeveloperTools: 'ne
 api.route('/progress', progressRoutes);
 api.route('/daily', dailyRoutes);
 api.route('/packs', packsRoutes);
+api.route('/feedback', feedbackRoutes);
 
 export const app = new OpenAPIHono({
 	defaultHook: handleZodError

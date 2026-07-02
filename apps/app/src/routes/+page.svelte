@@ -1,3 +1,5 @@
+<FeedbackModal open={feedbackOpen} onclose={() => (feedbackOpen = false)} />
+
 <svelte:head>
 	<title>Flip — The puzzle game that flips everything</title>
 </svelte:head>
@@ -55,7 +57,7 @@
 				<Card dashed class="mt-10 text-center">
 					<p class="text-sm font-semibold text-gray-900">Sign in to track your progress</p>
 					<p class="mt-1 text-sm text-gray-500">
-						We’ll remember which puzzles and packs you’ve completed, and keep your streaks in sync across devices.
+						We'll remember which puzzles and packs you've completed, and keep your streaks in sync across devices.
 					</p>
 					<Button href="/auth/login" variant="primary" class="mt-4">
 						Sign in to save progress
@@ -76,6 +78,16 @@
 						</Button>
 					</div>
 				</Card>
+
+				<Card dashed class="mt-4 text-center">
+					<p class="text-sm font-semibold text-gray-900">Got feedback?</p>
+					<p class="mt-1 text-sm text-gray-500">
+						Bug reports, feature ideas, or anything else — we'd love to hear from you.
+					</p>
+					<Button variant="secondary" class="mt-4" onclick={() => (feedbackOpen = true)}>
+						Send feedback
+					</Button>
+				</Card>
 			{/if}
 	</section>
 </main>
@@ -86,12 +98,14 @@
 	import Logo from '$lib/components/Logo.svelte';
 	import Card from '$lib/components/Card.svelte';
 	import Button from '$lib/components/Button.svelte';
+	import FeedbackModal from '$lib/components/FeedbackModal.svelte';
 	import PuzzleGridPreview from '$lib/components/game/PuzzleGridPreview.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 
 	let isSigningOut = $state(false);
+	let feedbackOpen = $state(false);
 
 	async function signOut() {
 	  isSigningOut = true;

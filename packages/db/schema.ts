@@ -254,6 +254,20 @@ export const savedGameState = pgTable('saved_game_state', {
 	updatedAt: timestamp('updated_at').notNull()
 });
 
+/** User-submitted feedback from logged-in users. */
+export const feedback = pgTable(
+	'feedback',
+	{
+		id: text('id').primaryKey(),
+		userId: text('user_id')
+			.notNull()
+			.references(() => user.id, { onDelete: 'cascade' }),
+		message: text('message').notNull(),
+		createdAt: timestamp('created_at').notNull()
+	},
+	(t) => [index('feedback_userId_idx').on(t.userId)]
+);
+
 /**
  * Curated daily puzzles — one row per calendar date (YYYY-MM-DD).
  * Public; no auth required to read today's entry.

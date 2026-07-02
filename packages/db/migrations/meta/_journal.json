@@ -15,6 +15,13 @@
       "when": 1772248961027,
       "tag": "0001_modern_black_widow",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1783011042708,
+      "tag": "0002_workable_menace",
+      "breakpoints": true
     }
   ]
 }
