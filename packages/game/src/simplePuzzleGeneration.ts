@@ -41,6 +41,12 @@ export interface SimplePackConfig {
 	requireEachTemplateUsedAtLeastOnce: boolean;
 	/** Minimum number of active (non-zero) cells per generated template. */
 	minFilledCells: number;
+	/**
+	 * Minimum Hamming distance required between any two templates (across all rotation
+	 * pairings). Set to 2 to prevent templates that are one cell different from each
+	 * other in any orientation. Omit or set to 0 to disable.
+	 */
+	requireMinShapeDistance?: number;
 }
 
 export interface SimpleSolutionMove {
@@ -103,6 +109,35 @@ function solvedGrid(size: number): PuzzleGrid {
 	return Array.from({ length: size }, () =>
 		Array.from({ length: size }, () => PIGMENT_CLEAR_SOLVED_VALUE as Pigment)
 	);
+}
+
+function hammingDistance(a: PuzzleTemplate, b: PuzzleTemplate): number {
+	let diff = 0;
+	for (let r = 0; r < a.shape.length; r++)
+		for (let c = 0; c < a.shape[r].length; c++)
+			if (a.shape[r][c] !== b.shape[r][c]) diff++;
+	return diff;
+}
+
+/** Minimum Hamming distance between a and b over all distinct rotation pairings. */
+function minRotationalShapeDistance(a: PuzzleTemplate, b: PuzzleTemplate): number {
+	let min = Infinity;
+	for (let ra = 0; ra < 4; ra++) {
+		const oa = orientTemplate(a, ra);
+		for (let rb = 0; rb < 4; rb++) {
+			const dist = hammingDistance(oa, orientTemplate(b, rb));
+			if (dist < min) min = dist;
+		}
+	}
+	return min;
+}
+
+/** True when any pair in the set is closer than minDistance across all rotations. */
+function hasTooSimilarTemplates(templates: PuzzleTemplate[], minDistance: number): boolean {
+	for (let i = 0; i < templates.length; i++)
+		for (let j = i + 1; j < templates.length; j++)
+			if (minRotationalShapeDistance(templates[i], templates[j]) < minDistance) return true;
+	return false;
 }
 
 // ─── Canonical template pool ──────────────────────────────────────────────────
@@ -286,7 +321,8 @@ export function generateSimplePuzzle(
 		allowedPigments,
 		requireMulticolorTemplate,
 		requireEachTemplateUsedAtLeastOnce,
-		minFilledCells
+		minFilledCells,
+		requireMinShapeDistance
 	} = packConfig;
 
 	const solvedValue = PIGMENT_CLEAR_SOLVED_VALUE;
@@ -309,6 +345,9 @@ export function generateSimplePuzzle(
 		// Reject if any template is a rotational subset of another — containment
 		// makes the contained template's moves redundant and confuses solvers.
 		if (hasTemplateContainment(templates)) continue;
+
+		// Reject if any two templates are too similar in shape (across all rotations).
+		if (requireMinShapeDistance && hasTooSimilarTemplates(templates, requireMinShapeDistance)) continue;
 
 		// 2. Build the full move pool (deduplicated rotations per template).
 		const movePool = enumerateMoves(puzzleSize, templates, templateSize);
