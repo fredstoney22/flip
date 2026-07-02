@@ -1,5 +1,6 @@
 import { getUserProgress } from '$lib/progress.server';
 import { getPackShortDescription } from '$lib/constants/packDescriptions';
+import { getPackName } from '$lib/constants/packNames';
 import type { PageServerLoad } from './$types';
 
 import { apiUrl } from '$lib/api-url.server';
@@ -34,7 +35,7 @@ export const load: PageServerLoad = async ({ fetch, request, locals }) => {
   );
 
   const packs = unlockedPacks.map((pack) => ({
-    name: pack.name,
+    name: getPackName(pack.slug) ?? pack.name,
     slug: pack.slug,
     description: getPackShortDescription(pack.slug),
     completed: completionMap.get(pack.slug)?.size ?? 0,

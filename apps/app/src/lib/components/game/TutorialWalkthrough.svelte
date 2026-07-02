@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { isInteractiveTutorialStep, type TutorialStep } from '$lib/constants/tutorialSteps';
+	import * as m from '$lib/paraglide/messages';
 
 	interface Props {
 		steps: TutorialStep[];
@@ -15,7 +16,7 @@
 	const isFirst = $derived(currentStep === 0);
 	const isInfoStep = $derived(step?.action === 'info');
 	const isWaitStep = $derived(step?.action === 'wait');
-	const finishLabel = $derived(step?.finishLabel ?? 'Continue');
+	const finishLabel = $derived(step?.finishLabel ?? m.tutorial_walkthrough_finish_label_default());
 	const finishHref = $derived(step?.finishHref ?? '/');
 	const interactiveStepCount = $derived(steps.filter(isInteractiveTutorialStep).length);
 	const interactivePosition = $derived.by(() => {
@@ -39,7 +40,7 @@
 	>
 		{#if showStepIndicator}
 			<div class="step-indicator" aria-hidden="true">
-				{interactivePosition} / {interactiveStepCount}
+				{m.tutorial_walkthrough_step_indicator({ position: interactivePosition, count: interactiveStepCount })}
 			</div>
 		{/if}
 		<h2 id="tutorial-title" class="step-title">{step.title}</h2>
@@ -48,15 +49,15 @@
 		<div class="actions">
 			{#if step.action === 'finish'}
 				<a href={finishHref} class="btn-primary" onclick={onComplete}>{finishLabel}</a>
-				<button type="button" class="btn-secondary" onclick={onSkip}>Close</button>
+				<button type="button" class="btn-secondary" onclick={onSkip}>{m.tutorial_walkthrough_close()}</button>
 			{:else if isWaitStep}
-				<button type="button" class="btn-secondary" onclick={onSkip}>Skip</button>
+				<button type="button" class="btn-secondary" onclick={onSkip}>{m.tutorial_walkthrough_skip()}</button>
 			{:else}
 				<button type="button" class="btn-primary" onclick={onNext}>
-					{step.action === 'start' ? 'Start' : 'Next'}
+					{step.action === 'start' ? m.tutorial_walkthrough_start() : m.tutorial_walkthrough_next()}
 				</button>
 				{#if !isFirst}
-					<button type="button" class="btn-secondary" onclick={onSkip}>Skip</button>
+					<button type="button" class="btn-secondary" onclick={onSkip}>{m.tutorial_walkthrough_skip()}</button>
 				{/if}
 			{/if}
 		</div>

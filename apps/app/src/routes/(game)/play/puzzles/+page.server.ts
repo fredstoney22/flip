@@ -1,7 +1,8 @@
 import { error, redirect } from '@sveltejs/kit';
-import { getFirstStepsConcept, getPuzzleById, FIRST_STEPS_SLUG } from '@flip/game';
+import { getPuzzleById, FIRST_STEPS_SLUG } from '@flip/game';
 import { getUserProgress } from '$lib/progress.server';
 import { isOptimalSolve } from '$lib/utils/starRating';
+import { getFirstStepsConceptLabel } from '$lib/constants/firstStepsConcepts';
 import type { PageServerLoad } from './$types';
 
 import { apiUrl } from '$lib/api-url.server';
@@ -50,7 +51,7 @@ export const load: PageServerLoad = async ({ url, fetch, request }) => {
       config: puzzleConfig ?? null,
       concept:
         packData.packSlug === FIRST_STEPS_SLUG
-          ? (getFirstStepsConcept(p.puzzleNumber) ?? null)
+          ? getFirstStepsConceptLabel(p.puzzleNumber)
           : null
     };
   });
