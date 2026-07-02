@@ -43,6 +43,8 @@ jobs:
         env:
           BETTER_AUTH_SECRET: ci-build-secret-not-for-production-use-only
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/boilerplate
+          STRIPE_SECRET_KEY: sk_test_placeholder_for_ci_build
+          STRIPE_PRO_PRICE_ID: price_placeholder_for_ci_build
 
   e2e:
     name: Playwright smoke tests

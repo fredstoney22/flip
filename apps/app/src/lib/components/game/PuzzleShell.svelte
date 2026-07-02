@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tick, untrack } from 'svelte';
+	import type { Snippet } from 'svelte';
 	import ColorVennDiagram from './ColorVennDiagram.svelte';
 	import HowToPlay from './HowToPlay.svelte';
 	import PrismFrame from './PrismFrame.svelte';
@@ -33,6 +34,9 @@
 		prismLightMonochrome?: boolean;
 		/** Dev/stories: skip win animation and show the final card immediately */
 		instantWin?: boolean;
+		grid?: Snippet;
+		templates?: Snippet;
+		legend?: Snippet;
 	}
 
 	interface WinSize {
@@ -59,7 +63,10 @@
 	  prismLightGrid = null,
 	  prismLightCellSize = 48,
 	  prismLightMonochrome = false,
-	  instantWin = false
+	  instantWin = false,
+	  grid,
+	  templates,
+	  legend
 	}: Props = $props();
 
 	const showPrismLight = $derived(
@@ -357,7 +364,7 @@
 					</div>
 					<PrismFrame winCollapse={false}>
 						<div bind:this={playAreaEl} class="play-area">
-							<slot name="grid" />
+							{@render grid?.()}
 						</div>
 					</PrismFrame>
 				{:else if winAnchor}
@@ -432,8 +439,8 @@
 	</div>
 
 	<div class="templates-section" class:win-fade={chromeFading}>
-		<slot name="templates" />
-		<slot name="legend" />
+		{@render templates?.()}
+		{@render legend?.()}
 	</div>
 
 	<div class="puzzle-action-bar" class:win-fade={chromeFading}>

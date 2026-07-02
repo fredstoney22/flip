@@ -630,7 +630,7 @@
 	prismLightCellSize={cellSize}
 	prismLightMonochrome={monochromeFlip}
 >
-	<svelte:fragment slot="grid">
+	{#snippet grid()}
 		<ColorSquare
 			bind:this={colorSquareRef}
 			grid={renderState}
@@ -644,9 +644,9 @@
 			onCellHover={handleCellHover}
 			onLeave={() => (hoverPosition = null)}
 		/>
-	</svelte:fragment>
+	{/snippet}
 
-	<svelte:fragment slot="templates">
+	{#snippet templates()}
 		<div class="templates-divider" aria-hidden="true"></div>
 		<div
 			class="templates-area"
@@ -711,8 +711,7 @@
 				</div>
 			{/each}
 		</div>
-	</svelte:fragment>
-
+	{/snippet}
 </PuzzleShell>
 {/key}
 </div>
