@@ -72,6 +72,8 @@ jobs:
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/boilerplate
       BETTER_AUTH_SECRET: playwright-test-secret-not-for-production
+      STRIPE_SECRET_KEY: sk_test_placeholder_for_ci_build
+      STRIPE_PRO_PRICE_ID: price_placeholder_for_ci_build
 
     steps:
       - name: Checkout
