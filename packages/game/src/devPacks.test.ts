@@ -7,7 +7,8 @@ describe('devPacks', () => {
 			'first-steps',
 			'chromatic-ascent',
 			'color-ladder',
-			'grid-4x4-dev'
+			'grid-4x4-dev',
+			'simple-mono-dev'
 		]);
 	});
 

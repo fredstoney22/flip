@@ -6,7 +6,7 @@
  *
  * To work on another pack locally: add its slug here, re-run `npm run db:seed`.
  */
-export const DEV_PACK_SLUGS = ['first-steps', 'chromatic-ascent', 'color-ladder', 'grid-4x4-dev'] as const;
+export const DEV_PACK_SLUGS = ['first-steps', 'chromatic-ascent', 'color-ladder', 'grid-4x4-dev', 'simple-mono-dev'] as const;
 
 export type DevPackSlug = (typeof DEV_PACK_SLUGS)[number];
 
