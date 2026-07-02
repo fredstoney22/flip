@@ -114,6 +114,8 @@ Seeding behaviour is controlled by `SEED_ACTIVE_MODE`:
 - `production` — activates only slugs in `PRODUCTION_PACK_SLUGS`
 - `all` — activates everything
 
+**`packs.ts` is the actual runtime data, not the hand-authored source files.** `packages/game/src/packs.ts`'s exported `packs` array is a big JSON literal — that's what `getPackBySlug`/`getPuzzleById`/`packages/db/seed.ts` read. Some packs (e.g. `simple-mono-dev`) are spliced in live via an imported variable, but others with dedicated source files under `packages/game/src/puzzles/` (e.g. `firstSteps.ts` → `firstStepsPack`, `monkey.ts` → `animalPack`) are imported *but never referenced* in that array — their JSON is a separately-maintained, hand-copied snapshot. Editing `firstSteps.ts` alone does **not** change what ships; you must also update the matching inline block in `packs.ts` (see `packages/game/scripts/sync-first-steps-packs.ts` for a splice-only script that does this without reserializing the whole file — a plain `JSON.stringify` of the full `packs` array will also flatten *live* array entries like `simpleMonoDevPack` into inline JSON, which is an unwanted structural change to unrelated packs).
+
 ### Stripe integration
 Paid packs use Stripe Checkout. The API routes live in `apps/api/src/stripe/`. Pack pricing is computed in `packages/game/src/packPricing.ts`. Use `npm run stripe:listen` locally to forward webhooks.
 

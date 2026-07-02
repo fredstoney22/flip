@@ -70,7 +70,7 @@ describe('firstStepsPack', () => {
 		expect(requiresEveryTemplate(firstStepsPack.puzzles[3])).toBe(true);
 	});
 
-	it('puzzle 4 requires multiple moves (smaller lens placement)', () => {
+	it('puzzle 4 requires multiple moves (rotate and reuse the same lens)', () => {
 		const report = pedagogy.validateConcept(firstStepsPack.puzzles[4], 4);
 		expect(report.checks.find((check) => check.ruleId === 'requires-min-moves-2')?.passed).toBe(
 			true

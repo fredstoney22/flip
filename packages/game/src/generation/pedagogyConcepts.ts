@@ -22,7 +22,7 @@ export type PedagogyConceptId = keyof typeof FIRST_STEPS_CONCEPTS | (string & {}
  * | 1       | Applying a template       | min 1 move                                         |
  * | 2       | Rotating a template       | rotation required, min 2 moves                     |
  * | 3       | Multiple lenses           | every template needed, ≥2 templates                |
- * | 4       | Smaller lenses            | min 2 moves (placement practice)                   |
+ * | 4       | Reusing a lens            | min 2 moves (rotate + reapply practice)            |
  * | 5       | Multiple colors           | ≥2 templates, ≥1 color change in solution          |
  * | 6       | Multi-color lenses        | ≥3 templates, ≥1 color change                      |
  * | 7       | Color mixing              | ≥2 templates, ≥2 color changes                   |

@@ -12,7 +12,7 @@ export const FIRST_STEPS_CONCEPTS: Record<number, string> = {
 	1: 'Applying a template',
 	2: 'Rotating a template',
 	3: 'Multiple lenses',
-	4: 'Smaller lenses',
+	4: 'Reusing a lens',
 	5: 'Multiple colors',
 	6: 'Multi-color lenses',
 	7: 'Color mixing',
@@ -84,13 +84,17 @@ const puzzles: Record<number, PuzzleConfig> = {
 	},
 	4: {
 		startState: [
-			[0, 1, 0],
-			[1, 1, 0],
-			[0, 0, 1]
+			[0, 0, 0],
+			[0, 0, 0],
+			[1, 0, 0]
 		],
 		templates: [
 			{
-				shape: [[1, 1]]
+				shape: [
+					[1, 0, 0],
+					[0, 0, 0],
+					[1, 0, 1]
+				]
 			}
 		],
 		solvedValue: 0,
@@ -98,16 +102,24 @@ const puzzles: Record<number, PuzzleConfig> = {
 	},
 	5: {
 		startState: [
-			[2, 2, 0],
-			[2, 3, 1],
-			[0, 1, 1]
+			[0, 0, 0],
+			[2, 0, 0],
+			[1, 0, 3]
 		],
 		templates: [
 			{
-				shape: [[1], [1]]
+				shape: [
+					[1, 0, 1],
+					[0, 0, 0],
+					[0, 0, 0]
+				]
 			},
 			{
-				shape: [[2, 2]]
+				shape: [
+					[2, 0, 0],
+					[0, 0, 2],
+					[0, 0, 0]
+				]
 			}
 		],
 		solvedValue: 0,
@@ -147,21 +159,30 @@ const puzzles: Record<number, PuzzleConfig> = {
 	},
 	7: {
 		startState: [
-			[0, 7, 0],
-			[7, 0, 7],
-			[0, 7, 0]
+			[6, 0, 1],
+			[2, 0, 7],
+			[5, 5, 2]
 		],
 		templates: [
 			{
 				shape: [
-					[1, 0],
-					[0, 2]
+					[1, 1, 0],
+					[0, 1, 1],
+					[1, 1, 0]
 				]
 			},
 			{
 				shape: [
-					[4, 0],
-					[0, 4]
+					[2, 2, 2],
+					[2, 0, 0],
+					[0, 0, 0]
+				]
+			},
+			{
+				shape: [
+					[4, 4, 0],
+					[4, 0, 4],
+					[0, 0, 0]
 				]
 			}
 		],
@@ -170,27 +191,23 @@ const puzzles: Record<number, PuzzleConfig> = {
 	},
 	8: {
 		startState: [
-			[0, 1, 1],
-			[2, 1, 0],
-			[2, 2, 1]
+			[0, 3, 1],
+			[3, 2, 0],
+			[0, 2, 1]
 		],
 		templates: [
 			{
 				shape: [
-					[0, 1],
-					[1, 0]
+					[1, 0, 1],
+					[1, 0, 1],
+					[1, 1, 1]
 				]
 			},
 			{
 				shape: [
-					[0, 0, 0],
-					[2, 2, 2]
-				]
-			},
-			{
-				shape: [
-					[0, 0, 2],
-					[2, 0, 1]
+					[0, 2, 0],
+					[1, 2, 0],
+					[1, 0, 1]
 				]
 			}
 		],
