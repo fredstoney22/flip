@@ -48,10 +48,12 @@
 		"stripe:status": "npx tsx apps/api/scripts/stripe-status.ts",
 		"stripe:replay-purchases": "npx tsx apps/api/scripts/replay-pack-purchases.ts",
 		"stripe:go-live": "npx tsx apps/api/scripts/go-live-stripe.ts",
-		"verify:auth": "npx tsx scripts/verify-production-auth.ts"
+		"verify:auth": "npx tsx scripts/verify-production-auth.ts",
+		"prepare": "husky"
 	},
 	"devDependencies": {
 		"@types/node": "^25.3.0",
+		"husky": "^9.1.7",
 		"oxfmt": "^0.27.0",
 		"oxlint": "^1.42.0",
 		"typescript": "^5",

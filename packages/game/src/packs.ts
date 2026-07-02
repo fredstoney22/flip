@@ -6,6 +6,7 @@
 import type { PackDefinition, PuzzleConfig } from './types.js';
 import { animalPack } from './puzzles/monkey.js';
 import { firstStepsPack } from './puzzles/firstSteps.js';
+import { simpleMonoDevPack } from './puzzles/simpleMonoDev.js';
 
 export const packs: PackDefinition[] = [
   {
@@ -8924,7 +8925,8 @@ export const packs: PackDefinition[] = [
         "minMovesToSolve": 6
       }
     }
-  }
+  },
+  simpleMonoDevPack
 ];
 export function getPackBySlug(slug: string): PackDefinition | undefined {
 	return packs.find((p) => p.slug === slug);

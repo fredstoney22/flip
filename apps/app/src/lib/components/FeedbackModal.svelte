@@ -13,51 +13,51 @@
 	let errorMessage = $state('');
 
 	function reset() {
-		message = '';
-		status = 'idle';
-		errorMessage = '';
+	  message = '';
+	  status = 'idle';
+	  errorMessage = '';
 	}
 
 	function handleClose() {
-		reset();
-		onclose();
+	  reset();
+	  onclose();
 	}
 
 	async function handleSubmit(e: SubmitEvent) {
-		e.preventDefault();
-		status = 'submitting';
-		errorMessage = '';
+	  e.preventDefault();
+	  status = 'submitting';
+	  errorMessage = '';
 
-		try {
-			const res = await fetch('/api/feedback', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ message })
-			});
+	  try {
+	    const res = await fetch('/api/feedback', {
+	      method: 'POST',
+	      headers: { 'Content-Type': 'application/json' },
+	      body: JSON.stringify({ message })
+	    });
 
-			if (!res.ok) throw new Error('Failed to submit');
-			status = 'success';
-		} catch {
-			status = 'error';
-			errorMessage = 'Something went wrong. Please try again.';
-		}
+	    if (!res.ok) throw new Error('Failed to submit');
+	    status = 'success';
+	  } catch {
+	    status = 'error';
+	    errorMessage = 'Something went wrong. Please try again.';
+	  }
 	}
 
 	function handleBackdropClick(e: MouseEvent) {
-		if (e.target === e.currentTarget) handleClose();
+	  if (e.target === e.currentTarget) handleClose();
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
-		if (e.key === 'Escape') handleClose();
+	  if (e.key === 'Escape') handleClose();
 	}
 </script>
 
 {#if open}
-	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<div
 		role="dialog"
 		aria-modal="true"
 		aria-label="Send feedback"
+		tabindex="-1"
 		class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
 		onclick={handleBackdropClick}
 		onkeydown={handleKeydown}
