@@ -135,6 +135,23 @@ test.describe('Unauthenticated access — redirects', () => {
     await expect(page).toHaveURL(/\/store/);
   });
 
+  test('/store shows a friendly empty state with a CTA when there are no packs', async ({
+    page
+  }) => {
+    // In this test environment the Hono API is unreachable, so /api/packs
+    // fails server-side and paidPacks resolves to []. This exercises the
+    // same "no packs" branch as an empty-catalog production response.
+    await page.goto('/store');
+    await expect(page.getByText('More puzzles coming soon!')).toBeVisible();
+    await expect(
+      page.getByText("There's nothing to buy just yet — check back soon.")
+    ).toBeVisible();
+
+    const backLink = page.getByRole('link', { name: 'Back to packs' });
+    await expect(backLink).toBeVisible();
+    await expect(backLink).toHaveAttribute('href', '/play');
+  });
+
   test('GET /dashboard redirects unauthenticated users to /auth/login', async ({ page }) => {
     await page.goto('/dashboard');
     await expect(page).toHaveURL(/\/auth\/login/);
