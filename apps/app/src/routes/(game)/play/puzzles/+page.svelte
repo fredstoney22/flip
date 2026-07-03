@@ -56,6 +56,7 @@
 						<PuzzleGridPreview
 							config={puzzle.config}
 							cellClass="h-2.5 w-2.5 rounded-[2px] sm:h-3 sm:w-3"
+							cellPx={10}
 						/>
 					{/if}
 					{#if puzzle.concept}
