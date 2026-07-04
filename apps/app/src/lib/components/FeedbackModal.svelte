@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Button from './Button.svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	interface Props {
 		open: boolean;
@@ -39,7 +40,7 @@
 	    status = 'success';
 	  } catch {
 	    status = 'error';
-	    errorMessage = 'Something went wrong. Please try again.';
+	    errorMessage = m.feedback_modal_error_generic();
 	  }
 	}
 
@@ -56,7 +57,7 @@
 	<div
 		role="dialog"
 		aria-modal="true"
-		aria-label="Send feedback"
+		aria-label={m.feedback_modal_dialog_aria()}
 		tabindex="-1"
 		class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
 		onclick={handleBackdropClick}
@@ -65,17 +66,17 @@
 		<div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
 			{#if status === 'success'}
 				<div class="text-center py-4">
-					<p class="text-lg font-semibold text-gray-900">Thanks for your feedback!</p>
-					<p class="mt-1 text-sm text-gray-500">We really appreciate you taking the time.</p>
-					<Button onclick={handleClose} class="mt-5">Close</Button>
+					<p class="text-lg font-semibold text-gray-900">{m.feedback_modal_success_title()}</p>
+					<p class="mt-1 text-sm text-gray-500">{m.feedback_modal_success_body()}</p>
+					<Button onclick={handleClose} class="mt-5">{m.common_close()}</Button>
 				</div>
 			{:else}
 				<div class="flex items-center justify-between mb-4">
-					<h2 class="text-base font-semibold text-gray-900">Send feedback</h2>
+					<h2 class="text-base font-semibold text-gray-900">{m.feedback_modal_heading()}</h2>
 					<button
 						onclick={handleClose}
 						class="text-gray-400 hover:text-gray-600 transition-colors"
-						aria-label="Close"
+						aria-label={m.feedback_modal_close_aria()}
 					>
 						<svg class="size-5" viewBox="0 0 20 20" fill="currentColor">
 							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
@@ -86,7 +87,7 @@
 				<form onsubmit={handleSubmit}>
 					<textarea
 						bind:value={message}
-						placeholder="What's on your mind? Bug reports, feature ideas, or anything else."
+						placeholder={m.feedback_modal_placeholder()}
 						rows="5"
 						maxlength="2000"
 						required
@@ -98,13 +99,13 @@
 					{/if}
 
 					<div class="mt-4 flex justify-end gap-3">
-						<Button variant="secondary" onclick={handleClose} type="button">Cancel</Button>
+						<Button variant="secondary" onclick={handleClose} type="button">{m.common_cancel()}</Button>
 						<Button
 							type="submit"
 							variant="primary"
 							disabled={status === 'submitting' || message.trim().length === 0}
 						>
-							{status === 'submitting' ? 'Sending…' : 'Send feedback'}
+							{status === 'submitting' ? m.feedback_modal_submit_sending() : m.feedback_modal_submit_default()}
 						</Button>
 					</div>
 				</form>

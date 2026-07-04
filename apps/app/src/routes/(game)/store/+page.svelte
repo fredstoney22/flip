@@ -1,5 +1,6 @@
 <script lang="ts">
 	import PageHeader from '$lib/components/PageHeader.svelte';
+	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -28,13 +29,13 @@
 
 	    if (!res.ok) {
 	      const body = await res.json().catch(() => ({}));
-	      throw new Error(body.message ?? 'Failed to start checkout');
+	      throw new Error(body.message ?? m.store_error_checkout_failed());
 	    }
 
 	    const { url } = (await res.json()) as { url: string };
 	    if (url) window.location.href = url;
 	  } catch (err) {
-	    errorMessage = err instanceof Error ? err.message : 'Something went wrong';
+	    errorMessage = err instanceof Error ? err.message : m.store_error_generic();
 	  } finally {
 	    loadingSlug = null;
 	  }
@@ -42,19 +43,19 @@
 </script>
 
 <svelte:head>
-	<title>Store — Flip</title>
+	<title>{m.store_title()}</title>
 </svelte:head>
 
 <div class="min-h-screen bg-gray-50">
-	<PageHeader backHref="/play" backLabel="← Packs" />
+	<PageHeader backHref="/play" backLabel={m.store_back_label()} />
 
 	<main class="mx-auto max-w-5xl px-4 py-10">
-		<h1 class="mb-2 text-2xl font-bold text-gray-900">Get more levels</h1>
-		<p class="mb-8 text-gray-500">Unlock premium puzzle packs with new challenges.</p>
+		<h1 class="mb-2 text-2xl font-bold text-gray-900">{m.store_heading()}</h1>
+		<p class="mb-8 text-gray-500">{m.store_subheading()}</p>
 
 		{#if data.purchaseSuccess}
 			<div class="mb-6 rounded-xl border border-green-200 bg-green-50 px-5 py-4 text-sm text-green-800">
-				Pack unlocked! Head back to your packs to start playing.
+				{m.store_purchase_success()}
 			</div>
 		{/if}
 
@@ -66,26 +67,26 @@
 
 		{#if availablePacks.length === 0 && ownedPacks.length === 0}
 			<div class="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-				<p class="text-sm text-gray-500">No premium packs available yet. Check back soon.</p>
+				<p class="text-sm text-gray-500">{m.store_empty_state()}</p>
 			</div>
 		{:else if availablePacks.length === 0}
 			<div class="rounded-2xl border border-green-200 bg-green-50 p-8 text-center">
-				<p class="text-sm font-medium text-green-900">You own all available premium packs.</p>
+				<p class="text-sm font-medium text-green-900">{m.store_all_owned()}</p>
 				<a
 					href="/play"
 					class="mt-4 inline-flex items-center justify-center rounded-full bg-gray-900 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-700"
 				>
-					Back to packs
+					{m.store_back_to_packs()}
 				</a>
 			</div>
 		{:else}
 			<section aria-labelledby="paid-packs-heading">
-				<h2 id="paid-packs-heading" class="sr-only">Premium puzzle packs</h2>
+				<h2 id="paid-packs-heading" class="sr-only">{m.store_available_heading_sr()}</h2>
 				<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 					{#each availablePacks as pack}
 						<article class="flex flex-col rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
 							<h3 class="font-semibold text-gray-900">{pack.name}</h3>
-							<p class="mt-1 text-sm text-gray-400">{pack.total} puzzles</p>
+							<p class="mt-1 text-sm text-gray-400">{m.store_puzzle_count({ total: pack.total })}</p>
 							{#if pack.description}
 								<p class="mt-2 text-sm text-gray-500">{pack.description}</p>
 							{/if}
@@ -97,11 +98,11 @@
 								onclick={() => purchasePack(pack.slug)}
 							>
 								{#if loadingSlug === pack.slug}
-									Redirecting…
+									{m.store_redirecting()}
 								{:else if pack.priceLabel}
-									Buy for {pack.priceLabel}
+									{m.store_buy_for({ priceLabel: pack.priceLabel })}
 								{:else}
-									Unlock this pack
+									{m.store_unlock_pack()}
 								{/if}
 							</button>
 						</article>
@@ -113,7 +114,7 @@
 		{#if ownedPacks.length > 0}
 			<section class="mt-12" aria-labelledby="owned-packs-heading">
 				<h2 id="owned-packs-heading" class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">
-					Your packs
+					{m.store_owned_heading()}
 				</h2>
 				<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 					{#each ownedPacks as pack}
@@ -122,8 +123,8 @@
 							class="block rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:border-gray-300 hover:shadow-md"
 						>
 							<h3 class="font-semibold text-gray-900">{pack.name}</h3>
-							<p class="mt-1 text-sm text-gray-400">{pack.total} puzzles</p>
-							<p class="mt-3 text-xs font-medium text-indigo-600">Play →</p>
+							<p class="mt-1 text-sm text-gray-400">{m.store_puzzle_count({ total: pack.total })}</p>
+							<p class="mt-3 text-xs font-medium text-indigo-600">{m.store_play_link()}</p>
 						</a>
 					{/each}
 				</div>

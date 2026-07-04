@@ -1,18 +1,20 @@
 import type { TutorialConfig } from '$lib/constants/tutorialSteps';
-import { DEFAULT_TUTORIAL } from '$lib/constants/tutorialSteps';
-import { FIRST_STEPS_TUTORIALS } from '$lib/constants/firstStepsTutorials';
+import { getDefaultTutorial } from '$lib/constants/tutorialSteps';
+import { getFirstStepsTutorials } from '$lib/constants/firstStepsTutorials';
 import { FIRST_STEPS_SLUG } from '@flip/game';
 
 /**
- * Pack- and puzzle-specific tutorial configs.
- * Add entries here to override DEFAULT_TUTORIAL for a given pack puzzle.
+ * Pack- and puzzle-specific tutorial configs, keyed by pack slug then puzzle id.
+ * Add entries here to override the default tutorial for a given pack puzzle.
  *
- * Example:
- *   'intro-pack': { 1: { steps: [...], skippedLinks: [...] } }
+ * Built per-call (not a module-level constant) so it always reflects the locale
+ * resolved for the current request/render.
  */
-const PACK_TUTORIALS: Record<string, Record<number, TutorialConfig>> = {
-  [FIRST_STEPS_SLUG]: FIRST_STEPS_TUTORIALS
-};
+function getPackTutorials(): Record<string, Record<number, TutorialConfig>> {
+  return {
+    [FIRST_STEPS_SLUG]: getFirstStepsTutorials()
+  };
+}
 
 /** Resolve the tutorial config for a pack puzzle, or the built-in default. */
 export function getTutorialConfig(
@@ -20,8 +22,8 @@ export function getTutorialConfig(
   puzzleId: number | null
 ): TutorialConfig {
   if (packSlug && puzzleId !== null) {
-    const config = PACK_TUTORIALS[packSlug]?.[puzzleId];
+    const config = getPackTutorials()[packSlug]?.[puzzleId];
     if (config) return config;
   }
-  return DEFAULT_TUTORIAL;
+  return getDefaultTutorial();
 }
