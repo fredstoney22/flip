@@ -231,9 +231,7 @@ export function packUsesMonoSquareTemplateGeneration(slug: string): boolean {
 	const spec = getPackGenerationSpec(slug);
 	if (!spec) return false;
 	if (spec.pool?.kind === 'mono') return true;
-	return spec.puzzles.some(
-		(slot) => slot.kind === 'mono' && (slot.templateSizes?.length ?? 0) > 0
-	);
+	return spec.puzzles.some((slot) => slot.kind === 'mono' && (slot.templateSizes?.length ?? 0) > 0);
 }
 
 export const MONO_SQUARE_TEMPLATE_PACK_SLUGS = PACK_GENERATION_SPECS.filter((spec) =>

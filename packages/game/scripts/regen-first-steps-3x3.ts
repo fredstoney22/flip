@@ -6,10 +6,7 @@
  *
  * Run from app-template: npx tsx packages/game/scripts/regen-first-steps-3x3.ts
  */
-import {
-	generateVerifiedPuzzleForSlot,
-	stripGeneratedPuzzle
-} from '../src/packGeneration.js';
+import { generateVerifiedPuzzleForSlot, stripGeneratedPuzzle } from '../src/packGeneration.js';
 import { FIRST_STEPS_REGEN_SLOTS } from '../src/packGenerationSpecs.js';
 import { resolveGenerationRuntime } from '../src/packGenerationRuntime.js';
 import { inferPuzzleKind } from '../src/packGenerationConfig.js';

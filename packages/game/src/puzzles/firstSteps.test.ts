@@ -1,23 +1,18 @@
 import { describe, it, expect } from 'vitest';
 import { solveMinMoves } from '../PuzzleGenerator.js';
 import { createPedagogyValidator } from '../generation/pedagogyValidator.js';
-import {
-	firstStepsPack,
-	FIRST_STEPS_CONCEPTS,
-	getFirstStepsConcept
-} from './firstSteps.js';
-import {
-	requiresEveryTemplate,
-	requiresTemplateRotation
-} from './firstStepsPedagogy.js';
+import { firstStepsPack, FIRST_STEPS_CONCEPTS, getFirstStepsConcept } from './firstSteps.js';
+import { requiresEveryTemplate, requiresTemplateRotation } from './firstStepsPedagogy.js';
 
 const pedagogy = createPedagogyValidator({ maxDepth: 12 });
 
 describe('firstStepsPack', () => {
 	it('defines nine concept labels in teaching order', () => {
-		expect(Object.keys(FIRST_STEPS_CONCEPTS).map(Number).sort((a, b) => a - b)).toEqual([
-			1, 2, 3, 4, 5, 6, 7, 8, 9
-		]);
+		expect(
+			Object.keys(FIRST_STEPS_CONCEPTS)
+				.map(Number)
+				.sort((a, b) => a - b)
+		).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
 	});
 
 	it('has a concept label for every puzzle in the pack', () => {
@@ -56,9 +51,9 @@ describe('firstStepsPack', () => {
 
 	it('puzzle 2 cannot be cleared without rotating', () => {
 		const report = pedagogy.validateConcept(firstStepsPack.puzzles[2], 2);
-		expect(report.checks.find((check) => check.ruleId === 'requires-template-rotation')?.passed).toBe(
-			true
-		);
+		expect(
+			report.checks.find((check) => check.ruleId === 'requires-template-rotation')?.passed
+		).toBe(true);
 		expect(requiresTemplateRotation(firstStepsPack.puzzles[2])).toBe(true);
 	});
 
