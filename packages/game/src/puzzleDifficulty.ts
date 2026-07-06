@@ -154,9 +154,12 @@ export function shortestSolutionUsesAllTemplates(
 export function evaluatePuzzleDifficulty(
 	config: PuzzleConfig,
 	maxDepth?: number,
-	options: Partial<ResolvedDifficultyOptions> & { profile?: DifficultyEvaluationProfile } = {}
+	options: Partial<ResolvedDifficultyOptions> & {
+		profile?: DifficultyEvaluationProfile;
+		maxStatesVisited?: number;
+	} = {}
 ): DifficultyReport | null {
-	const { profile, ...overrides } = options;
+	const { profile, maxStatesVisited, ...overrides } = options;
 	const {
 		includeForgiveness,
 		includeMuse,
@@ -164,7 +167,7 @@ export function evaluatePuzzleDifficulty(
 		includeGenerousFirstMoves
 	} = resolveDifficultyOptions(profile ?? 'standard', overrides);
 	const depth = maxDepth ?? resolveSearchBudget(config, 'authoring').maxDepth;
-	const session = buildPuzzleSearchSession(config, { maxDepth: depth });
+	const session = buildPuzzleSearchSession(config, { maxDepth: depth, maxStatesVisited });
 	if (!session) return null;
 
 	const solution = getShortestPath(session);
@@ -174,8 +177,8 @@ export function evaluatePuzzleDifficulty(
 	if (minMoves === null) return null;
 
 	const rotationMetrics = countRotationMetrics(solution);
-	const withRotation = solveMinMoves(config, depth, { includeRotations: true });
-	const withoutRotation = solveMinMoves(config, depth, { includeRotations: false });
+	const withRotation = solveMinMoves(config, depth, { includeRotations: true, maxStatesVisited });
+	const withoutRotation = solveMinMoves(config, depth, { includeRotations: false, maxStatesVisited });
 	const gridSize = config.startState.length;
 	const solutionGridCellsCovered = countSolutionGridCoverage(solution, config.templates);
 	const minGridCellsRequired = minSolutionGridCellsRequired(gridSize);

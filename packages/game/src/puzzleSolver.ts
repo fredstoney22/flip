@@ -14,7 +14,7 @@ export const DEFAULT_SOLVER_MAX_DEPTH = DEFAULT_PUZZLE_SEARCH_MAX_DEPTH;
 export function solveMinMoves(
 	config: PuzzleConfig,
 	maxDepth: number = DEFAULT_SOLVER_MAX_DEPTH,
-	options: { includeRotations?: boolean } = {}
+	options: { includeRotations?: boolean; maxStatesVisited?: number } = {}
 ): number | null {
 	return findMinMovesBfs(config, maxDepth, options);
 }

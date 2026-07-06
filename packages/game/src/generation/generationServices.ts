@@ -30,6 +30,8 @@ export interface DifficultyEvaluationOptions {
 	includeMuse?: boolean;
 	includeNearOptimalPaths?: boolean;
 	includeGenerousFirstMoves?: boolean;
+	/** Abort (treat as unsolvable) once BFS visited-state count exceeds this. Default: unbounded. */
+	maxStatesVisited?: number;
 }
 
 export interface DifficultyEvaluator {
@@ -44,7 +46,7 @@ export interface MinMovesSolver {
 	solve(
 		config: PuzzleConfig,
 		maxDepth?: number,
-		options?: { includeRotations?: boolean }
+		options?: { includeRotations?: boolean; maxStatesVisited?: number }
 	): number | null;
 }
 
@@ -79,7 +81,10 @@ export const defaultDifficultyEvaluator: DifficultyEvaluator = {
 			includeNearOptimalPaths: options?.includeNearOptimalPaths,
 			includeGenerousFirstMoves: options?.includeGenerousFirstMoves
 		});
-		return evaluatePuzzleDifficulty(config, maxDepth, resolved);
+		return evaluatePuzzleDifficulty(config, maxDepth, {
+			...resolved,
+			maxStatesVisited: options?.maxStatesVisited
+		});
 	}
 };
 

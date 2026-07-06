@@ -41,6 +41,14 @@ import type {
 } from './packGenerationTypes.js';
 import { DEFAULT_SCRAMBLE_POLICY } from './packGenerationTypes.js';
 
+/**
+ * Hard ceiling on BFS states explored while solving/scoring one pool candidate.
+ * Multi-colored templates (e.g. 'multicolor') can span a much higher-rank
+ * reachable state space than mono templates; without this cap a single
+ * pathological candidate can take minutes instead of milliseconds to solve.
+ */
+const POOL_SOLVE_MAX_STATES = 20_000;
+
 function resolvePoolKind(pool: PackPoolConfig): PuzzleKind {
 	if (pool.kind) return pool.kind;
 	if (pool.templateSizes || pool.templateCountMin !== undefined || pool.templateSizeOptions) {
@@ -303,11 +311,26 @@ export function tryBuildScrambledCandidate(
 		solvedValue
 	};
 
-	const maxDepth = Math.max(policy.maxMoves + 3, 12);
-	if (services.solver.solve(config, maxDepth) === null) return null;
+	// The reverse of the scramble is itself a valid solution, so minMoves can never
+	// exceed scrambleMoves.length — bounding BFS depth to that (instead of a flat
+	// pool-wide ceiling) keeps per-candidate solve cost tied to actual complexity.
+	// This matters far more for 'color' kind than 'mono': mixing multiple pigments
+	// into one template raises the rank of the reachable state space enormously,
+	// so a few extra BFS levels can blow up runtime by orders of magnitude.
+	const maxDepth = scrambleMoves.length;
+	// Multi-colored templates can push a candidate's reachable state space far
+	// beyond what mono candidates ever reach; cap it so one pathological candidate
+	// can't stall the whole pool search — treat "too complex to solve cheaply" the
+	// same as "unsolvable within budget" and move on to the next candidate.
+	if (services.solver.solve(config, maxDepth, { maxStatesVisited: POOL_SOLVE_MAX_STATES }) === null) {
+		return null;
+	}
 
 	const difficultyReport =
-		services.difficulty.evaluate(config, maxDepth, { profile: 'fast' }) ?? undefined;
+		services.difficulty.evaluate(config, maxDepth, {
+			profile: 'fast',
+			maxStatesVisited: POOL_SOLVE_MAX_STATES
+		}) ?? undefined;
 	if (!difficultyReport) return null;
 
 	const rotationReuseCount = countRotationReuse(scrambleMoves);
