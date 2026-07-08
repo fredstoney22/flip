@@ -196,6 +196,28 @@ export const INTRO_PACK_REGEN_SLOTS: Record<number, PuzzleSlotSpec> = {
 	9: { kind: 'mono', puzzleSize: 3, targetMinMoves: 3, templateCount: 3 }
 };
 
+/**
+ * Regeneration specs for First Steps (hand-maintained, not pool/slot-driven —
+ * see puzzles/firstSteps.ts) puzzles whose original templates were smaller
+ * than the 3×3 puzzle grid. Every template must match puzzleSize so the pack
+ * stays visually and mechanically consistent; targetMinMoves preserves each
+ * puzzle's original difficulty. Puzzles 1, 2, 3, 6 were already 3×3 and are
+ * untouched. Puzzle 4's original concept ("smaller lenses you can place
+ * anywhere") is inherently impossible at 3×3 — see firstStepsTutorials.ts for
+ * the accompanying copy change.
+ */
+export const FIRST_STEPS_REGEN_SLOTS: Record<number, PuzzleSlotSpec> = {
+	4: { kind: 'mono', puzzleSize: 3, targetMinMoves: 3, templateSizes: [3] },
+	5: color(2, [1, 2], { minTemplatesPerPigment: 1, minShapeSize: 3, maxShapeSize: 3 }),
+	7: color(6, [1, 2, 4], { minTemplatesPerPigment: 1, minShapeSize: 3, maxShapeSize: 3 }),
+	8: color(4, [1, 2], {
+		minTemplatesPerPigment: 1,
+		minMultiColoredTemplates: 1,
+		minShapeSize: 3,
+		maxShapeSize: 3
+	})
+};
+
 export function getPackGenerationSpec(slug: string): PackGenerationSpec | undefined {
 	return PACK_GENERATION_SPECS.find((spec) => spec.slug === slug);
 }
@@ -209,9 +231,7 @@ export function packUsesMonoSquareTemplateGeneration(slug: string): boolean {
 	const spec = getPackGenerationSpec(slug);
 	if (!spec) return false;
 	if (spec.pool?.kind === 'mono') return true;
-	return spec.puzzles.some(
-		(slot) => slot.kind === 'mono' && (slot.templateSizes?.length ?? 0) > 0
-	);
+	return spec.puzzles.some((slot) => slot.kind === 'mono' && (slot.templateSizes?.length ?? 0) > 0);
 }
 
 export const MONO_SQUARE_TEMPLATE_PACK_SLUGS = PACK_GENERATION_SPECS.filter((spec) =>

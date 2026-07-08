@@ -5743,18 +5743,18 @@ export const packs: PackDefinition[] = [
         "startState": [
           [
             0,
-            1,
-            0
-          ],
-          [
-            1,
-            1,
+            0,
             0
           ],
           [
             0,
             0,
-            1
+            0
+          ],
+          [
+            1,
+            0,
+            0
           ]
         ],
         "templates": [
@@ -5762,6 +5762,17 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 1,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                1,
+                0,
                 1
               ]
             ]
@@ -5773,29 +5784,38 @@ export const packs: PackDefinition[] = [
       "5": {
         "startState": [
           [
-            2,
-            2,
+            0,
+            0,
             0
           ],
           [
             2,
-            3,
-            1
+            0,
+            0
           ],
           [
-            0,
             1,
-            1
+            0,
+            3
           ]
         ],
         "templates": [
           {
             "shape": [
               [
+                1,
+                0,
                 1
               ],
               [
-                1
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0
               ]
             ]
           },
@@ -5803,7 +5823,18 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 2,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
                 2
+              ],
+              [
+                0,
+                0,
+                0
               ]
             ]
           }
@@ -5894,19 +5925,19 @@ export const packs: PackDefinition[] = [
       "7": {
         "startState": [
           [
+            6,
             0,
-            7,
-            0
+            1
           ],
           [
-            7,
+            2,
             0,
             7
           ],
           [
-            0,
-            7,
-            0
+            5,
+            5,
+            2
           ]
         ],
         "templates": [
@@ -5914,11 +5945,37 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 1,
+                1,
                 0
               ],
               [
                 0,
+                1,
+                1
+              ],
+              [
+                1,
+                1,
+                0
+              ]
+            ]
+          },
+          {
+            "shape": [
+              [
+                2,
+                2,
                 2
+              ],
+              [
+                2,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0
               ]
             ]
           },
@@ -5926,11 +5983,18 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 4,
+                4,
                 0
               ],
               [
+                4,
                 0,
                 4
+              ],
+              [
+                0,
+                0,
+                0
               ]
             ]
           }
@@ -5942,16 +6006,16 @@ export const packs: PackDefinition[] = [
         "startState": [
           [
             0,
-            1,
+            3,
             1
           ],
           [
+            3,
             2,
-            1,
             0
           ],
           [
-            2,
+            0,
             2,
             1
           ]
@@ -5960,12 +6024,19 @@ export const packs: PackDefinition[] = [
           {
             "shape": [
               [
+                1,
                 0,
                 1
               ],
               [
                 1,
-                0
+                0,
+                1
+              ],
+              [
+                1,
+                1,
+                1
               ]
             ]
           },
@@ -5973,25 +6044,16 @@ export const packs: PackDefinition[] = [
             "shape": [
               [
                 0,
-                0,
+                2,
                 0
               ],
               [
+                1,
                 2,
-                2,
-                2
-              ]
-            ]
-          },
-          {
-            "shape": [
-              [
-                0,
-                0,
-                2
+                0
               ],
               [
-                2,
+                1,
                 0,
                 1
               ]

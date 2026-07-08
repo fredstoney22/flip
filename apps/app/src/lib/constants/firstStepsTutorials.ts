@@ -95,8 +95,8 @@ export const FIRST_STEPS_TUTORIALS: Record<number, TutorialConfig> = {
   ]),
   4: config(4, [
     puzzleInfo(
-      'Smaller lenses',
-      `${GOAL} Lenses can be all shapes and sizes! When a lens is smaller than the puzzle, you can choose where to place it.`
+      'Reusing a lens',
+      `${GOAL} Not every puzzle needs a new lens — rotate the same one and apply it again to keep clearing the grid.`
     )
   ]),
   5: config(5, [
@@ -123,7 +123,7 @@ export const FIRST_STEPS_TUTORIALS: Record<number, TutorialConfig> = {
       `${GOAL} ${LENS_TOGGLE} Some lenses use a stencil — different cells in the same shape carry different colors.`
     ),
     selectLens('Select a lens and read which color each cell in the shape carries.'),
-    placeLens('Place it where those colors line up with the grid.', 1),
+    placeLens('Apply it to flip every matching cell at once.', 1),
     hintBeforeSolve('Hint highlights where the selected lens fits next.'),
     clearGrid('Use every lens — rotate and switch as needed — until the grid is white.'),
     finishStep(8, 'Stencils let one shape toggle several colors in a single move.')
