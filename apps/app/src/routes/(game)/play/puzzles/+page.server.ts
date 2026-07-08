@@ -37,8 +37,9 @@ export const load: PageServerLoad = async ({ url, fetch, request }) => {
   }
 
   const puzzleList = packData.puzzles.map((p) => {
+    const puzzleConfig = getPuzzleById(packData.packSlug, p.puzzleNumber);
     const bestMoveCount = bestMoves[p.puzzleNumber] ?? null;
-    const par = getPuzzleById(packData.packSlug, p.puzzleNumber)?.minMovesToSolve ?? null;
+    const par = puzzleConfig?.minMovesToSolve ?? null;
     const completed = completedIds.has(p.puzzleNumber);
 
     return {
@@ -46,6 +47,7 @@ export const load: PageServerLoad = async ({ url, fetch, request }) => {
       completed,
       optimal: completed && bestMoveCount !== null && isOptimalSolve(bestMoveCount, par),
       bestMoveCount,
+      config: puzzleConfig ?? null,
       concept:
         packData.packSlug === FIRST_STEPS_SLUG
           ? (getFirstStepsConcept(p.puzzleNumber) ?? null)

@@ -4,14 +4,15 @@
   import { isIridescentPigment, iridescentSheetSize } from '$lib/constants/iridescentPigment';
   import '$lib/styles/iridescent-pigment.css';
 
-  /** Matches Tailwind `h-4 w-4` + `gap-0.5` on the preview grid. */
-  const PREVIEW_CELL_PX = 16;
+  /** Gap matches the hardcoded `gap-0.5` class on the preview grid below. */
   const PREVIEW_GAP_PX = 2;
 
   interface Props {
     config?: PuzzleConfig;
     grid?: PuzzleGrid;
     cellClass?: string;
+    /** Cell size in px — must match the base (non-responsive) size in `cellClass`. */
+    cellPx?: number;
   }
 
   const MONO_OFF = '#1f2937';
@@ -20,7 +21,8 @@
   let {
     config,
     grid: gridProp,
-    cellClass = 'h-4 w-4 rounded-[4px] sm:h-5 sm:w-5'
+    cellClass = 'h-4 w-4 rounded-[4px] sm:h-5 sm:w-5',
+    cellPx = 16
   }: Props = $props();
 
   const grid = $derived(config?.startState ?? gridProp ?? []);
@@ -28,7 +30,7 @@
   const gridCols = $derived(grid[0]?.length ?? 0);
   const monochromeFlip = $derived(config ? isMonochromeFlipPuzzle(config) : true);
   const iridescentSheet = $derived(
-    iridescentSheetSize(gridRows, gridCols, PREVIEW_CELL_PX, PREVIEW_GAP_PX)
+    iridescentSheetSize(gridRows, gridCols, cellPx, PREVIEW_GAP_PX)
   );
   const hasIridescentSheet = $derived(
     !monochromeFlip && grid.some((row) => row.some((cell) => isIridescentPigment(cell)))
