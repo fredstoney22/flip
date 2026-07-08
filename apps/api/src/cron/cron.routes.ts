@@ -35,6 +35,7 @@ app.get('/daily-puzzles', async (c) => {
 	const today = formatDateUtc(new Date());
 	let generated = 0;
 	let skipped = 0;
+	let failed = 0;
 	const scheduled: string[] = [];
 
 	for (let offset = 0; offset < DAILY_SCHEDULE_LOOKAHEAD_DAYS; offset++) {
@@ -42,16 +43,21 @@ app.get('/daily-puzzles', async (c) => {
 		const existing = await getDailyPuzzleForDate(dateStr);
 
 		if (!existing) {
-			const epochDays = epochDaysForDate(dateStr);
-			const config = generateDailyPuzzle(epochDays);
-			const kind = dailyGenerationKind(epochDays);
-			await storeDailyGeneratedPuzzle(dateStr, JSON.stringify(config), kind);
-			generated++;
+			try {
+				const epochDays = epochDaysForDate(dateStr);
+				const config = generateDailyPuzzle(epochDays);
+				const kind = dailyGenerationKind(epochDays);
+				await storeDailyGeneratedPuzzle(dateStr, JSON.stringify(config), kind);
+				generated++;
+				scheduled.push(dateStr);
+			} catch (error) {
+				console.error(`Failed to generate daily puzzle for ${dateStr}:`, error);
+				failed++;
+			}
 		} else {
 			skipped++;
+			scheduled.push(dateStr);
 		}
-
-		scheduled.push(dateStr);
 	}
 
 	return c.json({
@@ -59,6 +65,7 @@ app.get('/daily-puzzles', async (c) => {
 		lookaheadDays: DAILY_SCHEDULE_LOOKAHEAD_DAYS,
 		generated,
 		skipped,
+		failed,
 		scheduled
 	});
 });
