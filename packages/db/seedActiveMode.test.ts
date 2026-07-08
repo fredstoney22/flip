@@ -39,9 +39,9 @@ describe('seedActiveMode', () => {
 		process.env.SEED_ACTIVE_MODE = 'production';
 		expect(resolveSeedActiveMode()).toBe('production');
 		expect(packActiveForSeed('first-steps', 'production')).toBe(true);
+		expect(packActiveForSeed('chromatic-ascent', 'production')).toBe(true);
 		expect(packActiveForSeed('monochrome', 'production')).toBe(true);
 		expect(packActiveForSeed('multicolor', 'production')).toBe(true);
-		expect(packActiveForSeed('chromatic-ascent', 'production')).toBe(false);
 		expect(packActiveForSeed('intro-pack', 'production')).toBe(false);
 		expect(packActiveForSeed('hard-in-3', 'production')).toBe(false);
 	});
