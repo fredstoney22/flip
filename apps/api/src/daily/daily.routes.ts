@@ -58,7 +58,7 @@ async function resolveDailyPuzzleResponse(row: DailyPuzzleRow) {
 
 /**
  * GET /daily
- * Returns today's curated puzzle config. No auth required.
+ * Returns today's procedurally generated puzzle config. No auth required.
  * Generates and stores a puzzle on demand if the cron hasn't run yet.
  */
 app.get('/', async (c) => {

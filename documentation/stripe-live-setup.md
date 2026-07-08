@@ -101,7 +101,7 @@ npm run db:seed:production
 npm run stripe:setup-paid-packs
 ```
 
-Seed production with `db:seed:production` so only packs listed in `packages/game/src/productionPacks.ts` are active: **first-steps** (free) and **chromatic-ascent** (paid). Puzzle data for all packs is still synced; non-allowlisted packs are stored as `active: false`.
+Seed production with `db:seed:production` so only packs listed in `packages/game/src/productionPacks.ts` are active: **first-steps**, **monochrome**, and **multicolor** (free), and **chromatic-ascent** (paid). Puzzle data for all packs is still synced; non-allowlisted packs are stored as `active: false`.
 
 This creates live Products/Prices in Stripe and stores `pack.stripeProductId` in production Postgres.
 

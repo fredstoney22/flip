@@ -66,12 +66,12 @@ Add these in Vercel → Project → Settings → Environment Variables (Producti
 
 ## Daily puzzle cron
 
-`vercel.json` schedules `/api/cron/daily-puzzles` daily at 05:00 UTC to pre-schedule the next 14 days of daily puzzles.
+`vercel.json` schedules `/api/cron/daily-puzzles` daily at 05:00 UTC to procedurally generate and store the next 14 days of daily puzzles (skipping dates that already have a row).
 
 1. Set `CRON_SECRET` in Vercel (Production). Vercel sends `Authorization: Bearer <CRON_SECRET>` automatically.
 2. Redeploy so the cron job is registered.
 
-If cron is missed, the first visitor to `/daily` still creates today's row on demand via `GET /api/daily`.
+If cron is missed, the first visitor to `/daily` still generates and stores today's row on demand via `GET /api/daily`.
 
 Manual backfill (local or CI):
 
