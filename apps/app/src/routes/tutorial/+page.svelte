@@ -4,6 +4,7 @@
 	import PuzzlePlayLayout from '$lib/components/game/PuzzlePlayLayout.svelte';
 	import TutorialWalkthrough from '$lib/components/game/TutorialWalkthrough.svelte';
 	import { createTutorialProgressCallbacks } from '$lib/utils/tutorialProgress';
+	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -24,14 +25,14 @@
 	});
 
 	const pageTitle = $derived(
-	  data.pack ? `Tutorial · ${data.pack.name}` : 'Tutorial'
+	  data.pack ? `${m.tutorial_page_heading()} · ${data.pack.name}` : m.tutorial_page_heading()
 	);
 
 	const backHref = $derived(
 	  data.pack ? `/play/puzzles?pack=${data.pack.slug}` : '/'
 	);
 
-	const backLabel = $derived(data.pack ? `← ${data.pack.name}` : '← Back');
+	const backLabel = $derived(data.pack ? `← ${data.pack.name}` : m.common_back());
 
 	$effect.pre(() => {
 	  void `${data.pack?.slug ?? ''}-${data.puzzleId ?? ''}`;
@@ -54,7 +55,7 @@
 	<title>{pageTitle} — Flip</title>
 </svelte:head>
 
-<PuzzlePlayLayout {backHref} {backLabel} title="Tutorial" sidePanelHidden={puzzleSolved}>
+<PuzzlePlayLayout {backHref} {backLabel} title={m.tutorial_page_heading()} sidePanelHidden={puzzleSolved}>
 	{#snippet sidePanel()}
 		{#if !skipped}
 			<TutorialWalkthrough
@@ -67,7 +68,7 @@
 		{:else}
 			<p class="tutorial-skipped-banner">
 				<button type="button" class="tutorial-skipped-link" onclick={() => (skipped = false)}>
-					Show again
+					{m.tutorial_show_again_link()}
 				</button>
 				{#if data.tutorial.skippedLinks?.length}
 					{#each data.tutorial.skippedLinks as link}

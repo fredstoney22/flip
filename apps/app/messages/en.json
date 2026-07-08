@@ -174,6 +174,23 @@
 	"play_more_body": "Unlock additional packs with new challenges and mechanics.",
 	"play_more_cta": "Get more levels",
 
+	"play_puzzles_back_label": "← Packs",
+	"play_puzzles_purchase_success": "🎉 Pack unlocked! Enjoy your puzzles.",
+	"play_puzzles_first_steps_hint": "Work through each puzzle in order — every one introduces a new idea.",
+	"play_puzzles_best_moves": "Best: {count} moves",
+	"play_puzzles_optimal_aria": "Optimal solve",
+	"play_puzzles_completed_aria": "Completed",
+
+	"puzzle_number_label": "Puzzle {id}",
+	"puzzle_fallback_label": "Puzzle",
+
+	"tutorial_page_heading": "Tutorial",
+	"tutorial_show_guide_link": "Show guide",
+	"tutorial_show_again_link": "Show again",
+
+	"daily_puzzle_title": "Daily Puzzle — Flip",
+	"daily_puzzle_pack_name": "Daily Puzzle",
+
 	"store_error_checkout_failed": "Failed to start checkout",
 	"store_error_generic": "Something went wrong",
 	"store_title": "Store — Flip",
