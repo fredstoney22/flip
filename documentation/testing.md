@@ -87,6 +87,8 @@ Playwright generates an HTML report after each run at `apps/app/playwright-repor
 
 Vitest is installed at the root workspace level. It's available for testing pure TypeScript logic (utilities, services, DB helpers, etc.) without needing a browser or a running server.
 
+The root `vitest.config.ts` is standalone from `apps/app/vite.config.ts`, so it registers its own `paraglideVitePlugin` (generating `apps/app/src/lib/paraglide/`, gitignored) before tests run — otherwise `apps/app` unit tests that import `$lib/paraglide/messages` (directly or via constants like `tutorialSteps.ts`) fail to resolve on a clean checkout.
+
 ### Running
 
 ```bash
