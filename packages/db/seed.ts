@@ -111,8 +111,7 @@ async function seed() {
 	console.log(`\nSeeding daily puzzles for the next ${DAILY_SCHEDULE_LOOKAHEAD_DAYS} days…`);
 	// Uses the same on-demand procedural generation as the production /daily route and
 	// the daily-puzzles cron (see apps/api/src/daily/daily.routes.ts, cron.routes.ts).
-	// A freshly seeded environment must NOT pre-populate rows via the legacy
-	// pack-rotation assignment (dailyPuzzleAssignment/ensureDailyPuzzleWindow) — that
+	// A freshly seeded environment must NOT pre-populate rows any other way — that
 	// would short-circuit generateDailyPuzzle() the first time /daily or the cron ran,
 	// since both only generate when no row exists yet for the date.
 	const today = formatDateUtc(new Date());
