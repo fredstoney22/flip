@@ -19,11 +19,7 @@ export function addDaysUtc(dateStr: string, days: number): string {
 
 /** Returns the scheduled row for a date, or undefined if none exists. */
 export async function getDailyPuzzleForDate(dateStr: string): Promise<DailyPuzzleRow | undefined> {
-	const rows = await db
-		.select()
-		.from(dailyPuzzle)
-		.where(eq(dailyPuzzle.date, dateStr))
-		.limit(1);
+	const rows = await db.select().from(dailyPuzzle).where(eq(dailyPuzzle.date, dateStr)).limit(1);
 
 	return rows[0];
 }

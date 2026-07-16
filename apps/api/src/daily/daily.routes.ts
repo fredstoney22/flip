@@ -6,7 +6,12 @@ import {
 	formatDateUtc,
 	type DailyPuzzleRow
 } from '@flip/db/dailyPuzzleSchedule';
-import { parseStoredPuzzle, generateDailyPuzzle, dailyGenerationKind, epochDaysForDate } from '@flip/game';
+import {
+	parseStoredPuzzle,
+	generateDailyPuzzle,
+	dailyGenerationKind,
+	epochDaysForDate
+} from '@flip/game';
 import type { PuzzleConfig } from '@flip/game';
 
 const app = new Hono();

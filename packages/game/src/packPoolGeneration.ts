@@ -26,10 +26,7 @@ import {
 } from './pigmentTemplates.js';
 import { gridToKey } from './puzzleGrid.js';
 import { constrainMonoTemplateSizes } from './templateShape.js';
-import {
-	countSolutionGridCoverage,
-	minSolutionGridCellsRequired
-} from './solutionGridCoverage.js';
+import { countSolutionGridCoverage, minSolutionGridCellsRequired } from './solutionGridCoverage.js';
 import { orientTemplate } from './templatePigment.js';
 import type { PackDefinition, Pigment, PuzzleConfig, PuzzleGrid, PuzzleTemplate } from './types.js';
 import { PIGMENT_CLEAR_SOLVED_VALUE } from './types.js';
@@ -87,9 +84,7 @@ function randomItem<T>(arr: T[]): T {
 }
 
 function solvedGrid(size: number, solvedValue: Pigment): PuzzleGrid {
-	return Array.from({ length: size }, () =>
-		Array<Pigment>(size).fill(solvedValue)
-	);
+	return Array.from({ length: size }, () => Array<Pigment>(size).fill(solvedValue));
 }
 
 function enumerateScrambleMoves(puzzleSize: number, templates: PuzzleTemplate[]): ScrambleMove[] {
@@ -182,8 +177,7 @@ function pickScrambleMove(
 ): ScrambleMove {
 	if (lastMove && Math.random() < rotateSameWeight) {
 		const sameTemplate = candidates.filter(
-			(move) =>
-				move.templateIndex === lastMove.templateIndex && move.rotation !== lastMove.rotation
+			(move) => move.templateIndex === lastMove.templateIndex && move.rotation !== lastMove.rotation
 		);
 		if (sameTemplate.length > 0) {
 			return randomItem(sameTemplate);
@@ -193,10 +187,7 @@ function pickScrambleMove(
 	return randomItem(candidates);
 }
 
-export function buildPoolGeneratorConfig(
-	pool: PackPoolConfig,
-	kind: PuzzleKind
-): GeneratorConfig {
+export function buildPoolGeneratorConfig(pool: PackPoolConfig, kind: PuzzleKind): GeneratorConfig {
 	const puzzleSize = pool.puzzleSize;
 	const solvedValue = PIGMENT_CLEAR_SOLVED_VALUE;
 
@@ -233,7 +224,8 @@ export function buildPoolGeneratorConfig(
 		targetMinMoves: 0,
 		solvedValue,
 		allowedPigments,
-		templateCount: pool.templateCount ?? requiredTemplateCount(allowedPigments, minTemplatesPerPigment),
+		templateCount:
+			pool.templateCount ?? requiredTemplateCount(allowedPigments, minTemplatesPerPigment),
 		minTemplatesPerPigment,
 		minShapeSize: pool.minShapeSize ?? 2,
 		maxShapeSize: pool.maxShapeSize ?? puzzleSize,
@@ -242,7 +234,6 @@ export function buildPoolGeneratorConfig(
 		maxPigmentsPerTemplate: pool.maxPigmentsPerTemplate ?? (pool.minMultiColoredTemplates ? 2 : 1)
 	};
 }
-
 
 export function tryBuildScrambledCandidate(
 	pool: PackPoolConfig,
@@ -322,7 +313,9 @@ export function tryBuildScrambledCandidate(
 	// beyond what mono candidates ever reach; cap it so one pathological candidate
 	// can't stall the whole pool search — treat "too complex to solve cheaply" the
 	// same as "unsolvable within budget" and move on to the next candidate.
-	if (services.solver.solve(config, maxDepth, { maxStatesVisited: POOL_SOLVE_MAX_STATES }) === null) {
+	if (
+		services.solver.solve(config, maxDepth, { maxStatesVisited: POOL_SOLVE_MAX_STATES }) === null
+	) {
 		return null;
 	}
 
@@ -364,7 +357,11 @@ export function generatePackCandidatePool(
 	const services = options.services ?? defaultGenerationServices;
 	const candidates: PackCandidate[] = [];
 
-	for (let attempt = 0; attempt < maxAttempts && candidates.length < pool.candidatesPerPack; attempt++) {
+	for (
+		let attempt = 0;
+		attempt < maxAttempts && candidates.length < pool.candidatesPerPack;
+		attempt++
+	) {
 		const candidate = tryBuildScrambledCandidate(pool, kind, services);
 		if (candidate) {
 			candidates.push(candidate);
@@ -419,8 +416,7 @@ export function assemblePackFromPool(
 		services
 	);
 	scored.sort((a, b) => {
-		const diff =
-			a.difficultyReport.compositeDifficulty - b.difficultyReport.compositeDifficulty;
+		const diff = a.difficultyReport.compositeDifficulty - b.difficultyReport.compositeDifficulty;
 		return diff !== 0 ? diff : a.difficultyScore - b.difficultyScore;
 	});
 

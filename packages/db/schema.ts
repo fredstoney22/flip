@@ -1,4 +1,12 @@
-import { pgTable, text, timestamp, boolean, integer, index, uniqueIndex } from 'drizzle-orm/pg-core';
+import {
+	pgTable,
+	text,
+	timestamp,
+	boolean,
+	integer,
+	index,
+	uniqueIndex
+} from 'drizzle-orm/pg-core';
 
 export type SubscriptionStatus =
 	| 'active'

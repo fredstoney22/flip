@@ -85,8 +85,7 @@ export function makePuzzleStateKeyFn(
 	config: PuzzleConfig,
 	includeRotations: boolean
 ): (grid: PuzzleGrid) => string {
-	const useCanonical =
-		includeRotations && config.solvedValue === MONO_FLIP_SOLVED_VALUE;
+	const useCanonical = includeRotations && config.solvedValue === MONO_FLIP_SOLVED_VALUE;
 	return (grid: PuzzleGrid) => (useCanonical ? canonicalizeGrid(grid) : gridToKey(grid));
 }
 
@@ -178,7 +177,10 @@ export function buildPuzzleReachability(
 				if (!distFromStart.has(key)) {
 					if (distFromStart.size >= maxStatesVisited) return null;
 					distFromStart.set(key, depth + 1);
-					gridByKey.set(key, nextGrid.map((row) => [...row]));
+					gridByKey.set(
+						key,
+						nextGrid.map((row) => [...row])
+					);
 					if (depth + 1 < minMoves) {
 						next.push(nextGrid);
 					}
@@ -202,7 +204,10 @@ export function buildPuzzleSearchSession(
 		maxStatesVisited = Infinity
 	} = options;
 
-	const reachability = buildPuzzleReachability(config, maxDepth, { includeRotations, maxStatesVisited });
+	const reachability = buildPuzzleReachability(config, maxDepth, {
+		includeRotations,
+		maxStatesVisited
+	});
 	if (!reachability || reachability.minMoves === null) {
 		return null;
 	}

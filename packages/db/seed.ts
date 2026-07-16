@@ -14,7 +14,11 @@ import {
 	formatDateUtc,
 	DAILY_SCHEDULE_LOOKAHEAD_DAYS
 } from './dailyPuzzleSchedule.js';
-import { epochDaysForDate, dailyGenerationKind, generateDailyPuzzle } from '../game/src/dailyGeneration.js';
+import {
+	epochDaysForDate,
+	dailyGenerationKind,
+	generateDailyPuzzle
+} from '../game/src/dailyGeneration.js';
 import { packActiveForSeed, resolveSeedActiveMode } from './seedActiveMode.js';
 
 /**
@@ -101,8 +105,7 @@ async function seed() {
 			}
 		}
 
-		const activeLabel =
-			active ? 'active' : seedActiveMode === 'dev' ? 'archived' : 'inactive';
+		const activeLabel = active ? 'active' : seedActiveMode === 'dev' ? 'archived' : 'inactive';
 		console.log(
 			`  ✓ ${packDef.name} (${packDef.access}, ${activeLabel}) — ${puzzleEntries.length} puzzle(s)`
 		);

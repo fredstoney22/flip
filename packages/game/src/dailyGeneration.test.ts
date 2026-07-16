@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-	dailyGenerationKind,
-	epochDaysForDate,
-	generateDailyPuzzle
-} from './dailyGeneration.js';
+import { dailyGenerationKind, epochDaysForDate, generateDailyPuzzle } from './dailyGeneration.js';
 import { solveMinMoves } from './puzzleSolver.js';
 import { isSolved } from './PuzzleFunctions.js';
 import { PIGMENT_CLEAR_SOLVED_VALUE } from './types.js';

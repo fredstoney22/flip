@@ -2,10 +2,7 @@
  * BFS shortest-path solver — shared by difficulty evaluation and verified generation.
  */
 
-import {
-	findMinMovesBfs,
-	DEFAULT_PUZZLE_SEARCH_MAX_DEPTH
-} from './puzzleSearchSession.js';
+import { findMinMovesBfs, DEFAULT_PUZZLE_SEARCH_MAX_DEPTH } from './puzzleSearchSession.js';
 import type { PuzzleConfig } from './types.js';
 
 export const DEFAULT_SOLVER_MAX_DEPTH = DEFAULT_PUZZLE_SEARCH_MAX_DEPTH;
