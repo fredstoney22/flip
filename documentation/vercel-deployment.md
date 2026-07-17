@@ -90,7 +90,7 @@ DATABASE_URL="postgresql://..." npm run db:push
 DATABASE_URL="postgresql://..." npm run db:seed:production
 ```
 
-Use `db:seed:production` (not plain `db:seed`) on production so only packs in `packages/game/src/productionPacks.ts` are active. Currently: **First Steps**, **Monochrome**, **Multicolor** (free) and **Chromatic Ascent** (paid). All other packs are stored as `active: false`.
+Use `db:seed:production` (not plain `db:seed`) on production so only packs in `packages/game/src/productionPacks.ts` are active. Currently: **First Steps**, **Monochrome**, **Multicolor** (all free). All other packs are stored as `active: false`.
 
 ---
 
