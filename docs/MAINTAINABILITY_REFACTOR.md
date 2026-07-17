@@ -6,7 +6,7 @@ Applied maintainability principles to app-template: extracted shared UI, moved l
 
 | Component | Purpose |
 |-----------|---------|
-| **Logo.svelte** | 5×5 “F” + “lip” logo; optional `href` to render as link (used in home header). |
+| **Logo.svelte** | Renders the prism icon logo (`lib/assets/logo-icon.png`); optional `href` to render as link (used in home header). |
 | **BackLink.svelte** | Consistent “← Back” (or custom label) link with shared styling. |
 | **PageHeader.svelte** | Header bar with back link, optional title, optional `trailingLabel` (e.g. “Puzzle 3”). Used on daily, tutorial, play, play/game. |
 | **Card.svelte** | Wrapper for card layout (`rounded-2xl border bg-white shadow-sm`). Optional `dashed` for CTA-style cards. |
