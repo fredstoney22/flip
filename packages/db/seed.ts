@@ -4,7 +4,7 @@ config({ path: resolve(process.cwd(), '../../.env') });
 
 import { randomUUID } from 'crypto';
 
-import { db, pack, puzzle, eq } from './index.js';
+import { db, pack, puzzle, eq, and, notInArray } from './index.js';
 import { packs } from '../game/src/packs.js';
 import { serializePuzzleForStorage } from '../game/src/storedPuzzle.js';
 import {
@@ -24,7 +24,9 @@ import { packActiveForSeed, resolveSeedActiveMode } from './seedActiveMode.js';
 /**
  * Seeds the database with pack and puzzle data from @flip/game, then ensures
  * daily_puzzle rows exist for today + the lookahead window.
- * Safe to re-run — pack and puzzle rows are upserted from packs.ts.
+ * Safe to re-run — pack and puzzle rows are upserted from packs.ts, and any
+ * puzzle rows whose puzzleNumber no longer exists in a pack's source data
+ * are pruned so removed puzzles don't linger as orphaned rows.
  *
  * SEED_ACTIVE_MODE:
  *   dev (default) — only slugs in devPacks.ts are active (local dev)
@@ -105,9 +107,22 @@ async function seed() {
 			}
 		}
 
+		// Prune puzzle rows whose puzzleNumber no longer exists in packDef.puzzles, so
+		// reseeding is authoritative and doesn't leave orphaned rows from past edits.
+		const currentPuzzleNumbers = puzzleEntries.map((entry) => entry.puzzleNumber);
+		const pruned = await db
+			.delete(puzzle)
+			.where(
+				currentPuzzleNumbers.length > 0
+					? and(eq(puzzle.packId, packRow.id), notInArray(puzzle.puzzleNumber, currentPuzzleNumbers))
+					: eq(puzzle.packId, packRow.id)
+			)
+			.returning({ puzzleNumber: puzzle.puzzleNumber });
+
 		const activeLabel = active ? 'active' : seedActiveMode === 'dev' ? 'archived' : 'inactive';
+		const prunedLabel = pruned.length > 0 ? `, pruned ${pruned.length}` : '';
 		console.log(
-			`  ✓ ${packDef.name} (${packDef.access}, ${activeLabel}) — ${puzzleEntries.length} puzzle(s)`
+			`  ✓ ${packDef.name} (${packDef.access}, ${activeLabel}) — ${puzzleEntries.length} puzzle(s)${prunedLabel}`
 		);
 	}
 
