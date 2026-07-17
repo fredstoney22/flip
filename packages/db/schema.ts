@@ -1,4 +1,12 @@
-import { pgTable, text, timestamp, boolean, integer, index, uniqueIndex } from 'drizzle-orm/pg-core';
+import {
+	pgTable,
+	text,
+	timestamp,
+	boolean,
+	integer,
+	index,
+	uniqueIndex
+} from 'drizzle-orm/pg-core';
 
 export type SubscriptionStatus =
 	| 'active'
@@ -275,7 +283,9 @@ export const feedback = pgTable(
 export const dailyPuzzle = pgTable('daily_puzzle', {
 	id: text('id').primaryKey(),
 	date: text('date').notNull().unique(),
-	packSlug: text('pack_slug').notNull(),
-	puzzleId: integer('puzzle_id').notNull(),
+	packSlug: text('pack_slug'),
+	puzzleId: integer('puzzle_id'),
+	generatedConfig: text('generated_config'),
+	generationKind: text('generation_kind'),
 	createdAt: timestamp('created_at').notNull()
 });

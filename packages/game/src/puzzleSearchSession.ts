@@ -31,6 +31,8 @@ export interface PuzzleSearchSession {
 export interface PuzzleSearchSessionOptions {
 	maxDepth?: number;
 	includeRotations?: boolean;
+	/** Abort (treat as unsolvable) once visited-state count exceeds this. Default: unbounded. */
+	maxStatesVisited?: number;
 }
 
 export interface PuzzleReachability {
@@ -83,8 +85,7 @@ export function makePuzzleStateKeyFn(
 	config: PuzzleConfig,
 	includeRotations: boolean
 ): (grid: PuzzleGrid) => string {
-	const useCanonical =
-		includeRotations && config.solvedValue === MONO_FLIP_SOLVED_VALUE;
+	const useCanonical = includeRotations && config.solvedValue === MONO_FLIP_SOLVED_VALUE;
 	return (grid: PuzzleGrid) => (useCanonical ? canonicalizeGrid(grid) : gridToKey(grid));
 }
 
@@ -92,9 +93,9 @@ export function makePuzzleStateKeyFn(
 export function findMinMovesBfs(
 	config: PuzzleConfig,
 	maxDepth: number = DEFAULT_PUZZLE_SEARCH_MAX_DEPTH,
-	options: { includeRotations?: boolean } = {}
+	options: { includeRotations?: boolean; maxStatesVisited?: number } = {}
 ): number | null {
-	const { includeRotations = true } = options;
+	const { includeRotations = true, maxStatesVisited = Infinity } = options;
 	const { startState, templates, solvedValue } = config;
 
 	if (isSolved(startState, solvedValue)) {
@@ -119,6 +120,7 @@ export function findMinMovesBfs(
 				}
 				const key = stateKey(newState);
 				if (!visited.has(key)) {
+					if (visited.size >= maxStatesVisited) return null;
 					visited.add(key);
 					next.push(newState);
 				}
@@ -138,9 +140,9 @@ export function findMinMovesBfs(
 export function buildPuzzleReachability(
 	config: PuzzleConfig,
 	maxDepth: number = DEFAULT_PUZZLE_SEARCH_MAX_DEPTH,
-	options: { includeRotations?: boolean } = {}
+	options: { includeRotations?: boolean; maxStatesVisited?: number } = {}
 ): PuzzleReachability | null {
-	const { includeRotations = true } = options;
+	const { includeRotations = true, maxStatesVisited = Infinity } = options;
 	const size = config.startState.length;
 	const placements = enumerateSearchPlacements(size, config.templates, includeRotations);
 	if (placements.length === 0) return null;
@@ -159,7 +161,7 @@ export function buildPuzzleReachability(
 		};
 	}
 
-	const minMoves = findMinMovesBfs(config, maxDepth, { includeRotations });
+	const minMoves = findMinMovesBfs(config, maxDepth, { includeRotations, maxStatesVisited });
 	if (minMoves === null) return null;
 
 	const distFromStart = new Map<string, number>([[startKey, 0]]);
@@ -173,8 +175,12 @@ export function buildPuzzleReachability(
 				const nextGrid = applyTemplate(grid, move.template, move.row, move.col);
 				const key = stateKey(nextGrid);
 				if (!distFromStart.has(key)) {
+					if (distFromStart.size >= maxStatesVisited) return null;
 					distFromStart.set(key, depth + 1);
-					gridByKey.set(key, nextGrid.map((row) => [...row]));
+					gridByKey.set(
+						key,
+						nextGrid.map((row) => [...row])
+					);
 					if (depth + 1 < minMoves) {
 						next.push(nextGrid);
 					}
@@ -194,10 +200,14 @@ export function buildPuzzleSearchSession(
 ): PuzzleSearchSession | null {
 	const {
 		maxDepth = DEFAULT_PUZZLE_SEARCH_MAX_DEPTH,
-		includeRotations = true
+		includeRotations = true,
+		maxStatesVisited = Infinity
 	} = options;
 
-	const reachability = buildPuzzleReachability(config, maxDepth, { includeRotations });
+	const reachability = buildPuzzleReachability(config, maxDepth, {
+		includeRotations,
+		maxStatesVisited
+	});
 	if (!reachability || reachability.minMoves === null) {
 		return null;
 	}

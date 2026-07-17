@@ -21,6 +21,8 @@ describe('seedActiveMode', () => {
 		expect(packActiveForSeed('first-steps', 'dev')).toBe(true);
 		expect(packActiveForSeed('chromatic-ascent', 'dev')).toBe(true);
 		expect(packActiveForSeed('grid-4x4-dev', 'dev')).toBe(true);
+		expect(packActiveForSeed('monochrome', 'dev')).toBe(true);
+		expect(packActiveForSeed('multicolor', 'dev')).toBe(true);
 		expect(packActiveForSeed('intro-pack', 'dev')).toBe(false);
 		expect(packActiveForSeed('tutorial-auto', 'dev')).toBe(false);
 	});
@@ -38,6 +40,8 @@ describe('seedActiveMode', () => {
 		expect(resolveSeedActiveMode()).toBe('production');
 		expect(packActiveForSeed('first-steps', 'production')).toBe(true);
 		expect(packActiveForSeed('chromatic-ascent', 'production')).toBe(true);
+		expect(packActiveForSeed('monochrome', 'production')).toBe(true);
+		expect(packActiveForSeed('multicolor', 'production')).toBe(true);
 		expect(packActiveForSeed('intro-pack', 'production')).toBe(false);
 		expect(packActiveForSeed('hard-in-3', 'production')).toBe(false);
 	});

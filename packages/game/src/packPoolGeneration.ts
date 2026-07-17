@@ -26,10 +26,7 @@ import {
 } from './pigmentTemplates.js';
 import { gridToKey } from './puzzleGrid.js';
 import { constrainMonoTemplateSizes } from './templateShape.js';
-import {
-	countSolutionGridCoverage,
-	minSolutionGridCellsRequired
-} from './solutionGridCoverage.js';
+import { countSolutionGridCoverage, minSolutionGridCellsRequired } from './solutionGridCoverage.js';
 import { orientTemplate } from './templatePigment.js';
 import type { PackDefinition, Pigment, PuzzleConfig, PuzzleGrid, PuzzleTemplate } from './types.js';
 import { PIGMENT_CLEAR_SOLVED_VALUE } from './types.js';
@@ -40,6 +37,14 @@ import type {
 	ScramblePolicy
 } from './packGenerationTypes.js';
 import { DEFAULT_SCRAMBLE_POLICY } from './packGenerationTypes.js';
+
+/**
+ * Hard ceiling on BFS states explored while solving/scoring one pool candidate.
+ * Multi-colored templates (e.g. 'multicolor') can span a much higher-rank
+ * reachable state space than mono templates; without this cap a single
+ * pathological candidate can take minutes instead of milliseconds to solve.
+ */
+const POOL_SOLVE_MAX_STATES = 20_000;
 
 function resolvePoolKind(pool: PackPoolConfig): PuzzleKind {
 	if (pool.kind) return pool.kind;
@@ -79,9 +84,7 @@ function randomItem<T>(arr: T[]): T {
 }
 
 function solvedGrid(size: number, solvedValue: Pigment): PuzzleGrid {
-	return Array.from({ length: size }, () =>
-		Array<Pigment>(size).fill(solvedValue)
-	);
+	return Array.from({ length: size }, () => Array<Pigment>(size).fill(solvedValue));
 }
 
 function enumerateScrambleMoves(puzzleSize: number, templates: PuzzleTemplate[]): ScrambleMove[] {
@@ -174,8 +177,7 @@ function pickScrambleMove(
 ): ScrambleMove {
 	if (lastMove && Math.random() < rotateSameWeight) {
 		const sameTemplate = candidates.filter(
-			(move) =>
-				move.templateIndex === lastMove.templateIndex && move.rotation !== lastMove.rotation
+			(move) => move.templateIndex === lastMove.templateIndex && move.rotation !== lastMove.rotation
 		);
 		if (sameTemplate.length > 0) {
 			return randomItem(sameTemplate);
@@ -185,10 +187,7 @@ function pickScrambleMove(
 	return randomItem(candidates);
 }
 
-export function buildPoolGeneratorConfig(
-	pool: PackPoolConfig,
-	kind: PuzzleKind
-): GeneratorConfig {
+export function buildPoolGeneratorConfig(pool: PackPoolConfig, kind: PuzzleKind): GeneratorConfig {
 	const puzzleSize = pool.puzzleSize;
 	const solvedValue = PIGMENT_CLEAR_SOLVED_VALUE;
 
@@ -225,7 +224,8 @@ export function buildPoolGeneratorConfig(
 		targetMinMoves: 0,
 		solvedValue,
 		allowedPigments,
-		templateCount: pool.templateCount ?? requiredTemplateCount(allowedPigments, minTemplatesPerPigment),
+		templateCount:
+			pool.templateCount ?? requiredTemplateCount(allowedPigments, minTemplatesPerPigment),
 		minTemplatesPerPigment,
 		minShapeSize: pool.minShapeSize ?? 2,
 		maxShapeSize: pool.maxShapeSize ?? puzzleSize,
@@ -234,7 +234,6 @@ export function buildPoolGeneratorConfig(
 		maxPigmentsPerTemplate: pool.maxPigmentsPerTemplate ?? (pool.minMultiColoredTemplates ? 2 : 1)
 	};
 }
-
 
 export function tryBuildScrambledCandidate(
 	pool: PackPoolConfig,
@@ -303,11 +302,28 @@ export function tryBuildScrambledCandidate(
 		solvedValue
 	};
 
-	const maxDepth = Math.max(policy.maxMoves + 3, 12);
-	if (services.solver.solve(config, maxDepth) === null) return null;
+	// The reverse of the scramble is itself a valid solution, so minMoves can never
+	// exceed scrambleMoves.length — bounding BFS depth to that (instead of a flat
+	// pool-wide ceiling) keeps per-candidate solve cost tied to actual complexity.
+	// This matters far more for 'color' kind than 'mono': mixing multiple pigments
+	// into one template raises the rank of the reachable state space enormously,
+	// so a few extra BFS levels can blow up runtime by orders of magnitude.
+	const maxDepth = scrambleMoves.length;
+	// Multi-colored templates can push a candidate's reachable state space far
+	// beyond what mono candidates ever reach; cap it so one pathological candidate
+	// can't stall the whole pool search — treat "too complex to solve cheaply" the
+	// same as "unsolvable within budget" and move on to the next candidate.
+	if (
+		services.solver.solve(config, maxDepth, { maxStatesVisited: POOL_SOLVE_MAX_STATES }) === null
+	) {
+		return null;
+	}
 
 	const difficultyReport =
-		services.difficulty.evaluate(config, maxDepth, { profile: 'fast' }) ?? undefined;
+		services.difficulty.evaluate(config, maxDepth, {
+			profile: 'fast',
+			maxStatesVisited: POOL_SOLVE_MAX_STATES
+		}) ?? undefined;
 	if (!difficultyReport) return null;
 
 	const rotationReuseCount = countRotationReuse(scrambleMoves);
@@ -341,7 +357,11 @@ export function generatePackCandidatePool(
 	const services = options.services ?? defaultGenerationServices;
 	const candidates: PackCandidate[] = [];
 
-	for (let attempt = 0; attempt < maxAttempts && candidates.length < pool.candidatesPerPack; attempt++) {
+	for (
+		let attempt = 0;
+		attempt < maxAttempts && candidates.length < pool.candidatesPerPack;
+		attempt++
+	) {
 		const candidate = tryBuildScrambledCandidate(pool, kind, services);
 		if (candidate) {
 			candidates.push(candidate);
@@ -396,8 +416,7 @@ export function assemblePackFromPool(
 		services
 	);
 	scored.sort((a, b) => {
-		const diff =
-			a.difficultyReport.compositeDifficulty - b.difficultyReport.compositeDifficulty;
+		const diff = a.difficultyReport.compositeDifficulty - b.difficultyReport.compositeDifficulty;
 		return diff !== 0 ? diff : a.difficultyScore - b.difficultyScore;
 	});
 

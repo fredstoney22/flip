@@ -1,5 +1,12 @@
 import { Hono } from 'hono';
-import { ensureDailyPuzzleWindow, DAILY_SCHEDULE_LOOKAHEAD_DAYS } from '@flip/db/dailyPuzzleSchedule';
+import {
+	getDailyPuzzleForDate,
+	storeDailyGeneratedPuzzle,
+	addDaysUtc,
+	formatDateUtc,
+	DAILY_SCHEDULE_LOOKAHEAD_DAYS
+} from '@flip/db/dailyPuzzleSchedule';
+import { generateDailyPuzzle, dailyGenerationKind, epochDaysForDate } from '@flip/game';
 import { bootstrapStripe } from '../stripe/stripe-bootstrap.js';
 
 const app = new Hono();
@@ -16,19 +23,50 @@ function unauthorized(c: { json: (body: unknown, status?: number) => Response })
 
 /**
  * GET /cron/daily-puzzles
- * Vercel Cron — pre-schedules daily puzzles for the lookahead window.
- * Requires Authorization: Bearer <CRON_SECRET> (set automatically by Vercel when CRON_SECRET is configured).
+ * Vercel Cron — generates and stores daily puzzles for the lookahead window.
+ * Skips dates that already have a row (idempotent).
+ * Requires Authorization: Bearer <CRON_SECRET>.
  */
 app.get('/daily-puzzles', async (c) => {
 	if (!isAuthorizedCronRequest(c.req.header('Authorization'))) {
 		return unauthorized(c);
 	}
 
-	const result = await ensureDailyPuzzleWindow(DAILY_SCHEDULE_LOOKAHEAD_DAYS);
+	const today = formatDateUtc(new Date());
+	let generated = 0;
+	let skipped = 0;
+	let failed = 0;
+	const scheduled: string[] = [];
+
+	for (let offset = 0; offset < DAILY_SCHEDULE_LOOKAHEAD_DAYS; offset++) {
+		const dateStr = addDaysUtc(today, offset);
+		const existing = await getDailyPuzzleForDate(dateStr);
+
+		if (!existing) {
+			try {
+				const epochDays = epochDaysForDate(dateStr);
+				const config = generateDailyPuzzle(epochDays);
+				const kind = dailyGenerationKind(epochDays);
+				await storeDailyGeneratedPuzzle(dateStr, JSON.stringify(config), kind);
+				generated++;
+				scheduled.push(dateStr);
+			} catch (error) {
+				console.error(`Failed to generate daily puzzle for ${dateStr}:`, error);
+				failed++;
+			}
+		} else {
+			skipped++;
+			scheduled.push(dateStr);
+		}
+	}
+
 	return c.json({
 		ok: true,
 		lookaheadDays: DAILY_SCHEDULE_LOOKAHEAD_DAYS,
-		...result
+		generated,
+		skipped,
+		failed,
+		scheduled
 	});
 });
 

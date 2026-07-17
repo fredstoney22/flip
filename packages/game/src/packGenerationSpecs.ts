@@ -150,6 +150,49 @@ export const PACK_GENERATION_SPECS: PackGenerationSpec[] = [
 			},
 			pruneUnusedTemplates: true
 		}
+	},
+	/** 3×3 mono pack — 50 puzzles, 2–3 templates, easiest → hardest. */
+	{
+		name: 'Monochrome',
+		slug: 'monochrome',
+		access: 'free',
+		pool: {
+			puzzleCount: 50,
+			candidatesPerPack: 150,
+			puzzleSize: 3,
+			kind: 'mono',
+			templateCountMin: 2,
+			templateCountMax: 3,
+			templateSizeOptions: [3],
+			scramble: {
+				maxMoves: 15,
+				maxExtraAfterCoverage: 3,
+				rotateSameTemplateWeight: 0.25
+			},
+			pruneUnusedTemplates: true
+		}
+	},
+	/** 3×3 RYB color pack — 50 puzzles, 3 templates, easiest → hardest. */
+	{
+		name: 'Multicolor',
+		slug: 'multicolor',
+		access: 'free',
+		pool: {
+			puzzleCount: 50,
+			candidatesPerPack: 150,
+			puzzleSize: 3,
+			kind: 'color',
+			allowedPigments: [1, 2, 4] as Pigment[],
+			templateCount: 3,
+			minMultiColoredTemplates: 1,
+			minTemplatesPerPigment: 1,
+			scramble: {
+				maxMoves: 15,
+				maxExtraAfterCoverage: 3,
+				rotateSameTemplateWeight: 0.25
+			},
+			pruneUnusedTemplates: true
+		}
 	}
 ];
 
@@ -231,7 +274,9 @@ export function packUsesMonoSquareTemplateGeneration(slug: string): boolean {
 	const spec = getPackGenerationSpec(slug);
 	if (!spec) return false;
 	if (spec.pool?.kind === 'mono') return true;
-	return spec.puzzles.some((slot) => slot.kind === 'mono' && (slot.templateSizes?.length ?? 0) > 0);
+	return (spec.puzzles ?? []).some(
+		(slot) => slot.kind === 'mono' && (slot.templateSizes?.length ?? 0) > 0
+	);
 }
 
 export const MONO_SQUARE_TEMPLATE_PACK_SLUGS = PACK_GENERATION_SPECS.filter((spec) =>

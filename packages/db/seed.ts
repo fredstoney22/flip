@@ -8,9 +8,17 @@ import { db, pack, puzzle, eq } from './index.js';
 import { packs } from '../game/src/packs.js';
 import { serializePuzzleForStorage } from '../game/src/storedPuzzle.js';
 import {
-	ensureDailyPuzzleWindow,
+	getDailyPuzzleForDate,
+	storeDailyGeneratedPuzzle,
+	addDaysUtc,
+	formatDateUtc,
 	DAILY_SCHEDULE_LOOKAHEAD_DAYS
 } from './dailyPuzzleSchedule.js';
+import {
+	epochDaysForDate,
+	dailyGenerationKind,
+	generateDailyPuzzle
+} from '../game/src/dailyGeneration.js';
 import { packActiveForSeed, resolveSeedActiveMode } from './seedActiveMode.js';
 
 /**
@@ -97,20 +105,40 @@ async function seed() {
 			}
 		}
 
-		const activeLabel =
-			active ? 'active' : seedActiveMode === 'dev' ? 'archived' : 'inactive';
+		const activeLabel = active ? 'active' : seedActiveMode === 'dev' ? 'archived' : 'inactive';
 		console.log(
 			`  ✓ ${packDef.name} (${packDef.access}, ${activeLabel}) — ${puzzleEntries.length} puzzle(s)`
 		);
 	}
 
 	console.log(`\nSeeding daily puzzles for the next ${DAILY_SCHEDULE_LOOKAHEAD_DAYS} days…`);
-	const { created, updated, scheduled } = await ensureDailyPuzzleWindow(DAILY_SCHEDULE_LOOKAHEAD_DAYS);
-	for (const dateStr of scheduled) {
-		console.log(`  ✓ ${dateStr}`);
+	// Uses the same on-demand procedural generation as the production /daily route and
+	// the daily-puzzles cron (see apps/api/src/daily/daily.routes.ts, cron.routes.ts).
+	// A freshly seeded environment must NOT pre-populate rows any other way — that
+	// would short-circuit generateDailyPuzzle() the first time /daily or the cron ran,
+	// since both only generate when no row exists yet for the date.
+	const today = formatDateUtc(new Date());
+	let generated = 0;
+	let skipped = 0;
+	const scheduled: string[] = [];
+	for (let offset = 0; offset < DAILY_SCHEDULE_LOOKAHEAD_DAYS; offset++) {
+		const dateStr = addDaysUtc(today, offset);
+		scheduled.push(dateStr);
+
+		if (await getDailyPuzzleForDate(dateStr)) {
+			skipped++;
+			continue;
+		}
+
+		const epochDays = epochDaysForDate(dateStr);
+		const kind = dailyGenerationKind(epochDays);
+		const config = generateDailyPuzzle(epochDays);
+		await storeDailyGeneratedPuzzle(dateStr, JSON.stringify(config), kind);
+		generated++;
+		console.log(`  ✓ ${dateStr} (${kind})`);
 	}
 	console.log(
-		`  (${created} new, ${updated} updated, ${scheduled.length} total in window)`
+		`  (${generated} generated, ${skipped} already scheduled, ${scheduled.length} total in window)`
 	);
 
 	console.log('\nSeed complete.');

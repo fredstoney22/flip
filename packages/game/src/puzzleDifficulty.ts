@@ -5,11 +5,7 @@
 import { solveMinMoves } from './puzzleSolver.js';
 import { distinctPigmentsInPuzzle } from './pigmentTemplates.js';
 import { distinctPigmentsInTemplate, orientTemplate } from './templatePigment.js';
-import {
-	buildPuzzleSearchSession,
-	getShortestPath,
-	getMinMoves
-} from './puzzleSearchSession.js';
+import { buildPuzzleSearchSession, getShortestPath, getMinMoves } from './puzzleSearchSession.js';
 import {
 	countSolutionGridCoverage,
 	meetsMinSolutionGridCoverage,
@@ -26,7 +22,10 @@ import {
 import type { PuzzleConfig, PuzzleTemplate } from './types.js';
 import { computeMuse } from './puzzleEntropy.js';
 import type { ResolvedDifficultyOptions } from './generation/difficultyProfiles.js';
-import { resolveDifficultyOptions, type DifficultyEvaluationProfile } from './generation/difficultyProfiles.js';
+import {
+	resolveDifficultyOptions,
+	type DifficultyEvaluationProfile
+} from './generation/difficultyProfiles.js';
 import { resolveSearchBudget } from './searchBudget.js';
 
 export type { DifficultyEvaluationProfile, ResolvedDifficultyOptions };
@@ -154,17 +153,16 @@ export function shortestSolutionUsesAllTemplates(
 export function evaluatePuzzleDifficulty(
 	config: PuzzleConfig,
 	maxDepth?: number,
-	options: Partial<ResolvedDifficultyOptions> & { profile?: DifficultyEvaluationProfile } = {}
+	options: Partial<ResolvedDifficultyOptions> & {
+		profile?: DifficultyEvaluationProfile;
+		maxStatesVisited?: number;
+	} = {}
 ): DifficultyReport | null {
-	const { profile, ...overrides } = options;
-	const {
-		includeForgiveness,
-		includeMuse,
-		includeNearOptimalPaths,
-		includeGenerousFirstMoves
-	} = resolveDifficultyOptions(profile ?? 'standard', overrides);
+	const { profile, maxStatesVisited, ...overrides } = options;
+	const { includeForgiveness, includeMuse, includeNearOptimalPaths, includeGenerousFirstMoves } =
+		resolveDifficultyOptions(profile ?? 'standard', overrides);
 	const depth = maxDepth ?? resolveSearchBudget(config, 'authoring').maxDepth;
-	const session = buildPuzzleSearchSession(config, { maxDepth: depth });
+	const session = buildPuzzleSearchSession(config, { maxDepth: depth, maxStatesVisited });
 	if (!session) return null;
 
 	const solution = getShortestPath(session);
@@ -174,8 +172,11 @@ export function evaluatePuzzleDifficulty(
 	if (minMoves === null) return null;
 
 	const rotationMetrics = countRotationMetrics(solution);
-	const withRotation = solveMinMoves(config, depth, { includeRotations: true });
-	const withoutRotation = solveMinMoves(config, depth, { includeRotations: false });
+	const withRotation = solveMinMoves(config, depth, { includeRotations: true, maxStatesVisited });
+	const withoutRotation = solveMinMoves(config, depth, {
+		includeRotations: false,
+		maxStatesVisited
+	});
 	const gridSize = config.startState.length;
 	const solutionGridCellsCovered = countSolutionGridCoverage(solution, config.templates);
 	const minGridCellsRequired = minSolutionGridCellsRequired(gridSize);
@@ -189,9 +190,8 @@ export function evaluatePuzzleDifficulty(
 				includeGenerousFirstMoves
 			})
 		: {
-				hammingWeight: config.startState
-					.flat()
-					.filter((cell) => cell !== config.solvedValue).length,
+				hammingWeight: config.startState.flat().filter((cell) => cell !== config.solvedValue)
+					.length,
 				generousFirstMoveCount: 0,
 				totalFirstMoves: 0,
 				generousFirstMoveRate: 0,
@@ -224,7 +224,7 @@ export function evaluatePuzzleDifficulty(
 
 	const museExtras = includeMuse
 		? (() => {
-					const museReport = computeMuse(config, { maxDepth: depth, actionPolicy: 'shortest-path' });
+				const museReport = computeMuse(config, { maxDepth: depth, actionPolicy: 'shortest-path' });
 				if (!museReport) return {};
 				pillars.cognitive = museReport.muse;
 				return {
@@ -246,11 +246,7 @@ export function evaluatePuzzleDifficulty(
 		templateCount,
 		solutionGridCellsCovered,
 		minSolutionGridCellsRequired: minGridCellsRequired,
-		meetsMinGridCoverage: meetsMinSolutionGridCoverage(
-			solution,
-			config.templates,
-			gridSize
-		),
+		meetsMinGridCoverage: meetsMinSolutionGridCoverage(solution, config.templates, gridSize),
 		forgiveness,
 		compositeDifficulty: compositeDifficultyScore(
 			minMoves,
