@@ -114,7 +114,10 @@ async function seed() {
 			.delete(puzzle)
 			.where(
 				currentPuzzleNumbers.length > 0
-					? and(eq(puzzle.packId, packRow.id), notInArray(puzzle.puzzleNumber, currentPuzzleNumbers))
+					? and(
+							eq(puzzle.packId, packRow.id),
+							notInArray(puzzle.puzzleNumber, currentPuzzleNumbers)
+						)
 					: eq(puzzle.packId, packRow.id)
 			)
 			.returning({ puzzleNumber: puzzle.puzzleNumber });
