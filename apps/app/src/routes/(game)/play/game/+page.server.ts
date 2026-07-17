@@ -1,6 +1,7 @@
 import { error, redirect } from '@sveltejs/kit';
 import { getTutorialConfig } from '$lib/constants/tutorialRegistry';
 import { getUserProgress } from '$lib/progress.server';
+import { getPackName } from '$lib/constants/packNames';
 import type { PageServerLoad } from './$types';
 import { FIRST_STEPS_SLUG, type PuzzleConfig } from '@flip/game';
 import { apiUrl } from '$lib/api-url.server';
@@ -41,7 +42,7 @@ export const load: PageServerLoad = async ({ url, fetch, request }) => {
 		slug === FIRST_STEPS_SLUG ? getTutorialConfig(slug, puzzleNumber) : null;
 
   return {
-    pack: { name: puzzleData.packName, slug },
+    pack: { name: getPackName(slug) ?? puzzleData.packName, slug },
     puzzleId: puzzleNumber,
     config: puzzleData.config,
     bestMoveCount,

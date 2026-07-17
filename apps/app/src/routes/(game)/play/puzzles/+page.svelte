@@ -1,5 +1,6 @@
 <script lang="ts">
 	import PuzzleGridPreview from '$lib/components/game/PuzzleGridPreview.svelte';
+	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -12,19 +13,19 @@
 <div class="min-h-screen bg-gray-50">
 	<main class="mx-auto max-w-5xl px-4 py-10">
 		<div class="mb-6 flex items-center gap-3">
-			<a href="/play" class="text-sm text-gray-400 hover:text-gray-700">← Packs</a>
+			<a href="/play" class="text-sm text-gray-400 hover:text-gray-700">{m.play_puzzles_back_label()}</a>
 			<h1 class="text-2xl font-bold text-gray-900">{data.pack.name}</h1>
 		</div>
 
 		{#if data.purchaseSuccess}
 			<div class="mb-6 rounded-xl border border-green-200 bg-green-50 px-5 py-4 text-sm text-green-800">
-				🎉 Pack unlocked! Enjoy your puzzles.
+				{m.play_puzzles_purchase_success()}
 			</div>
 		{/if}
 
 		{#if data.pack.slug === 'first-steps'}
 			<p class="mb-6 text-sm text-gray-500">
-				Work through each puzzle in order — every one introduces a new idea.
+				{m.play_puzzles_first_steps_hint()}
 			</p>
 		{/if}
 
@@ -45,13 +46,13 @@
 							class:text-green-500={!puzzle.optimal}
 						>
 							{#if puzzle.optimal}
-								<span aria-label="Optimal solve">★</span>
+								<span aria-label={m.play_puzzles_optimal_aria()}>★</span>
 							{:else}
-								<span aria-label="Completed">✓</span>
+								<span aria-label={m.play_puzzles_completed_aria()}>✓</span>
 							{/if}
 						</span>
 					{/if}
-					<span class="text-sm font-semibold text-gray-800">Puzzle {puzzle.id}</span>
+					<span class="text-sm font-semibold text-gray-800">{m.puzzle_number_label({ id: puzzle.id })}</span>
 					{#if puzzle.config}
 						<PuzzleGridPreview
 							config={puzzle.config}
@@ -63,7 +64,7 @@
 						<p class="text-center text-xs text-indigo-600">{puzzle.concept}</p>
 					{/if}
 					{#if puzzle.completed && puzzle.bestMoveCount !== null}
-						<p class="text-xs text-gray-400">Best: {puzzle.bestMoveCount} moves</p>
+						<p class="text-xs text-gray-400">{m.play_puzzles_best_moves({ count: puzzle.bestMoveCount })}</p>
 					{/if}
 				</a>
 			{/each}

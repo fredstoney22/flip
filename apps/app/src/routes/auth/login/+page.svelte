@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { authClient } from '$lib/auth-client';
+	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -17,14 +18,14 @@
 	  });
 
 	  if (signInError) {
-	    error = signInError.message ?? 'Failed to sign in with Google. Please try again.';
+	    error = signInError.message ?? m.login_error_google();
 	    isLoading = false;
 	  }
 	}
 </script>
 
 <svelte:head>
-	<title>Sign In</title>
+	<title>{m.login_title()}</title>
 </svelte:head>
 
 <div class="flex min-h-screen items-center justify-center bg-gray-50 px-4">
@@ -48,8 +49,8 @@
 					/>
 				</svg>
 			</div>
-			<h1 class="text-2xl font-bold tracking-tight text-gray-900">Welcome back</h1>
-			<p class="mt-2 text-sm text-gray-500">Sign in to continue to your account</p>
+			<h1 class="text-2xl font-bold tracking-tight text-gray-900">{m.login_heading()}</h1>
+			<p class="mt-2 text-sm text-gray-500">{m.login_subheading()}</p>
 		</div>
 
 		{#if error}
@@ -79,7 +80,7 @@
 							d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
 						></path>
 					</svg>
-					Signing in…
+					{m.login_signing_in()}
 				{:else}
 					<svg viewBox="0 0 24 24" class="h-5 w-5" aria-hidden="true">
 						<path
@@ -99,13 +100,13 @@
 							fill="#EA4335"
 						/>
 					</svg>
-					Continue with Google
+					{m.login_continue_google()}
 				{/if}
 			</button>
 		</div>
 
 		<p class="text-center text-xs text-gray-400">
-			New users will have an account created automatically on first sign-in.
+			{m.login_disclaimer()}
 		</p>
 	</div>
 </div>

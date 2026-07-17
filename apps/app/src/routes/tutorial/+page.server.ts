@@ -2,6 +2,7 @@ import { error } from '@sveltejs/kit';
 import { apiUrl } from '$lib/api-url.server';
 import { getTutorialConfig } from '$lib/constants/tutorialRegistry';
 import { TUTORIAL_PUZZLE_CONFIG } from '$lib/constants/tutorialPuzzle';
+import { getPackName } from '$lib/constants/packNames';
 import type { PageServerLoad } from './$types';
 import { FIRST_STEPS_SLUG, type PuzzleConfig } from '@flip/game';
 
@@ -44,7 +45,7 @@ export const load: PageServerLoad = async ({ url, fetch, request }) => {
     source: 'pack' as const,
     config: puzzleData.config,
     tutorial: getTutorialConfig(packSlug, puzzleId),
-    pack: { slug: packSlug, name: puzzleData.packName },
+    pack: { slug: packSlug, name: getPackName(packSlug) ?? puzzleData.packName },
     puzzleId,
     pedagogyConceptId: packSlug === FIRST_STEPS_SLUG ? puzzleId : undefined
   };

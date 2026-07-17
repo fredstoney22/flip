@@ -17,7 +17,7 @@ Applied maintainability principles to app-template: extracted shared UI, moved l
 | File | Purpose |
 |------|---------|
 | **lib/utils/date.ts** | `formatLongDate(dateStr)` for “Weekday, Month Day, Year”; `formatShortDate(dateStr)` for short dates. Used on daily page. |
-| **lib/constants/tutorialSteps.ts** | `TUTORIAL_STEPS` array and `TutorialStep` / `StepAction` types. Single source of truth for tutorial copy; `TutorialWalkthrough.svelte` imports types from here. |
+| **lib/constants/tutorialSteps.ts** | `getDefaultTutorial()` and `TutorialStep` / `StepAction` types. Single source of truth for tutorial copy; `TutorialWalkthrough.svelte` imports types from here. |
 
 ## Where they’re used
 
@@ -26,7 +26,7 @@ Applied maintainability principles to app-template: extracted shared UI, moved l
 - **Daily**  
   `BackLink`, `formatLongDate` for the date label.
 - **Tutorial**  
-  `PageHeader`, `TUTORIAL_STEPS` from constants (steps no longer defined in the page).
+  `PageHeader`, `getDefaultTutorial()` from constants (steps no longer defined in the page).
 - **Play**  
   `PageHeader` for the back link.
 - **Play/game**  

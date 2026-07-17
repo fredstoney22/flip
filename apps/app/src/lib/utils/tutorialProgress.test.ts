@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_TUTORIAL } from '$lib/constants/tutorialSteps';
+import { getDefaultTutorial } from '$lib/constants/tutorialSteps';
 import {
   advanceManualStep,
   createTutorialProgressCallbacks,
@@ -7,7 +7,7 @@ import {
 } from './tutorialProgress.js';
 
 describe('tutorialProgress', () => {
-  const steps = DEFAULT_TUTORIAL.steps;
+  const steps = getDefaultTutorial().steps;
 
   it('tryAdvanceOnEvent advances wait steps when the trigger matches', () => {
     expect(tryAdvanceOnEvent(steps, 1, { type: 'templateSelect', templateIndex: 0 })).toBe(2);
