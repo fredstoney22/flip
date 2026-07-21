@@ -73,23 +73,35 @@ The Playwright e2e suite (`npm test`) is slow — run it for UI route changes or
 
 ## 5. Database Migration Workflow
 
-Schema changes follow a strict sequence inside the Crewmate's worktree:
+Schema changes follow a strict sequence inside the Crewmate's worktree, and **must ship
+with a committed migration file — `db:migrate` in production only applies migrations
+that already exist as files, so a schema.ts change with no matching migration silently
+never reaches production:**
 
 1. Edit `packages/db/schema.ts`
 2. `npm run db:generate` — review the generated SQL in `packages/db/migrations/`
-3. `npm run db:push` — apply to the **dev** database only
+3. `npm run db:push` — apply to the **dev** database only (push is fine for local
+   iteration; it is never used against production — see below)
 4. Verify the change works end-to-end
-5. Commit both `schema.ts` and the new migration file together
+5. Commit both `schema.ts` and the new migration file together, in the same PR
 
 **Production convergence is automatic, not a manual step.** `.github/workflows/db-sync.yml`
-runs `npm run db:push` then `npm run db:seed:production` against the production database
-on every push to `main` (never on `pull_request` — check the trigger before touching that
-file). This closes the historical failure mode where a merged schema change or pack/puzzle
-edit silently didn't reach production because a human forgot to run the command by hand.
-Do not add a step to a PR description asking the Captain to manually run `db:push` after
-merge — merging to `main` **is** the trigger. The workflow needs a `DATABASE_URL` repository
-secret (production Supabase connection string, port 5432) configured in GitHub Actions
-settings; if it's missing the workflow fails loudly on merge rather than silently no-op'ing.
+runs `npm run db:migrate` (drizzle-kit migrate, applying committed files under
+`packages/db/migrations/`) then `npm run db:seed:production` against the production
+database on every push to `main` (never on `pull_request` — check the trigger before
+touching that file). Production intentionally uses `db:migrate`, not `db:push`: `db:push`
+computes and applies whatever diff is needed live and unattended, so the exact SQL is
+never visible for review before it runs against production. `db:migrate` only replays
+migration files already committed and reviewed in the merged PR's diff — if a schema
+change has no matching migration file, `db:migrate` does nothing for it (no error, no
+drift, just silently skipped), which is why step 2 above is mandatory, not optional, for
+any PR touching `schema.ts`. This closes the historical failure mode where a merged
+schema change or pack/puzzle edit silently didn't reach production because a human forgot
+to run the command by hand. Do not add a step to a PR description asking the Captain to
+manually run `db:migrate` after merge — merging to `main` **is** the trigger. The workflow
+needs a `DATABASE_URL` repository secret (production Supabase connection string, port
+5432) configured in GitHub Actions settings; if it's missing the workflow fails loudly on
+merge rather than silently no-op'ing.
 
 Never run `db:push`, `db:migrate`, or `db:seed:production` against the production database
 **yourself** (by hand, from a worktree, with a production `DATABASE_URL`) without explicit

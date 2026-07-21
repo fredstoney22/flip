@@ -2,11 +2,21 @@ name: Production DB sync
 
 # Converges the production database (schema + pack/puzzle seed data) to match
 # what's on main, on every merge — closing the gap where this previously
-# required a human to remember to run `npm run db:push` and
+# required a human to remember to run `npm run db:migrate` and
 # `npm run db:seed:production` by hand.
 #
+# Schema changes are applied from committed migration files (npm run
+# db:migrate → drizzle-kit migrate), NOT computed live (drizzle-kit push).
+# db:migrate only applies migrations that already exist as files under
+# packages/db/migrations/ — it does nothing if a schema.ts change has no
+# matching migration. This means any PR touching packages/db/schema.ts MUST
+# also run `npm run db:generate` and commit the resulting migration file in
+# the same PR, so the exact SQL this workflow will run against production is
+# visible and reviewed in the PR diff before merge, rather than computed
+# unattended at deploy time.
+#
 # Trigger is deliberately `push: branches: [main]` ONLY — never
-# `pull_request`. db:push and db:seed:production run destructive/authoritative
+# `pull_request`. db:migrate and db:seed:production run destructive/authoritative
 # operations (schema migration + pack/puzzle upsert-and-prune) against
 # whatever DATABASE_URL secret is configured below. Running this on a PR or
 # preview branch would mean arbitrary unreviewed code migrating/seeding
@@ -29,7 +39,7 @@ concurrency:
 
 jobs:
   db-sync:
-    name: Push schema + seed production packs
+    name: Migrate schema + seed production packs
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -54,8 +64,8 @@ jobs:
             exit 1
           fi
 
-      - name: Push schema (drizzle-kit push)
-        run: npm run db:push
+      - name: Apply migrations (drizzle-kit migrate)
+        run: npm run db:migrate
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
