@@ -15,7 +15,7 @@ Run from `app-template/`:
 | `npm run stripe:status` | Show key mode, paid packs, webhook endpoints |
 | `npm run stripe:setup-paid-packs` | Create Stripe products for packs in `pack-pricing.ts` |
 | `npm run stripe:setup-webhook` | Register production webhook (prints signing secret) |
-| `npm run stripe:create-pack-product -- --slug=chromatic-ascent --price-cents=99` | Single pack setup |
+| `npm run stripe:create-pack-product -- --slug=<pack-slug> --price-cents=<cents>` | Single pack setup |
 
 Point scripts at production by prefixing env vars:
 
@@ -31,11 +31,11 @@ Edit `packages/game/src/packPricing.ts`:
 
 ```ts
 export const PACK_PRICES_CENTS: Record<string, number> = {
-  'chromatic-ascent': 99   // $0.99
+  'pack-slug': 99   // $0.99
 };
 ```
 
-Production sells **Chromatic Ascent** only. Other paid packs in `packs.ts` (e.g. `hard-in-3`) stay inactive in production via `productionPacks.ts`.
+`PACK_PRICES_CENTS` is currently empty — production has no paid packs (`first-steps`, `monochrome`, `multicolor` are all free). Add a slug here only once it's also listed in `productionPacks.ts`. Other paid packs in `packs.ts` (e.g. `hard-in-3`) stay inactive in production via `productionPacks.ts`. Note: removing a slug from this map does not archive its existing Stripe product — that's a separate, manual step in the Stripe Dashboard.
 
 ---
 
@@ -101,7 +101,7 @@ npm run db:seed:production
 npm run stripe:setup-paid-packs
 ```
 
-Seed production with `db:seed:production` so only packs listed in `packages/game/src/productionPacks.ts` are active: **first-steps**, **monochrome**, and **multicolor** (free), and **chromatic-ascent** (paid). Puzzle data for all packs is still synced; non-allowlisted packs are stored as `active: false`.
+Seed production with `db:seed:production` so only packs listed in `packages/game/src/productionPacks.ts` are active: **first-steps**, **monochrome**, and **multicolor** (all free — no paid packs currently). Puzzle data for all packs is still synced; non-allowlisted packs are stored as `active: false`.
 
 This creates live Products/Prices in Stripe and stores `pack.stripeProductId` in production Postgres.
 

@@ -9,12 +9,7 @@
  *
  * To ship a new pack: validate it locally, play-test, then add its slug here.
  */
-export const PRODUCTION_PACK_SLUGS = [
-	'first-steps',
-	'chromatic-ascent',
-	'monochrome',
-	'multicolor'
-] as const;
+export const PRODUCTION_PACK_SLUGS = ['first-steps', 'monochrome', 'multicolor'] as const;
 
 export type ProductionPackSlug = (typeof PRODUCTION_PACK_SLUGS)[number];
 

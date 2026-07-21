@@ -1,6 +1,6 @@
 # Production launch checklist
 
-Ship **First Steps**, **Monochrome**, **Multicolor** (free) + **Chromatic Ascent** (paid, $0.99) to `https://flip.frederickstoney.com`.
+Ship **First Steps**, **Monochrome**, **Multicolor** (all free) to `https://flip.frederickstoney.com`.
 
 ---
 
@@ -23,9 +23,8 @@ Confirm **Settings → Domains**: `flip.frederickstoney.com` is assigned to **Pr
 
 | File | Purpose |
 |------|---------|
-| `packages/game/src/productionPacks.ts` | Active packs: `first-steps`, `chromatic-ascent`, `monochrome`, `multicolor` |
-| `packages/game/src/packs.ts` | Chromatic Ascent `access: 'paid'` |
-| `packages/game/src/packPricing.ts` | Stripe price: `chromatic-ascent` → 99¢ (UI + Stripe) |
+| `packages/game/src/productionPacks.ts` | Active packs: `first-steps`, `monochrome`, `multicolor` |
+| `packages/game/src/packPricing.ts` | Stripe prices for sellable packs (currently empty — no paid packs in production) |
 
 ---
 
@@ -49,6 +48,8 @@ DATABASE_URL="postgresql://..." npm run stripe:status
 ---
 
 ## 4. Stripe live mode
+
+No packs are currently sellable (`PACK_PRICES_CENTS` is empty) — skip this step until a paid pack is added. When one is:
 
 **Automated (recommended):** see [`stripe-live-setup.md`](./stripe-live-setup.md) → Option A (GitHub Actions or curl). Requires `sk_live_…` in Vercel Production + `CRON_SECRET`.
 
@@ -87,8 +88,7 @@ Vercel builds `main` → `flip.frederickstoney.com` updates.
 2. **First Steps** `/play/puzzles?pack=first-steps` — playable without sign-in
 3. **Monochrome** `/play/puzzles?pack=monochrome` and **Multicolor** `/play/puzzles?pack=multicolor` — playable without sign-in
 4. **Daily** `/daily` — returns a procedurally generated puzzle (alternates mono/color by day)
-5. **Sign in** → **Pricing** `/pricing` — Chromatic Ascent listed, checkout works
-6. After purchase → `/play/puzzles?pack=chromatic-ascent` unlocks
+5. **Sign in** → **Pricing** `/pricing` — no paid packs listed (none currently for sale)
 
 ```bash
 npm run verify:auth -- --url=https://flip.frederickstoney.com
@@ -104,5 +104,4 @@ npm run verify:auth -- --url=https://flip.frederickstoney.com
 | `flip.frederickstoney.com/play/puzzles?pack=first-steps` | Free, no login |
 | `flip.frederickstoney.com/play/puzzles?pack=monochrome` | Free, no login |
 | `flip.frederickstoney.com/play/puzzles?pack=multicolor` | Free, no login |
-| `flip.frederickstoney.com/play/puzzles?pack=chromatic-ascent` | Redirects to `/pricing` if not owned |
-| `flip.frederickstoney.com/pricing` | Chromatic Ascent purchase (login required) |
+| `flip.frederickstoney.com/pricing` | No paid packs listed (none currently for sale) |

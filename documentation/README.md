@@ -16,7 +16,7 @@ This folder holds all project documentation and Cursor context.
 | [stripe.md](./stripe.md) | Stripe pack purchases + legacy subscription POC |
 | [stripe-live-setup.md](./stripe-live-setup.md) | **Go live** — pack products, webhooks, Vercel env vars |
 | [vercel-deployment.md](./vercel-deployment.md) | **Deploy to Vercel** — env vars, Stripe webhooks, custom domain |
-| [production-launch.md](./production-launch.md) | **Go live** — `main`-only deploys, First Steps/Monochrome/Multicolor + Chromatic Ascent |
+| [production-launch.md](./production-launch.md) | **Go live** — `main`-only deploys, First Steps/Monochrome/Multicolor |
 | [production-auth.md](./production-auth.md) | Production Google OAuth verification — env vars, Google Console, automated checks |
 | [cloudflare.md](./cloudflare.md) | Cloudflare setup: bot protection, DNS proxying, rate limiting rules |
 | [sst-deployment.md](./sst-deployment.md) | Deprecated AWS/SST notes (historical) |
