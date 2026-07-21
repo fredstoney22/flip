@@ -30,13 +30,13 @@ Confirm **Settings → Domains**: `flip.frederickstoney.com` is assigned to **Pr
 
 ## 3. Database (automatic after the first deploy)
 
-`.github/workflows/db-sync.yml` runs `db:push` + `db:seed:production` against the `DATABASE_URL` GitHub Actions secret on every push to `main`, so schema and pack changes converge automatically after merge — no manual step needed. Requires that secret to be set once (GitHub repo → Settings → Secrets and variables → Actions).
+`.github/workflows/db-sync.yml` runs `db:migrate` + `db:seed:production` against the `DATABASE_URL` GitHub Actions secret on every push to `main`, so schema and pack changes converge automatically after merge — no manual step needed. Requires that secret to be set once (GitHub repo → Settings → Secrets and variables → Actions).
 
-For the very first deploy, or to run it by hand before that secret exists, push and seed directly against your **Neon production** `DATABASE_URL`:
+For the very first deploy, or to run it by hand before that secret exists, migrate and seed directly against your **Neon production** `DATABASE_URL`:
 
 ```bash
 cd app-template
-DATABASE_URL="postgresql://..." npm run db:push
+DATABASE_URL="postgresql://..." npm run db:migrate
 DATABASE_URL="postgresql://..." npm run db:seed:production
 ```
 
