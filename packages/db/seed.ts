@@ -24,9 +24,11 @@ import { packActiveForSeed, resolveSeedActiveMode } from './seedActiveMode.js';
 /**
  * Seeds the database with pack and puzzle data from @flip/game, then ensures
  * daily_puzzle rows exist for today + the lookahead window.
- * Safe to re-run — pack and puzzle rows are upserted from packs.ts, and any
+ * Safe to re-run — pack and puzzle rows are upserted from packs.ts, any
  * puzzle rows whose puzzleNumber no longer exists in a pack's source data
- * are pruned so removed puzzles don't linger as orphaned rows.
+ * are pruned, and any pack row whose slug no longer exists in packs.ts at
+ * all is deactivated (not deleted) so removed packs/puzzles don't linger
+ * as stale, still-active rows.
  *
  * SEED_ACTIVE_MODE:
  *   dev (default) — only slugs in devPacks.ts are active (local dev)
@@ -126,6 +128,26 @@ async function seed() {
 		const prunedLabel = pruned.length > 0 ? `, pruned ${pruned.length}` : '';
 		console.log(
 			`  ✓ ${packDef.name} (${packDef.access}, ${activeLabel}) — ${puzzleEntries.length} puzzle(s)${prunedLabel}`
+		);
+	}
+
+	// Deactivate pack rows whose slug no longer exists in packs.ts at all (not just
+	// slugs unlisted from PRODUCTION_PACK_SLUGS, which the loop above already handles
+	// by setting active=false). Without this, a pack deleted outright from source data
+	// would never be visited by the loop above and would stay active forever — the
+	// same class of stale-row bug PR #17 fixed for puzzles, one level up. We deactivate
+	// rather than delete: puzzle rows and purchase/progress history keyed by packSlug
+	// should survive, and any live Stripe product/price still needs a human decision
+	// (see CLAUDE.md).
+	const currentSlugs = packs.map((packDef) => packDef.slug);
+	const orphaned = await db
+		.update(pack)
+		.set({ active: false })
+		.where(and(eq(pack.active, true), notInArray(pack.slug, currentSlugs)))
+		.returning({ slug: pack.slug });
+	if (orphaned.length > 0) {
+		console.log(
+			`\nDeactivated ${orphaned.length} pack(s) no longer in packs.ts: ${orphaned.map((p) => p.slug).join(', ')}`
 		);
 	}
 

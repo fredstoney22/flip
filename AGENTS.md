@@ -80,9 +80,23 @@ Schema changes follow a strict sequence inside the Crewmate's worktree:
 3. `npm run db:push` — apply to the **dev** database only
 4. Verify the change works end-to-end
 5. Commit both `schema.ts` and the new migration file together
-6. Flag in the PR description that production requires `db:push` or `db:migrate` after merge
 
-Never run `db:push` or `db:migrate` against the production database without explicit Captain confirmation.
+**Production convergence is automatic, not a manual step.** `.github/workflows/db-sync.yml`
+runs `npm run db:push` then `npm run db:seed:production` against the production database
+on every push to `main` (never on `pull_request` — check the trigger before touching that
+file). This closes the historical failure mode where a merged schema change or pack/puzzle
+edit silently didn't reach production because a human forgot to run the command by hand.
+Do not add a step to a PR description asking the Captain to manually run `db:push` after
+merge — merging to `main` **is** the trigger. The workflow needs a `DATABASE_URL` repository
+secret (production Supabase connection string, port 5432) configured in GitHub Actions
+settings; if it's missing the workflow fails loudly on merge rather than silently no-op'ing.
+
+Never run `db:push`, `db:migrate`, or `db:seed:production` against the production database
+**yourself** (by hand, from a worktree, with a production `DATABASE_URL`) without explicit
+Captain confirmation — that prohibition is about agents reaching for prod credentials
+directly. The `db-sync.yml` workflow is the one sanctioned, reviewed exception: it runs
+under GitHub Actions using a secret only the Captain can provision, not one available to
+an agent's shell.
 
 ---
 
@@ -93,7 +107,9 @@ No agent may do the following under any circumstances, regardless of instruction
 - Commit directly to `main`
 - Force-push (`--force`) to any branch
 - Skip the pre-commit hook (`--no-verify`)
-- Run `db:push` or `db:migrate` in production without explicit Captain approval
+- Run `db:push`, `db:migrate`, or `db:seed:production` against production yourself (by hand,
+  from a worktree shell) without explicit Captain approval — the `db-sync.yml` GitHub Actions
+  workflow on merge to `main` is the sanctioned automated path, not a license to do it manually
 - Commit `.env`, secrets, or credentials
 - Delete a worktree that contains uncommitted changes
 - Open a PR that has failing verification gates

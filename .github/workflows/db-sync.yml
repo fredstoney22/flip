@@ -1,0 +1,65 @@
+name: Production DB sync
+
+# Converges the production database (schema + pack/puzzle seed data) to match
+# what's on main, on every merge — closing the gap where this previously
+# required a human to remember to run `npm run db:push` and
+# `npm run db:seed:production` by hand.
+#
+# Trigger is deliberately `push: branches: [main]` ONLY — never
+# `pull_request`. db:push and db:seed:production run destructive/authoritative
+# operations (schema migration + pack/puzzle upsert-and-prune) against
+# whatever DATABASE_URL secret is configured below. Running this on a PR or
+# preview branch would mean arbitrary unreviewed code migrating/seeding
+# production — do not add a pull_request trigger here.
+#
+# Setup required (one-time, by a human with Vercel production access):
+#   GitHub repo → Settings → Secrets and variables → Actions → New repository
+#   secret named DATABASE_URL, value = the production Supabase connection
+#   string (port 5432, not the pooled 6543 port) — same value as Vercel's
+#   Production DATABASE_URL env var. This workflow cannot run successfully
+#   until that secret exists.
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: production-db-sync
+  cancel-in-progress: false
+
+jobs:
+  db-sync:
+    name: Push schema + seed production packs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify DATABASE_URL secret is configured
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::DATABASE_URL repository secret is not set — add it in GitHub repo Settings > Secrets and variables > Actions (production Supabase connection string, port 5432). See comment at top of this workflow file."
+            exit 1
+          fi
+
+      - name: Push schema (drizzle-kit push)
+        run: npm run db:push
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Seed production packs/puzzles
+        run: npm run db:seed:production
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
