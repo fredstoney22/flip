@@ -28,9 +28,11 @@ Confirm **Settings → Domains**: `flip.frederickstoney.com` is assigned to **Pr
 
 ---
 
-## 3. Database (one-time or after pack changes)
+## 3. Database (automatic after the first deploy)
 
-Against your **Neon production** `DATABASE_URL`:
+`.github/workflows/db-sync.yml` runs `db:push` + `db:seed:production` against the `DATABASE_URL` GitHub Actions secret on every push to `main`, so schema and pack changes converge automatically after merge — no manual step needed. Requires that secret to be set once (GitHub repo → Settings → Secrets and variables → Actions).
+
+For the very first deploy, or to run it by hand before that secret exists, push and seed directly against your **Neon production** `DATABASE_URL`:
 
 ```bash
 cd app-template
