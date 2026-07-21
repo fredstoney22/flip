@@ -25,6 +25,12 @@ On failure, the Playwright HTML report is uploaded as a CI artifact (7-day reten
 
 No secrets are required for the default pipeline (build uses placeholder env vars).
 
+### Production DB sync (GitHub Actions)
+
+Workflow: [`.github/workflows/db-sync.yml`](../.github/workflows/db-sync.yml)
+
+Runs `npm run db:push` then `npm run db:seed:production` on every push to `main` only (never on `pull_request`), converging the production database's schema and pack/puzzle data automatically after merge. Requires a `DATABASE_URL` repository secret (production Supabase connection string, port `5432`) — set once under **Settings → Secrets and variables → Actions**. The workflow fails loudly (non-zero exit, visible in the Actions tab) if that secret is missing or either command fails.
+
 ---
 
 ## Uptime monitoring
@@ -111,6 +117,7 @@ Site metadata (name, URL, contact email) lives in `apps/app/src/lib/constants/si
 ## Quick checklist before launch
 
 - [ ] CI workflow green on latest commit
+- [ ] `DATABASE_URL` repository secret set in GitHub Actions (required for `db-sync.yml` to push/seed production on merge)
 - [ ] Uptime monitor on `/` and `/api/healthcheck`
 - [ ] `SENTRY_DSN` + `PUBLIC_SENTRY_DSN` set in Vercel (optional but recommended)
 - [ ] Privacy and Terms pages reviewed; contact email correct in `site.ts`
