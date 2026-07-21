@@ -140,14 +140,20 @@ async function seed() {
 	// should survive, and any live Stripe product/price still needs a human decision
 	// (see CLAUDE.md).
 	const currentSlugs = packs.map((packDef) => packDef.slug);
-	const orphaned = await db
-		.update(pack)
-		.set({ active: false })
-		.where(and(eq(pack.active, true), notInArray(pack.slug, currentSlugs)))
-		.returning({ slug: pack.slug });
-	if (orphaned.length > 0) {
-		console.log(
-			`\nDeactivated ${orphaned.length} pack(s) no longer in packs.ts: ${orphaned.map((p) => p.slug).join(', ')}`
+	if (currentSlugs.length > 0) {
+		const orphaned = await db
+			.update(pack)
+			.set({ active: false })
+			.where(and(eq(pack.active, true), notInArray(pack.slug, currentSlugs)))
+			.returning({ slug: pack.slug });
+		if (orphaned.length > 0) {
+			console.log(
+				`\nDeactivated ${orphaned.length} pack(s) no longer in packs.ts: ${orphaned.map((p) => p.slug).join(', ')}`
+			);
+		}
+	} else {
+		console.warn(
+			'\nSkipping orphan-pack deactivation: packs.ts exported no packs (likely a broken build/import).'
 		);
 	}
 
