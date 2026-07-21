@@ -29,7 +29,7 @@ No secrets are required for the default pipeline (build uses placeholder env var
 
 Workflow: [`.github/workflows/db-sync.yml`](../.github/workflows/db-sync.yml)
 
-Runs `npm run db:push` then `npm run db:seed:production` on every push to `main` only (never on `pull_request`), converging the production database's schema and pack/puzzle data automatically after merge. Requires a `DATABASE_URL` repository secret (production Supabase connection string, port `5432`) — set once under **Settings → Secrets and variables → Actions**. The workflow fails loudly (non-zero exit, visible in the Actions tab) if that secret is missing or either command fails.
+Runs `npm run db:migrate` then `npm run db:seed:production` on every push to `main` only (never on `pull_request`), converging the production database's schema and pack/puzzle data automatically after merge. `db:migrate` applies committed migration files under `packages/db/migrations/` — it does not compute schema diffs live, so any PR touching `packages/db/schema.ts` must include the generated migration file (`npm run db:generate`) or the schema change silently never reaches production. Requires a `DATABASE_URL` repository secret (production Supabase connection string, port `5432`) — set once under **Settings → Secrets and variables → Actions**. The workflow fails loudly (non-zero exit, visible in the Actions tab) if that secret is missing or either command fails.
 
 ---
 

@@ -83,14 +83,14 @@ curl -H "Authorization: Bearer $CRON_SECRET" https://your-domain/api/cron/daily-
 
 ## Database migrations
 
-`.github/workflows/db-sync.yml` pushes the schema and reseeds production automatically on every push to `main` (`npm run db:push` then `npm run db:seed:production`) — no manual step needed after the first deploy. It requires a `DATABASE_URL` repository secret in GitHub Actions settings (production Supabase connection string, port `5432`); the workflow fails loudly if that secret is missing.
+`.github/workflows/db-sync.yml` migrates the schema and reseeds production automatically on every push to `main` (`npm run db:migrate` then `npm run db:seed:production`) — no manual step needed after the first deploy. `db:migrate` only applies migration files already committed under `packages/db/migrations/`; any PR touching `packages/db/schema.ts` must include the generated migration file (`npm run db:generate`) or the schema change silently never reaches production. It requires a `DATABASE_URL` repository secret in GitHub Actions settings (production Supabase connection string, port `5432`); the workflow fails loudly if that secret is missing.
 
 `db:seed:production` (not plain `db:seed`) is used so only packs in `packages/game/src/productionPacks.ts` are active. Currently: **First Steps**, **Monochrome**, **Multicolor** (all free). All other packs are stored as `active: false`.
 
-Before the very first deploy — or to run it manually if the workflow secret isn't set up yet — push and seed by hand:
+Before the very first deploy — or to run it manually if the workflow secret isn't set up yet — migrate and seed by hand:
 
 ```bash
-DATABASE_URL="postgresql://..." npm run db:push
+DATABASE_URL="postgresql://..." npm run db:migrate
 DATABASE_URL="postgresql://..." npm run db:seed:production
 ```
 
