@@ -1,6 +1,8 @@
-# Flip — Colour-Mixing Logic Puzzle
+# Prism — Colour-Mixing Logic Puzzle
 
-**Production: [flip.frederickstoney.com](https://flip.frederickstoney.com)**
+**Production: [prism.frederickstoney.com](https://prism.frederickstoney.com)**
+
+*(Repo/package names still say "Flip" — that's the pre-rebrand codename and hasn't been renamed yet.)*
 
 A grid-based logic puzzle: apply templates to a grid of pigment cells to XOR-mix Red/Yellow/Blue primaries, and clear the whole board back to white. Ships as an installable SvelteKit PWA with a paid-pack storefront, daily puzzles, and accounts.
 
