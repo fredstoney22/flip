@@ -1,48 +1,37 @@
-# app-template
+# Flip — Colour-Mixing Logic Puzzle
 
-A full-stack monorepo template based on [thomasmol/boilerplate](https://github.com/thomasmol/boilerplate), adapted for **npm** (no Bun required).
+**Production: [flip.frederickstoney.com](https://flip.frederickstoney.com)**
+
+A grid-based logic puzzle: apply templates to a grid of pigment cells to XOR-mix Red/Yellow/Blue primaries, and clear the whole board back to white. Ships as an installable SvelteKit PWA with a paid-pack storefront, daily puzzles, and accounts.
+
+## Highlights
+
+- **Puzzle engine built on linear algebra over GF(2)** — puzzle generation, solvability analysis, and difficulty scoring model the board as a system of XOR equations rather than hand-authored levels (`packages/game`).
+- **Procedurally generated daily puzzle**, deterministic per UTC day, no curated rotation.
+- **Paid puzzle packs via Stripe Checkout**, with a bootstrap script that keeps Stripe products/prices in sync with the pack catalog.
+- **Google OAuth accounts** via `better-auth`, Postgres/Drizzle for persistence (Supabase).
+- Bilingual (English / Spanish) via Paraglide i18n.
+
+## Stack
+
+SvelteKit 2 · Svelte 5 · Hono (API) · TypeScript · Drizzle ORM + PostgreSQL (Supabase) · better-auth · Stripe · Vercel (hosting + cron)
 
 ## Structure
 
 | Path | What it is |
 |------|------------|
-| `apps/app` | SvelteKit frontend (TypeScript, Vite, Tailwind CSS) |
-| `apps/api` | Hono API backend (TypeScript, runs on Node via tsx) |
-| `packages/auth` | better-auth shared config |
-| `packages/db` | Drizzle ORM — schema, migrations, DB connection |
+| `apps/app` | SvelteKit frontend (PWA, Vite, Tailwind CSS) |
+| `apps/api` | Hono API backend |
+| `packages/game` | Puzzle engine — generation, solving, difficulty scoring, pack/pricing definitions |
+| `packages/auth` | Shared `better-auth` config |
+| `packages/db` | Drizzle ORM schema, migrations, DB connection |
 
-## Quick start
+## Running locally
 
-```bash
-# Install all workspace dependencies from the repo root
+```sh
 npm install
-
-# Run the SvelteKit frontend
-npm run app:dev
-
-# Run the Hono API
-npm run api:dev
+npm run app:dev   # SvelteKit frontend
+npm run api:dev   # Hono API
 ```
 
-## All scripts (run from repo root)
-
-| Script | What it does |
-|--------|-------------|
-| `npm run app:dev` | Start SvelteKit dev server (`apps/app`) |
-| `npm run api:dev` | Start Hono API with hot-reload via `tsx watch` (`apps/api`) |
-| `npm run db:generate` | Generate Drizzle DB migrations |
-| `npm run db:studio` | Open Drizzle Studio to inspect the database |
-
-## Deploy
-
-Deploy to [Vercel](https://vercel.com) — see [`documentation/vercel-deployment.md`](./documentation/vercel-deployment.md).
-
-## Documentation
-
-See [`documentation/`](./documentation/) for detailed guides:
-
-- [`new-app-checklist.md`](./documentation/new-app-checklist.md) — **start here** when reusing this template for a new project
-- [`vercel-deployment.md`](./documentation/vercel-deployment.md) — production deployment
-- [`setup.md`](./documentation/setup.md) — full setup notes and changes from the original boilerplate
-- [`stripe-cli.md`](./documentation/stripe-cli.md) — Stripe CLI for local webhook testing
-- [`gemeni-sveltekit.md`](./documentation/gemeni-sveltekit.md) — SvelteKit notes
+Requires a Postgres connection string and Stripe test keys in a root `.env` — see `documentation/setup.md` for the full list of environment variables.
